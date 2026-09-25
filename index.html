@@ -154,7 +154,7 @@ tr.click:hover td{background:var(--hover)}
 .scene::after{content:"";position:absolute;left:0;right:0;bottom:0;height:58px;z-index:0;
   background:repeating-linear-gradient(90deg,transparent 0 9.5%,rgba(0,0,0,.13) 9.5% calc(9.5% + 1.5px)),linear-gradient(180deg,#bdbdb6 0,#e2e2dc 10px,#f1f1ec 100%)}
 .machine{--ink:#141414;--dim:#4a4a47;--paper:#f4f4f0;--ok:#1f7a45;--alarm:#b3261e;--lamp:#8a6a10;--soft:#cfcfc9;--faint:#6d6d69;--hover:#fff;--rule:1.5px solid #141414;
-  position:relative;z-index:1;max-width:1080px;margin:0 auto 26px;background:#d6d6d2;color:#141414;border:1.5px solid #141414;padding:16px;
+  position:relative;z-index:1;margin:0 0 26px;background:#d6d6d2;color:#141414;border:1.5px solid #141414;padding:16px;
   box-shadow:0 22px 26px -20px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.55)}
 .machine::before,.machine::after{content:"";position:absolute;left:6px;right:6px;height:7px;pointer-events:none;opacity:.6;
   background:radial-gradient(circle at 3.5px 3.5px,transparent 1.8px,#141414 2px,#141414 3px,transparent 3.3px) left/7px 7px no-repeat,radial-gradient(circle at 3.5px 3.5px,transparent 1.8px,#141414 2px,#141414 3px,transparent 3.3px) right/7px 7px no-repeat}
@@ -162,7 +162,54 @@ tr.click:hover td{background:var(--hover)}
 .m-marquee{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;background:#0a0a0a;border:1.5px solid #141414;padding:11px 16px;margin-bottom:16px}
 .m-name{font-size:17px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#e8ffe9;text-shadow:0 0 8px rgba(62,207,122,.5)}
 .m-lamps{display:flex;gap:5px}.m-lamps i{width:8px;height:8px;background:#3a3a36;border:1px solid #000}
-.m-sub{margin-left:auto;color:#7fb37a;font-size:11px}
+/* the service key: turn it for the expert settings */
+.svc{margin-left:auto;display:flex;align-items:center;gap:22px;background:none;border:0;padding:0;cursor:pointer;color:#7fb37a}
+.svc .lock{position:relative;width:30px;height:30px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#f4f4f0,#b9b9b4 60%,#8a8a85);border:1.5px solid #000;box-shadow:inset 0 -2px 3px rgba(0,0,0,.35)}
+.svc .lock::before{content:"";position:absolute;left:50%;top:50%;width:4px;height:14px;margin:-7px 0 0 -2px;background:#141414;border-radius:2px;transition:transform .35s cubic-bezier(.16,1,.3,1)}
+.svc .keyhead{position:absolute;left:50%;top:-11px;width:12px;height:12px;margin-left:-6px;background:#ffcf5a;border:1.5px solid #000;border-radius:3px 3px 50% 50%;transition:transform .35s cubic-bezier(.16,1,.3,1);transform-origin:50% 26px}
+.svc-t{font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#e8ffe9}
+.svc:hover .lock::before,.svc:hover .keyhead,.svc.on .lock::before,.svc.on .keyhead{transform:rotate(90deg)}
+.svc.on .svc-t{color:#ffcf5a}
+.svc:focus-visible{outline:2px solid #3ecf7a;outline-offset:4px}
+/* two appliances on the wall */
+.scene-row{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,290px);gap:24px;align-items:end;max-width:1400px;margin:0 auto}
+@media (max-width:1180px){.scene-row{grid-template-columns:minmax(0,1fr)}.reader{max-width:560px;width:100%;justify-self:center;margin-bottom:76px}}
+/* the card reader: print the instruction card, feed back the answer */
+.reader{position:relative;background:#d6d6d2;color:#141414;border:1.5px solid #141414;padding:14px 14px 16px;margin-bottom:26px;display:flex;flex-direction:column;gap:10px;
+  box-shadow:0 22px 26px -20px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.55)}
+.reader::before,.reader::after{content:"";position:absolute;left:6px;right:6px;height:7px;pointer-events:none;opacity:.6;
+  background:radial-gradient(circle at 3.5px 3.5px,transparent 1.8px,#141414 2px,#141414 3px,transparent 3.3px) left/7px 7px no-repeat,radial-gradient(circle at 3.5px 3.5px,transparent 1.8px,#141414 2px,#141414 3px,transparent 3.3px) right/7px 7px no-repeat}
+.reader::before{top:5px}.reader::after{bottom:5px}
+.r-marquee{margin-bottom:0;padding:9px 12px}
+.r-marquee .m-name{font-size:14px}
+.r-sub{margin-left:auto;color:#7fb37a;font-size:10px}
+.r-phos{background:#0a0a0a;border:1.5px solid #141414;box-shadow:inset 0 0 0 3px #1b1b19;color:#3ecf7a;font-size:11px;padding:8px 10px;min-height:34px;text-shadow:0 0 6px rgba(62,207,122,.4)}
+.r-phos::before{content:"› "}
+.r-phos.err{color:#ff6b62;text-shadow:none}
+.r-step{display:grid;grid-template-columns:22px minmax(0,1fr);gap:9px;align-items:start}
+.r-step em{font-style:normal;font-weight:700;font-size:11px;width:22px;height:22px;border:1.5px solid #141414;border-radius:50%;display:grid;place-items:center;background:#f4f4f0}
+.r-step p{margin:2px 0 0;font-size:11.5px;line-height:1.45}
+.r-key{grid-template-columns:minmax(0,1fr);padding:9px 12px}
+.r-key span{font-size:12px}
+.printer{display:flex;flex-direction:column}
+.p-slot{height:9px;margin:10px 6px 0;background:#141414;border-radius:5px;box-shadow:inset 0 2px 3px rgba(0,0,0,.8);position:relative;z-index:2}
+.p-out{height:0;overflow:hidden;margin:0 14px;transition:height .5s cubic-bezier(.16,1,.3,1)}
+.p-out.on{height:76px}
+.p-card{height:72px;background:#f3f0e4;border:1px solid #141414;border-top:0;padding:8px 10px 8px 26px;font-size:10.5px;display:flex;flex-direction:column;gap:1px;
+  background-image:radial-gradient(circle,#2a2a28 1.5px,transparent 1.8px);background-size:10px 10px;background-repeat:repeat-y;background-position:8px 4px;transform:translateY(-100%);transition:transform .6s cubic-bezier(.16,1,.3,1)}
+.p-out.on .p-card{transform:none}
+.p-card b{text-transform:uppercase;letter-spacing:.12em;font-size:10px}
+.p-card span{color:#4a4a47}
+.c-slot{height:9px;margin:0 6px -14px;background:#141414;border-radius:5px;box-shadow:inset 0 2px 3px rgba(0,0,0,.8);position:relative;z-index:2}
+.card-in{margin:0 12px;width:auto;min-height:118px;resize:vertical;font:11.5px/1.5 var(--mono);color:#141414;background:#f3f0e4;border:1px solid #141414;border-radius:0;padding:14px 10px 10px 28px;outline:none;
+  background-image:radial-gradient(circle,#b8b09a 1.5px,transparent 1.8px);background-size:10px 10px;background-repeat:repeat-y;background-position:9px 6px}
+.card-in::placeholder{color:#6d6a5e}
+.card-in:focus{box-shadow:0 0 0 2px #3ecf7a}
+.r-read.next{background:#3ecf7a}
+.r-more summary{cursor:pointer;font-size:10.5px;color:#4a4a47;text-decoration:underline;text-underline-offset:3px}
+.r-more textarea{width:100%;min-height:160px;margin-top:6px;font-size:10.5px;background:#f3f0e4;color:#141414;border:1px solid #141414}
+@media (prefers-reduced-motion:reduce){.p-out,.p-card{transition:none}}
+@media (max-width:1180px){.reader{margin-bottom:84px}}
 .m-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,340px);gap:16px;align-items:start}
 .m-display{background:#0a0a0a;border:1.5px solid #141414;box-shadow:inset 0 0 0 4px #1b1b19,inset 0 0 30px rgba(62,207,122,.07);padding:16px 18px;color:#c9ecbf;display:flex;flex-direction:column;gap:9px;min-height:268px}
 .d-product{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7fb37a}
@@ -288,8 +335,10 @@ input,textarea{caret-color:var(--ink)}
   <p class="lede" id="lede">Machines run by identity.md holders pick up work: reports, smart contracts, websites, images, answers to questions. Say what you want, check it for free, then pay 0.5 IMD from your wallet.</p>
 
   <div class="scene" id="scene">
+   <div class="scene-row">
     <div class="machine" role="group" aria-label="The request machine">
-      <div class="m-marquee"><span class="m-name">Ask the swarm</span><span class="m-lamps" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="m-sub">machines of identity.md holders do the work</span></div>
+      <div class="m-marquee"><span class="m-name">Ask the swarm</span><span class="m-lamps" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+        <button type="button" class="svc" id="mExpert" aria-label="Expert: open the advanced settings"><span class="lock" aria-hidden="true"><i class="keyhead"></i></span><span class="svc-t">Expert</span></button></div>
       <div class="m-body">
         <div class="m-front">
           <div class="m-display" id="mDisplay">
@@ -310,22 +359,26 @@ input,textarea{caret-color:var(--ink)}
         <div class="m-keypad" id="mKeypad" role="group" aria-label="Pick what you want"></div>
       </div>
     </div>
+    <aside class="reader" aria-label="Let your own AI write the request">
+      <div class="m-marquee r-marquee"><span class="m-name">Your AI</span><span class="r-sub">Claude, ChatGPT, Codex</span></div>
+      <div class="r-phos" id="rPhos" aria-live="polite">card reader ready</div>
+      <div class="r-step"><em>1</em><p>Print the instruction card. It goes to your clipboard.</p></div>
+      <div class="printer"><button type="button" class="key r-key" id="copyPrompt"><span>Print the card</span><small>copies the prompt</small></button>
+        <div class="p-slot" aria-hidden="true"></div>
+        <div class="p-out"><div class="p-card" id="pCard" aria-hidden="true"><b>Instruction card</b><span id="promptInfo"></span><span>paste it into your AI</span></div></div></div>
+      <div class="r-step"><em>2</em><p>In your AI, replace the card's last line with what you want.</p></div>
+      <div class="r-step"><em>3</em><p>Feed its answer to the reader.</p></div>
+      <div class="c-slot" aria-hidden="true"></div>
+      <textarea id="agentPaste" class="card-in" spellcheck="false" aria-label="Your AI's answer" placeholder='paste the answer: {"action": … , "input": { … }}'></textarea>
+      <button type="button" class="key r-key r-read" id="applyPaste"><span>Read the card</span><small>fills in the request</small></button>
+      <details class="r-more"><summary>see what the card says</summary><textarea id="agentPrompt" readonly spellcheck="false"></textarea></details>
+    </aside>
+   </div>
     <canvas class="pepe" id="pepe" aria-hidden="true" title="poke Pepe"></canvas>
   </div>
-  <p class="start-alt small">Rather describe it in your own words? <button type="button" class="linkbtn" id="openAgent">Let your AI write the request</button>. Know the API? <button type="button" class="linkbtn" id="toExpert">Open the full form</button>.</p>
   <div class="chosen" id="chosenBar" hidden></div>
 
-  <details class="sec agent" id="agentBox">
-    <summary><h2>Let your own AI write it</h2><span class="small muted">Claude, ChatGPT, Codex or any assistant</span></summary>
-    <ol class="agent-steps">
-      <li><button type="button" class="btn sm primary" id="copyPrompt">Copy the prompt</button> and paste it into your AI.</li>
-      <li>Replace its last line with what you want, in your own words.</li>
-      <li>Paste the AI's answer here and press <b>Use this answer</b>.</li>
-    </ol>
-    <textarea id="agentPaste" spellcheck="false" placeholder='{"action": "job.open", "input": { … }}'></textarea>
-    <div class="btns agent-actions"><button type="button" class="btn primary" id="applyPaste">Use this answer</button><span id="promptInfo" class="small muted"></span></div>
-    <details class="more"><summary>see the prompt</summary><textarea id="agentPrompt" readonly spellcheck="false"></textarea></details>
-  </details>
+  
 
   <div class="compose" id="composeGrid" hidden>
     <div>
@@ -1458,7 +1511,7 @@ function machineUpdate(){  // the check line, after every change
 }
 function renderStart(){
   const g = goalOf(S.ui.goal), machine = onMachine();
-  $("#scene").hidden = !machine; $(".start-alt").hidden = !machine; $("#agentBox").hidden = !machine;
+  $("#scene").hidden = !machine; $("#mExpert").classList.toggle("on", !!$("#expertBox")?.open);
   $("#chosenBar").hidden = machine;
   if (!machine) $("#chosenBar").innerHTML = `<span class="small muted">${S.ui.source === "agent" ? "Written by your AI · the check on the right says what to fix" : "The full form"}</span><button type="button" class="linkbtn" data-restart="1">back to the machine</button>`;
   $("#composeGrid").hidden = machine && !g;
@@ -1527,8 +1580,14 @@ $("#chosenBar").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b || !b.dataset.restart) return;
   S.ui = {goal:null, expert:false, source:null}; renderAll(); renderStart(); $("#scene").scrollIntoView({behavior:"smooth", block:"start"});
 });
-$("#toExpert").onclick = () => { S.ui = {goal:S.ui.goal, expert:true, source:null}; renderAll(); renderStart(); };
-$("#openAgent").onclick = () => { $("#agentBox").open = true; $("#agentBox").scrollIntoView({behavior:"smooth", block:"start"}); };
+$("#mExpert").onclick = () => {
+  const box = $("#expertBox");
+  if (goalOf(S.ui.goal) && box) { box.open = !box.open; $("#mExpert").classList.toggle("on", box.open); if (box.open) box.scrollIntoView({behavior:"smooth", block:"start"}); return; }
+  S.ui = {goal:null, expert:true, source:null}; renderAll(); renderStart(); $("#chosenBar").scrollIntoView({behavior:"smooth", block:"start"});
+};
+document.addEventListener("toggle", e => { if (e.target.id === "expertBox") $("#mExpert").classList.toggle("on", e.target.open); }, true);
+const rSay = (msg, err) => { const r = $("#rPhos"); r.textContent = msg; r.classList.toggle("err", !!err); };
+$("#agentPaste").addEventListener("input", e => $("#applyPaste").classList.toggle("next", !!e.target.value.trim()));
 function parseLoose(text){  // an AI answer may come wrapped in prose or a code fence
   const t = text.trim(), a = t.indexOf("{"), b = t.lastIndexOf("}");
   if (a < 0 || b < a) throw new Error("no JSON object found");
@@ -1540,7 +1599,9 @@ function applyBody(o){
   loadInput(action, input); resetQuote();
 }
 $("#applyPaste").onclick = () => {
-  let o; try { o = parseLoose($("#agentPaste").value); } catch (e) { return toast("That is not a JSON request: " + e.message); }
+  if (!$("#agentPaste").value.trim()) return rSay("the card is blank: paste your AI's answer first", true);
+  let o; try { o = parseLoose($("#agentPaste").value); } catch (e) { return rSay("can't read that card: " + e.message, true); }
+  rSay(`read · ${o.action || "request"} · loaded below`);
   S.ui = {goal:null, expert:true, source:"agent"};
   applyBody(o); renderStart();
   $("#chosenBar").scrollIntoView({behavior:"smooth", block:"start"});
@@ -1607,7 +1668,11 @@ function renderPrompt(){
   $("#promptInfo").textContent = `${SKILLS.length} skills · ${STATIC ? "catalog snapshot " + SKILLS_DATE : "live catalog"}`;
 }
 const SKILLS_DATE = "2026-09-26";
-$("#copyPrompt").onclick = async () => { try { await navigator.clipboard.writeText($("#agentPrompt").value); toast("prompt copied"); } catch { $("#agentPrompt").select(); toast("select and copy by hand"); } };
+$("#copyPrompt").onclick = async () => {
+  const out = $("#pCard").parentElement; out.classList.remove("on"); void out.offsetWidth; out.classList.add("on");
+  try { await navigator.clipboard.writeText($("#agentPrompt").value); rSay("card printed · copied to your clipboard"); }
+  catch { $(".r-more").open = true; $("#agentPrompt").select(); rSay("printed · copy it from 'see what the card says'", true); }
+};
 function applyStatic(){
   STATIC = true;
   document.querySelectorAll('[data-tab="orders"],[data-tab="net"],#netDot,#walletBtn').forEach(e => e.hidden = true);
