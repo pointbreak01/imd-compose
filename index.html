@@ -149,12 +149,45 @@ tr.click:hover td{background:var(--hover)}
 .subnav{margin-bottom:14px}
 .warnbox{border:1.5px solid var(--lamp);padding:10px 12px;font-size:12px;margin-bottom:12px}
 .errbox{border:1.5px solid var(--alarm);padding:10px 12px;font-size:12px;margin-bottom:12px}
-.agent>summary{cursor:pointer;list-style:none;margin-bottom:10px}
-.agent>summary::-webkit-details-marker{display:none}
-.agent>summary::before{content:"▸ ";color:var(--dim)}
-.agent[open]>summary::before{content:"▾ "}
-.agent-steps{margin:0 0 10px;padding-left:18px;color:var(--dim)}
-#agentPrompt{width:100%;min-height:220px;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical;box-sizing:border-box}
+/* start: what do you want */
+.goals{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));border-top:var(--rule);border-left:var(--rule);margin-bottom:12px}
+.goal{display:block;text-align:left;background:var(--paper);border:0;border-right:var(--rule);border-bottom:var(--rule);padding:14px 16px 15px;cursor:pointer}
+.goal b{display:block;font-size:13px;margin-bottom:3px}
+.goal span{display:block;font-size:11px;color:var(--dim);line-height:1.45}
+.goal:hover{background:var(--hover)}
+.goal.on{background:var(--ink);color:var(--paper)}
+.goal.on span{color:color-mix(in srgb,var(--paper) 72%,var(--ink))}
+.goal:focus-visible,.linkbtn:focus-visible{outline:2px solid var(--ink);outline-offset:-4px}
+.start{margin-bottom:18px}
+.start>h2{margin-bottom:12px}
+.start-alt{color:var(--dim);margin:4px 0 10px}
+.linkbtn{background:none;border:0;padding:0;color:var(--ink);font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.chosen{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;border:var(--rule);padding:12px 16px;margin-bottom:16px}
+.chosen b{font-size:14px}
+/* the simple path and the optional fine-tune */
+.simple .tip{font-size:11px;color:var(--dim);margin:-4px 0 12px}
+.simple textarea.tall{min-height:150px}
+.expert{margin:4px 0 16px}
+.expert>summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;border-top:var(--rule);border-bottom:var(--rule);padding:11px 0;margin-bottom:16px}
+.expert>summary::-webkit-details-marker,.agent>summary::-webkit-details-marker,#jsonBox>summary::-webkit-details-marker{display:none}
+.expert>summary b{font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.expert>summary::before,.agent>summary::before,#jsonBox>summary::before{content:"+";font-weight:700;width:12px}
+.expert[open]>summary::before,.agent[open]>summary::before,#jsonBox[open]>summary::before{content:"−"}
+/* agent */
+.agent>summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;margin-bottom:10px}
+.agent>summary h2{margin:0}
+.agent-steps{margin:0 0 12px;padding-left:20px;line-height:2.1}
+.agent-actions{align-items:center;margin:10px 0 12px}
+#agentPaste{min-height:120px;font-size:12px}
+#helperCmd{white-space:pre-wrap;word-break:break-all}
+#agentPrompt{min-height:220px;font-size:12px;margin-top:8px}
+/* send */
+.send-steps{margin:0 0 14px;padding-left:18px}
+.send-steps li+li{margin-top:6px}
+#jsonBox>summary{cursor:pointer;list-style:none;margin:0;display:flex;align-items:baseline;gap:10px}
+#jsonBox>summary h2{flex:1}
+::selection{background:var(--ink);color:var(--paper)}
+input,textarea{caret-color:var(--ink)}
 </style>
 </head>
 <body>
@@ -175,23 +208,31 @@ tr.click:hover td{background:var(--hover)}
 <main>
 <!-- ============ COMPOSE ============ -->
 <section id="tab-compose">
-  <h1>Compose a request for the swarm</h1>
-  <p class="lede">Pick what to ask for, fill in the fields and check the problems on the right. <b>Quote</b> is free: the control plane rebuilds the request and tells you whether it is valid. You only pay with <b>Pay</b>, signing from your wallet (0.5 IMD).</p>
+  <h1>Ask the swarm</h1>
+  <p class="lede" id="lede">Machines run by identity.md holders pick up work: reports, smart contracts, websites, images, answers to questions. Say what you want, check it for free, then pay 0.5 IMD from your wallet.</p>
 
-  <details class="sec agent" id="agentBox" open>
-    <summary><h2 style="display:inline">Or ask your own agent <small>Claude, Codex or any assistant writes the JSON for you</small></h2></summary>
-    <ol class="small agent-steps">
-      <li>Copy the prompt below and paste it into your agent.</li>
-      <li>Replace the last line with what you want the swarm to do.</li>
-      <li>Paste the JSON it answers with into <b>JSON body → Edit</b> and press <b>Apply to form</b>. The checks on the right tell you what to fix.</li>
+  <div class="start" id="startBox">
+    <h2>1 · What do you want?</h2>
+    <div class="goals" id="goals" role="list"></div>
+    <p class="start-alt small">Rather describe it in your own words? <button type="button" class="linkbtn" id="openAgent">Let your AI write the request</button>. Know the API? <button type="button" class="linkbtn" id="toExpert">Open the full form</button>.</p>
+  </div>
+  <div class="chosen" id="chosenBar" hidden></div>
+
+  <details class="sec agent" id="agentBox">
+    <summary><h2>Let your own AI write it</h2><span class="small muted">Claude, ChatGPT, Codex or any assistant</span></summary>
+    <ol class="agent-steps">
+      <li><button type="button" class="btn sm primary" id="copyPrompt">Copy the prompt</button> and paste it into your AI.</li>
+      <li>Replace its last line with what you want, in your own words.</li>
+      <li>Paste the AI's answer here and press <b>Use this answer</b>.</li>
     </ol>
-    <textarea id="agentPrompt" readonly spellcheck="false"></textarea>
-    <div class="btns" style="margin:8px 0 10px"><button class="btn sm primary" id="copyPrompt">Copy prompt</button><span id="promptInfo" class="small muted"></span></div>
+    <textarea id="agentPaste" spellcheck="false" placeholder='{"action": "job.open", "input": { … }}'></textarea>
+    <div class="btns agent-actions"><button type="button" class="btn primary" id="applyPaste">Use this answer</button><span id="promptInfo" class="small muted"></span></div>
+    <details class="more"><summary>see the prompt</summary><textarea id="agentPrompt" readonly spellcheck="false"></textarea></details>
   </details>
 
-  <div class="compose">
+  <div class="compose" id="composeGrid" hidden>
     <div>
-      <div class="sec">
+      <div class="sec" id="typeBox">
         <h2>Request type <small id="actionHelp"></small></h2>
         <div class="seg" id="actionSeg">
           <button data-action="job.open">Job</button>
@@ -209,38 +250,38 @@ tr.click:hover td{background:var(--hover)}
 
     <aside class="side">
       <div class="box">
-        <div class="status-line"><h2 style="margin:0">Check</h2><span id="probSummary"></span></div>
+        <div class="status-line"><h2 style="margin:0">3 · Check</h2><span id="probSummary"></span></div>
         <ul class="probs" id="probs"></ul>
       </div>
-      <div class="box">
-        <div class="status-line">
-          <h2 style="margin:0">JSON body</h2>
-          <span class="btns"><span id="bytes" class="small muted"></span>
-            <button class="btn sm" id="copyJson">Copy</button>
-            <button class="btn sm" id="editJson">Edit</button></span>
+      <div class="box" id="staticBox" hidden>
+        <h2>4 · Quote and pay</h2>
+        <p class="small">api.imd.fun refuses quotes and payments from web pages on other domains, so this hosted copy can only compose and check. To send the request, run the same page on your computer (Python 3, nothing to install):</p>
+        <pre class="small" id="helperCmd"></pre>
+        <p class="small muted">Then open <code>http://127.0.0.1:8790</code>, paste the JSON (<b>Let your own AI write it → Use this answer</b> takes it too), get the free quote and pay from your wallet.</p>
+      </div>
+      <div class="box" id="sendBox">
+        <h2>4 · Quote and pay</h2>
+        <ol class="send-steps small">
+          <li><b>Get a quote.</b> Free: the network rebuilds your request and says whether machines can take it.</li>
+          <li><b>Pay 0.5 IMD</b> from your wallet on Ethereum mainnet. The wallet asks for two signatures.</li>
+        </ol>
+        <div class="f"><label for="labelIn"><b>Name it</b><span>only for you, to find it in Orders</span></label><input type="text" id="labelIn" placeholder="e.g. vault audit"></div>
+        <div class="btns">
+          <button class="btn" id="quoteBtn">Get a quote (free)</button>
+          <button class="btn primary" id="payBtn" disabled>Pay 0.5 IMD and send</button>
         </div>
+        <div id="quoteOut" style="margin-top:12px"></div>
+      </div>
+      <details class="box" id="jsonBox">
+        <summary><h2 style="margin:0">The exact request (JSON)</h2><span id="bytes" class="small muted"></span></summary>
+        <div class="btns" style="margin:10px 0"><button class="btn sm" id="copyJson">Copy</button><button class="btn sm" id="editJson">Edit</button></div>
         <pre id="json"></pre>
         <div id="jsonEditWrap" hidden>
           <textarea id="jsonEdit" spellcheck="false"></textarea>
           <div class="btns" style="margin-top:8px"><button class="btn sm primary" id="applyJson">Apply to form</button><button class="btn sm" id="cancelJson">Cancel</button></div>
           <div class="hint small muted" style="margin-top:6px">Accepts just the <code>input</code> or the full body of <code>/requests/quote</code> (<code>{requestKey, action, input}</code>).</div>
         </div>
-      </div>
-      <div class="box" id="staticBox" hidden>
-        <h2>Quote and pay</h2>
-        <p class="small">api.imd.fun refuses quotes and payments from web pages on other domains, so this hosted copy can only compose and check. To send the request, run the same page locally (Python 3, no dependencies):</p>
-        <pre class="small" id="helperCmd"></pre>
-        <p class="small muted">Then open <code>http://127.0.0.1:8790</code>, paste your JSON with <b>Edit → Apply</b>, press <b>Quote (free)</b> and pay from your wallet.</p>
-      </div>
-      <div class="box" id="sendBox">
-        <h2>Send</h2>
-        <div class="f"><label for="labelIn"><b>Label</b><span>local only, to find it later</span></label><input type="text" id="labelIn" placeholder="e.g. ERC-8004 report"></div>
-        <div class="btns">
-          <button class="btn" id="quoteBtn">Quote (free)</button>
-          <button class="btn primary" id="payBtn" disabled>Pay and send</button>
-        </div>
-        <div id="quoteOut" style="margin-top:12px"></div>
-      </div>
+      </details>
     </aside>
   </div>
 </section>
@@ -310,6 +351,7 @@ const blankOracle = () => ({question:"", chainId:"1", windowMode:"hours", hours:
   min:"", max:"", sources:[], minSources:"", consumerChainId:"", consumerContract:""});
 let S = {action:"job.open", job:blankJob(), wf:{request:"", context:""}, or:blankOracle()};
 try { const saved = JSON.parse(localStorage.getItem("imd-compose-draft") || "null"); if (saved && saved.job) S = Object.assign(S, saved); } catch {}
+S.ui = Object.assign({goal:null, expert:false, source:null}, S.ui || {});
 const persist = () => { try { localStorage.setItem("imd-compose-draft", JSON.stringify(S)); } catch {} };
 
 /* path get/set: "job.steps.0.objective" */
@@ -372,6 +414,7 @@ function buildInput(){
   if (S.action === "oracle.request") return buildOracle(S.or);
   if (S.action === "workflow.open") {
     const d = buildJob(S.job, "workflow.open");
+    if (!d.objective && S.wf.request) d.objective = S.wf.request.slice(0, 8000);  // the simple path asks for the request only
     const perm = {github: d.github === true, ipfs: d.ipfs ?? false, onchain:{kind: typeof d.onchain === "string" ? d.onchain : "", chainId: WF_CHAIN}};
     return {request:S.wf.request, context:S.wf.context || undefined, draft:d, permissions:perm};
   }
@@ -616,7 +659,8 @@ function validate(action, x){
 
 /* ================= form rendering ================= */
 const opt = (v, cur, label) => `<option value="${esc(v)}"${String(v) === String(cur) ? " selected" : ""}>${esc(label ?? v)}</option>`;
-const fld = (k, label, hint, inner) => `<div class="f" data-f="${esc(k)}"><label><b>${label}</b><span>${hint||""}</span></label>${inner}</div>`;
+const SKIP = new Set();   // keys already shown on the simple path
+const fld = (k, label, hint, inner) => SKIP.has(k) ? "" : `<div class="f" data-f="${esc(k)}"><label><b>${label}</b><span>${hint||""}</span></label>${inner}</div>`;
 const txt = (k, ph="", t="str") => `<input type="text" data-k="${k}" data-t="${t}" value="${esc(getP(k))}" placeholder="${esc(ph)}">`;
 const area = (k, ph="", cls="") => `<textarea data-k="${k}" data-t="str" class="${cls}" placeholder="${esc(ph)}">${esc(getP(k))}</textarea>`;
 const linesA = (k, ph="") => `<textarea data-k="${k}" data-t="lines" placeholder="${esc(ph)}">${esc((getP(k)||[]).join("\n"))}</textarea>`;
@@ -765,8 +809,17 @@ function renderOracleForm(){
 }
 
 function renderForm(){
-  const h = S.action === "oracle.request" ? renderOracleForm() : renderJobForm(S.action);
+  const full = () => S.action === "oracle.request" ? renderOracleForm() : renderJobForm(S.action);
+  let h;
+  if (S.ui.goal && !S.ui.expert) {
+    const simple = renderSimple();
+    SKIP.clear(); simple.keys.forEach(k => SKIP.add(k));
+    const rest = full(); SKIP.clear();
+    const open = document.querySelector("#expertBox")?.open;
+    h = simple.html + `<details class="expert" id="expertBox"${open ? " open" : ""}><summary><b>Fine-tune</b><span class="small muted">optional · which skills run, in what order, files, publishing. The defaults already work.</span></summary>${rest}</details>`;
+  } else h = full();
   $("#form").innerHTML = h;
+  $("#typeBox").hidden = !!(S.ui.goal && !S.ui.expert);
   $("#actionSeg").querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.action === S.action));
   $("#actionHelp").textContent = {"job.open":"a network job, no deployment", "launch.open":"a job that ends in an on-chain deployment", "workflow.open":"contracts → deploy → site, one payment", "oracle.request":"a typed question and a panel that signs the answer"}[S.action];
   renderPresets();
@@ -779,13 +832,15 @@ function refresh(){
   persist();
   const input = buildInput();
   const {problems, bytes} = SKILLS.length ? validate(S.action, input) : {problems:[{lvl:"warn", path:"", msg:"skill catalog not loaded: partial validation"}], bytes:0};
+  if (S.ui.goal === "repo" && !S.ui.expert && !S.job.repoUrl) problems.unshift({lvl:"err", path:"job.repoUrl", msg:"Repository: paste the GitHub address of the code to review"});
+  if (S.ui.goal === "repo" && !S.ui.expert && !S.job.baseCommit) problems.unshift({lvl:"err", path:"job.baseCommit", msg:"Commit: copy the full id of the commit to review from the repository's commit list"});
   lastProblems = problems;
   $("#json").textContent = JSON.stringify({action:S.action, input}, null, 2);
   $("#bytes").textContent = bytes ? `${bytes} / 16384 B` : "";
   const errs = problems.filter(p => p.lvl === "err").length, warns = problems.length - errs;
   $("#probSummary").innerHTML = errs ? `<span class="tag err">${errs} errors</span>` : warns ? `<span class="tag warn">${warns} warnings</span>` : `<span class="tag ok">ready</span>`;
   $("#probs").innerHTML = problems.length ? problems.map(p => `<li class="${p.lvl}" data-path="${esc(p.path)}">${esc(p.msg)}</li>`).join("")
-    : `<li class="ok">No problems found locally. The quote runs the last check: it rebuilds the job and checks that capable seats exist.</li>`;
+    : `<li class="ok">Looks good. The free quote does the last check: that machines able to do it are online.</li>`;
   document.querySelectorAll(".is-bad").forEach(e => e.classList.remove("is-bad"));
   problems.filter(p => p.lvl === "err").forEach(p => document.querySelectorAll(`[data-k="${CSS.escape(p.path)}"]`).forEach(e => e.classList.add("is-bad")));
   $("#quoteBtn").disabled = errs > 0;
@@ -807,6 +862,7 @@ $("#form").addEventListener("input", e => {
     const mk = el.dataset.k.replace(/path$/, "mediaType"), ext = (el.value.match(/\.[a-z0-9]+$/i)||[""])[0].toLowerCase();
     if (!getP(mk) && MEDIA[ext]) { setP(mk, MEDIA[ext]); const m = document.querySelector(`[data-k="${mk}"]`); if (m) m.value = MEDIA[ext]; }
   }
+  if (el.dataset.k === "job.ipfsLabel" && S.ui.goal === "site") S.job.ipfs = el.value ? "label" : "true";
   if (el.dataset.k === "job.objective" || el.dataset.k === "or.question") { const lab = el.closest(".f").querySelector("label span"); if (lab) lab.textContent = `${el.value.length} / ${el.dataset.k === "or.question" ? "2,000" : "8,000"}`; }
   refresh();
 });
@@ -888,11 +944,10 @@ $("#editJson").onclick = () => { $("#jsonEdit").value = $("#json").textContent; 
 $("#cancelJson").onclick = () => { $("#json").hidden = false; $("#jsonEditWrap").hidden = true; };
 $("#applyJson").onclick = () => {
   let o; try { o = JSON.parse($("#jsonEdit").value); } catch (e) { return toast("Invalid JSON: " + e.message); }
-  let action = o.action || S.action, input = o.input || o;
-  if (!o.action) { if (input.question) action = "oracle.request"; else if (input.draft) action = "workflow.open"; else if (input.onchain !== undefined) action = "launch.open"; }
-  loadInput(action, input); $("#cancelJson").onclick(); resetQuote();
+  S.ui = {goal:null, expert:true, source:null};  // hand-edited JSON can hold anything: show the full form
+  applyBody(o); $("#cancelJson").onclick(); renderStart();
 };
-$("#copyJson").onclick = async () => { try { await navigator.clipboard.writeText(JSON.stringify(buildInput(), null, 2)); toast("input copied"); } catch { toast("copy failed"); } };
+$("#copyJson").onclick = async () => { try { await navigator.clipboard.writeText(JSON.stringify({action:S.action, input:buildInput()}, null, 2)); toast("request copied"); } catch { toast("copy failed"); } };
 
 /* ================= quote + pay ================= */
 const post = (url, body) => fetch(url, {method:"POST", headers:{"Content-Type":"application/json", "X-Compose":"1"}, body:JSON.stringify(body || {})}).then(r => r.json());
@@ -1238,6 +1293,104 @@ async function openOracle(id){
     Object.keys(b).forEach(k => b[k] === undefined && delete b[k]); loadInput("oracle.request", b); closeOverlay(); showTab("compose"); toast("Question loaded: the window is reset to 24 h"); };
 }
 
+/* ================= the simple path: pick a goal, describe it ================= */
+const REPORT_OUT = [{name:"report", path:"artifacts/report.md", mediaType:"text/markdown"}];
+const GOALS = [
+  {id:"report", title:"A research report", blurb:"A sourced write-up that answers a question or compares options.",
+   action:"job.open", input:{objective:"", skill:"research-report", outputs:REPORT_OUT, minCitations:5},
+   ask:"What should the report answer?", ph:"Compare the three main ways to … and recommend one for a small team. Include a table and cite your sources."},
+  {id:"contract", title:"A smart contract, tested and reviewed", blurb:"One machine writes it, another tests it, a third attacks it. Not deployed.",
+   action:"job.open", input:{objective:"", shape:"chain", references:["solidity-security-review"], steps:[{skill:"build-contract-project"},{skill:"write-foundry-tests", paths:["test"]},{skill:"adversarial-review"}], github:true},
+   ask:"What should the contract do?", ph:"An ERC-4626 vault for a mock USDC with a 0.5% withdrawal fee to a fixed treasury. No owner, no upgrades. Do not deploy it."},
+  {id:"launch", title:"Deploy a token or contract", blurb:"Built, reviewed, then deployed on Sepolia, the Ethereum test network.",
+   action:"launch.open", input:{objective:"", shape:"chain", onchain:"evm_project", references:["solidity-security-review"], steps:[{skill:"build-contract-project"},{skill:"adversarial-review"}]},
+   ask:"What should be deployed?", ph:"A fixed-supply ERC-20 called Example (symbol EXM) with 1,000,000 tokens minted to the deployer. No owner mint."},
+  {id:"dapp", title:"Contracts plus a website", blurb:"Contracts deployed on Sepolia, then a site to use them, published on IPFS.",
+   action:"workflow.open", input:{request:"", context:"Sepolia only. GitHub publication and IPFS hosting are approved.", draft:{objective:"", shape:"chain", onchain:"evm_project", github:true, ipfs:true, steps:[{skill:"build-contract-project"},{skill:"frontend-for-contract"},{skill:"adversarial-review"}]}},
+   ask:"Describe the contracts and the website", ph:"A tip jar: an ERC-20 called TIPS and a contract that forwards ETH tips to a recipient; deploy both; then a one-page site to connect a wallet, tip and see the totals."},
+  {id:"site", title:"A website", blurb:"A static site, published at <name>.site.identitymd.eth.",
+   action:"job.open", input:{objective:"", skill:"build-website", ipfs:true},
+   ask:"What should the site say and do?", ph:"A one-page site for my project … : what it is, how to join, links to the docs. Light and dark theme."},
+  {id:"repo", title:"Review code on GitHub", blurb:"A security or quality report on a public repository, at a fixed commit.",
+   action:"job.open", input:{objective:"", skill:"research-report", outputs:REPORT_OUT},
+   ask:"What should the reviewers look for?", ph:"Security audit of this repository: how it handles user input, secrets and permissions. Report each problem with the file, the line and a fix."},
+  {id:"image", title:"An image", blurb:"Only a few machines have an image tool, so it may find no taker.",
+   action:"job.open", input:{objective:"", skill:"create-image", outputs:[{name:"image", path:"artifacts/image.png", mediaType:"image/png"}], github:false},
+   ask:"Describe the image", ph:"A warm illustration of a frog running a control room full of dials, for a website header, 16:9."},
+  {id:"oracle", title:"A question answered by a panel", blurb:"Several machines answer on their own; the answer they agree on is signed.",
+   action:"oracle.request", input:{v:1, question:"", chainId:1, window:{hours:48}, answerType:"bool", evidence:"panel", panelSize:5, quorum:4, validForSeconds:86400,
+     definitions:{missing:"Unavailable evidence is not a no. Report inability rather than guessing."}},
+   ask:"What is the question?", ph:"Did project X publish a new release on its GitHub page on September 21, 2026 (UTC)?"},
+];
+const goalOf = id => GOALS.find(g => g.id === id);
+function renderSimple(){
+  const g = goalOf(S.ui.goal), a = S.action, keys = [];
+  const k = x => (keys.push(x), x);
+  let h = `<div class="sec simple"><h2>2 · Describe it</h2>`;
+  if (a === "oracle.request") {
+    h += fld(k("or.question"), g.ask, `${S.or.question.length} / 2,000`, area("or.question", g.ph, "tall"))
+      + `<p class="tip">Ask something with one clear answer, and say exactly which day or period you mean.</p>`
+      + `<div class="row">${fld(k("or.answerType"), "The answer is", "", sel("or.answerType", [["bool","yes or no"],["uint256","a number"],["address","an address"],["address[]","a list of addresses"],["bytes32","a 32-byte value"],["bytes32[]","a list of 32-byte values"]]).replace("<select", '<select data-struct="1"'))}
+        ${fld(k("or.evidence"), "Found in", "", sel("or.evidence", [["panel","public web sources"],["chain","blockchain data"]]).replace("<select", '<select data-struct="1"'))}</div>`;
+  } else if (a === "workflow.open") {
+    h += fld(k("wf.request"), g.ask, `${S.wf.request.length} / 16,000`, area("wf.request", g.ph, "tall"))
+      + `<p class="tip">Name the token, its symbol and supply, what the contracts must never do, and what the site shows.</p>`
+      + fld(k("wf.context"), "Anything already decided", "optional", area("wf.context", "Sepolia only. No owner, no admin, no upgrades."));
+  } else {
+    h += fld(k("job.objective"), g.ask, `${S.job.objective.length} / 8,000`, area("job.objective", g.ph, "tall"))
+      + `<p class="tip">Be specific: names, numbers, what must never happen, and what "done" looks like. Machines cannot ask you questions.</p>`;
+    if (g.id === "site") h += fld(k("job.ipfsLabel"), "Site name", "optional · becomes &lt;name&gt;.site.identitymd.eth", txt("job.ipfsLabel", "my-project"));
+    if (g.id === "repo") h += `<div class="row2">${fld(k("job.repoUrl"), "Repository", "public GitHub URL", txt("job.repoUrl", "https://github.com/owner/repo"))}
+      ${fld(k("job.baseCommit"), "Commit", "the full 40-character id, from the repo's commit list", txt("job.baseCommit", "40 characters, 0-9 and a-f"))}</div>`;
+  }
+  return {html: h + `</div>`, keys};
+}
+function renderStart(){
+  const g = goalOf(S.ui.goal), picked = !!(g || S.ui.expert);
+  $("#goals").innerHTML = GOALS.map(x => `<button type="button" role="listitem" class="goal${x.id === S.ui.goal ? " on" : ""}" data-goal="${x.id}"><b>${esc(x.title)}</b><span>${esc(x.blurb)}</span></button>`).join("");
+  $("#startBox").hidden = picked;
+  $("#agentBox").hidden = picked;
+  $("#composeGrid").hidden = !picked;
+  $("#chosenBar").hidden = !picked;
+  if (picked) $("#chosenBar").innerHTML = g && !S.ui.expert
+    ? `<span class="small muted">You asked for</span><b>${esc(g.title)}</b><button type="button" class="linkbtn" data-restart="1">change</button><button type="button" class="linkbtn" data-full="1">use the full form</button>`
+    : `<span class="small muted">${S.ui.source === "agent" ? "Written by your AI · check it on the right" : "Full form"}</span><button type="button" class="linkbtn" data-restart="1">back to the simple choices</button>`;
+}
+function chooseGoal(id){
+  const g = goalOf(id); if (!g) return;
+  S.ui = {goal:id, expert:false, source:null};
+  if (g.action === "oracle.request") S.or = blankOracle();
+  loadInput(g.action, JSON.parse(JSON.stringify(g.input)));
+  resetQuote(); renderStart();
+  const f = $("#form .simple textarea");
+  if (f) { f.focus({preventScroll:true}); $("#chosenBar").scrollIntoView({behavior:"smooth", block:"start"}); }
+}
+$("#goals").addEventListener("click", e => { const b = e.target.closest("[data-goal]"); if (b) chooseGoal(b.dataset.goal); });
+$("#chosenBar").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.restart) { S.ui = {goal:null, expert:false, source:null}; persist(); renderStart(); $("#startBox").scrollIntoView({behavior:"smooth", block:"start"}); }
+  if (b.dataset.full) { S.ui.expert = true; renderAll(); renderStart(); }
+});
+$("#toExpert").onclick = () => { S.ui = {goal:null, expert:true, source:null}; renderAll(); renderStart(); };
+$("#openAgent").onclick = () => { $("#agentBox").open = true; $("#agentBox").scrollIntoView({behavior:"smooth", block:"start"}); };
+function parseLoose(text){  // an AI answer may come wrapped in prose or a code fence
+  const t = text.trim(), a = t.indexOf("{"), b = t.lastIndexOf("}");
+  if (a < 0 || b < a) throw new Error("no JSON object found");
+  return JSON.parse(t.slice(a, b + 1));
+}
+function applyBody(o){
+  let action = o.action || S.action, input = o.input || o;
+  if (!o.action) { if (input.question) action = "oracle.request"; else if (input.draft) action = "workflow.open"; else if (input.onchain !== undefined) action = "launch.open"; }
+  loadInput(action, input); resetQuote();
+}
+$("#applyPaste").onclick = () => {
+  let o; try { o = parseLoose($("#agentPaste").value); } catch (e) { return toast("That is not a JSON request: " + e.message); }
+  S.ui = {goal:null, expert:true, source:"agent"};
+  applyBody(o); renderStart();
+  $("#chosenBar").scrollIntoView({behavior:"smooth", block:"start"});
+  toast("Loaded. The check on the right says what, if anything, to fix.");
+};
+
 /* ================= prompt for the user's own agent ================= */
 const HELPER_REPO = "https://github.com/pointbreak01/imd-compose";
 function agentPrompt(){
@@ -1303,7 +1456,7 @@ function applyStatic(){
   STATIC = true;
   document.querySelectorAll('[data-tab="orders"],[data-tab="net"],#netDot,#walletBtn').forEach(e => e.hidden = true);
   $("#sendBox").hidden = true; $("#staticBox").hidden = false;
-  $("#tab-compose .lede").innerHTML = "Pick what to ask for, fill in the fields and check the problems on the right, or let your own agent write the JSON. This hosted copy composes and checks; quoting and paying need the local helper (see <b>Quote and pay</b>).";
+  $("#lede").textContent = "Machines run by identity.md holders pick up work: reports, smart contracts, websites, images, answers to questions. Say what you want and check it here; this hosted copy cannot send it, so step 4 shows how to send it from your computer.";
   $("#helperCmd").textContent = `git clone ${HELPER_REPO}\ncd imd-compose && python3 server.py`;
 }
 
@@ -1325,11 +1478,11 @@ try { const th = localStorage.getItem("imd-compose-theme"); if (th) document.doc
   let helper = false;
   try { helper = Array.isArray(await get("/local/orders")); } catch {}
   if (!helper) {  // no local server behind this page (e.g. IPFS): compose and check only
-    applyStatic(); renderAll(); renderPrompt(); showTab("compose"); return;
+    applyStatic(); renderAll(); renderPrompt(); renderStart(); showTab("compose"); return;
   }
   try { const s = await api("/skills"); SKILLS = Array.isArray(s) ? s : s.skills || []; } catch (e) { toast("Live skill catalog unavailable, using the snapshot: " + e.message); }
   try { CAPS = await api("/requests/capabilities"); } catch {}
-  renderAll(); renderPrompt(); loadStats(); refreshOrders();
+  renderAll(); renderPrompt(); renderStart(); loadStats(); refreshOrders();
   let t = "compose"; try { t = localStorage.getItem("imd-compose-tab") || t; } catch {}
   showTab(t);
   if (eth()) eth().request({method:"eth_accounts"}).then(a => { if (a[0]) { W.addr = a[0]; readWallet(); } }).catch(() => {});
