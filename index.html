@@ -149,41 +149,95 @@ tr.click:hover td{background:var(--hover)}
 .subnav{margin-bottom:14px}
 .warnbox{border:1.5px solid var(--lamp);padding:10px 12px;font-size:12px;margin-bottom:12px}
 .errbox{border:1.5px solid var(--alarm);padding:10px 12px;font-size:12px;margin-bottom:12px}
-/* the room (same idiom as imd-panel's wall, after imd.fun's front page): the skills wall, the ticket, pepe at the desk */
-.room{position:relative;border:var(--rule);background:var(--paper);overflow:hidden;margin-bottom:6px}
-.wall{position:relative;background:#7d7d79;margin:0}
-.wall canvas{display:block;width:100%}
-.wtip{position:absolute;z-index:6;transform:translate(-50%,-100%);min-width:220px;max-width:340px;padding:8px 10px;background:#0a0a0a;color:#c9ecbf;border:1.5px solid #141414;box-shadow:0 0 0 1px rgba(201,236,191,.15);font-size:11px;line-height:1.55;pointer-events:none;opacity:0;transition:opacity .12s}
-.wtip.on{opacity:1}.wtip.below{transform:translate(-50%,0)}
-.wtip .th{display:flex;justify-content:space-between;gap:10px;color:#e8ffe9}.wtip .th span{color:#7fb37a;text-transform:uppercase;letter-spacing:.08em;font-size:10px}
-.wtip .tt{color:#7fb37a;white-space:normal}.wtip .tk{color:#3ecf7a;font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-top:4px}.wtip .tk.ref{color:#ffcf5a}
-.desk{position:relative;margin-top:-1px;height:clamp(84px,9vw,128px);clip-path:inset(-100vh 0 0 0);
-  background:linear-gradient(180deg,#0b0b0b 0,#0b0b0b 34%,#2a2a28 34%,#2a2a28 calc(34% + 2px),#0b0b0b calc(34% + 2px),#0b0b0b 46%,#d9d9d3 46%,#f1f1ec 56%,#f1f1ec 100%)}
-.desk::before{content:"";position:absolute;left:0;right:0;top:46%;bottom:0;background:repeating-linear-gradient(90deg,transparent 0 9.5%,rgba(0,0,0,.14) 9.5% calc(9.5% + 1.5px)),linear-gradient(180deg,rgba(0,0,0,.28),transparent 30%)}
-.desk::after{content:"";position:absolute;left:8%;right:8%;top:34%;height:2px;background:rgba(255,255,255,.08)}
-.deskScene{position:absolute;inset:0}
-.credit{position:absolute;right:1.6%;bottom:9%;padding:3px 8px;font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#141414;background:#ffcf5a;border:1.5px solid #141414;box-shadow:2px 2px 0 #141414;text-decoration:none;z-index:3;transform:rotate(2deg);transform-origin:right bottom}
+/* the scene: a request machine against the grey wall of imd-panel, pepe beside it (art by imd.fun) */
+.scene{position:relative;border:var(--rule);background:#7d7d79 repeating-linear-gradient(90deg,transparent 0 159px,rgba(0,0,0,.13) 159px 160.5px);padding:30px clamp(10px,4vw,64px) 0;overflow:hidden;margin-bottom:12px}
+.scene::after{content:"";position:absolute;left:0;right:0;bottom:0;height:58px;z-index:0;
+  background:repeating-linear-gradient(90deg,transparent 0 9.5%,rgba(0,0,0,.13) 9.5% calc(9.5% + 1.5px)),linear-gradient(180deg,#bdbdb6 0,#e2e2dc 10px,#f1f1ec 100%)}
+.machine{--ink:#141414;--dim:#4a4a47;--paper:#f4f4f0;--ok:#1f7a45;--alarm:#b3261e;--lamp:#8a6a10;--soft:#cfcfc9;--faint:#6d6d69;--hover:#fff;--rule:1.5px solid #141414;
+  position:relative;z-index:1;max-width:1080px;margin:0 auto 26px;background:#d6d6d2;color:#141414;border:1.5px solid #141414;padding:16px;
+  box-shadow:0 22px 26px -20px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.55)}
+.machine::before,.machine::after{content:"";position:absolute;left:6px;right:6px;height:7px;pointer-events:none;opacity:.6;
+  background:radial-gradient(circle at 3.5px 3.5px,transparent 1.8px,#141414 2px,#141414 3px,transparent 3.3px) left/7px 7px no-repeat,radial-gradient(circle at 3.5px 3.5px,transparent 1.8px,#141414 2px,#141414 3px,transparent 3.3px) right/7px 7px no-repeat}
+.machine::before{top:5px}.machine::after{bottom:5px}
+.m-marquee{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;background:#0a0a0a;border:1.5px solid #141414;padding:11px 16px;margin-bottom:16px}
+.m-name{font-size:17px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:#e8ffe9;text-shadow:0 0 8px rgba(62,207,122,.5)}
+.m-lamps{display:flex;gap:5px}.m-lamps i{width:8px;height:8px;background:#3a3a36;border:1px solid #000}
+.m-sub{margin-left:auto;color:#7fb37a;font-size:11px}
+.m-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,340px);gap:16px;align-items:start}
+.m-display{background:#0a0a0a;border:1.5px solid #141414;box-shadow:inset 0 0 0 4px #1b1b19,inset 0 0 30px rgba(62,207,122,.07);padding:16px 18px;color:#c9ecbf;display:flex;flex-direction:column;gap:9px;min-height:268px}
+.d-product{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#7fb37a}
+.d-product b{color:#0a0a0a;background:#ffcf5a;padding:1px 6px;margin-right:6px;letter-spacing:.06em}
+.d-label{font-size:14px;font-weight:600;color:#e8ffe9}
+.m-display textarea,.m-display input,.m-display select{background:#0f1410;border:1.5px solid #2b3a2e;color:#c9ecbf;caret-color:#3ecf7a;border-radius:0;outline:none;width:100%}
+.m-display textarea:focus,.m-display input:focus,.m-display select:focus{border-color:#3ecf7a;box-shadow:0 0 0 1px rgba(62,207,122,.35)}
+.m-display ::placeholder{color:#6f9a6b}
+.d-ask{font-size:14px;line-height:1.55;min-height:132px;padding:10px 12px}
+.d-ask:disabled{opacity:.55;cursor:not-allowed}
+.d-extra{display:grid;gap:8px}.d-extra:empty{display:none}
+.d-extra label{display:flex;justify-content:space-between;gap:10px;font-size:11px;color:#7fb37a;margin-bottom:3px}
+.d-extra label b{color:#e8ffe9;font-weight:600}
+.d-extra .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.d-check{border-top:1px solid #1d2a21;padding-top:9px;font-size:12px;min-height:22px}
+.d-check .st::before{content:"";display:inline-block;width:8px;height:8px;margin-right:8px;background:#4a5a4c}
+.d-check .st.ok{color:#3ecf7a}.d-check .st.ok::before{background:#3ecf7a;box-shadow:0 0 6px #3ecf7a}
+.d-check .st.err{color:#ff6b62}.d-check .st.err::before{background:#ff6b62}
+.d-check ul{list-style:none;margin:6px 0 0;padding:0}
+.d-check li{margin-top:3px}.d-check li.warn{color:#ffcf5a}
+.d-check li button{background:none;border:0;padding:0;color:#ff9d97;text-align:left;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.m-controls{display:grid;grid-template-columns:auto minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:14px;align-items:stretch}
+.m-price{background:#0a0a0a;border:1.5px solid #141414;padding:8px 16px;display:flex;flex-direction:column;justify-content:center;min-width:132px}
+.m-price span{font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;color:#7fb37a}
+.m-price b{font-size:23px;color:#ffcf5a;letter-spacing:.04em;text-shadow:0 0 8px rgba(255,207,90,.35);line-height:1.2}
+.m-price small{font-size:10px;color:#7fb37a}
+.key{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:12px;align-items:center;text-align:left;background:#f4f4f0;color:#141414;border:1.5px solid #141414;border-bottom-width:5px;padding:10px 14px;cursor:pointer;transition:transform .08s,border-bottom-width .08s,background .15s}
+.key em{grid-row:1/3;font-style:normal;font-weight:700;width:28px;height:28px;border:1.5px solid #141414;border-radius:50%;display:grid;place-items:center}
+.key span{font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.key small{font-size:10.5px;color:#4a4a47}
+.key:hover:not(:disabled){background:#fff}
+.key:active:not(:disabled){transform:translateY(3px);border-bottom-width:2px}
+.key:disabled{opacity:.42;cursor:not-allowed}
+.key.next{background:#3ecf7a;box-shadow:0 0 0 3px rgba(62,207,122,.3)}
+.key.next small{color:#0f3d22}
+.coin{display:flex;gap:10px;align-items:stretch;min-width:0}
+.coin .key{flex:1;min-width:0}
+.slot{flex:none;width:12px;background:#2a2a28;border:1.5px solid #141414;border-radius:7px;box-shadow:inset 0 3px 4px rgba(0,0,0,.7);margin:8px 0}
+.m-keypad{background:#c4c4bf;border:1.5px solid #141414;padding:10px;display:grid;gap:7px}
+.pk{display:grid;grid-template-columns:34px minmax(0,1fr) 10px;gap:10px;align-items:center;text-align:left;background:#f4f4f0;color:#141414;border:1.5px solid #141414;border-bottom-width:3px;padding:7px 10px;cursor:pointer;transition:transform .08s,background .15s}
+.pk .code{font-size:11px;font-weight:700;letter-spacing:.06em;text-align:center;background:#0a0a0a;color:#ffcf5a;padding:4px 0}
+.pk .t{display:block;font-size:12px;font-weight:700;line-height:1.3}
+.pk .d{display:block;font-size:10.5px;color:#4a4a47;line-height:1.35;margin-top:1px}
+.pk .lamp{width:10px;height:10px;border:1px solid #141414;border-radius:50%;background:#b9b9b4}
+.pk:hover{background:#fff}
+.pk[aria-pressed="true"]{background:#e6ecdc;transform:translateY(2px);border-bottom-width:1.5px}
+.pk[aria-pressed="true"] .lamp{background:#3ecf7a;box-shadow:0 0 7px #3ecf7a}
+.pk:focus-visible,.key:focus-visible{outline:2px solid #141414;outline-offset:2px}
+.m-tray{margin-top:16px;background:#2a2a28;border:1.5px solid #141414;padding:10px 12px 12px;box-shadow:inset 0 10px 14px -8px rgba(0,0,0,.75)}
+.receipt{--paper:#f3f0e4;--code:#e6e1d0;--ink:#141414;background:#f3f0e4;color:#141414;border:1px solid #141414;padding:12px 14px;font-size:12px;min-height:44px;overflow:hidden}
+.receipt .r-status{color:#4a4a47}
+.receipt pre{background:#e6e1d0;color:#141414;padding:8px 10px;margin:6px 0}
+.receipt h2{font-size:10.5px}
+.receipt .r-status b{color:#141414}
+.receipt #quoteOut:not(:empty){margin-top:10px}
+.receipt .warnbox,.receipt .errbox{margin-bottom:0}
+.receipt.printing{animation:print .7s cubic-bezier(.16,1,.3,1)}
+@keyframes print{from{clip-path:inset(0 0 100% 0);transform:translateY(-10px)}to{clip-path:inset(0 0 0 0);transform:none}}
+.credit{position:absolute;right:16px;top:-13px;padding:3px 8px;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#141414;background:#ffcf5a;border:1.5px solid #141414;text-decoration:none;transform:rotate(1.5deg);z-index:2}
 .credit:hover{background:#3ecf7a;transform:rotate(0)}
-@media (max-width:720px){.credit{font-size:7px;letter-spacing:.08em;bottom:6%;right:2%;padding:2px 5px}.pepe{left:9%}}
-.pepe{position:absolute;left:18%;bottom:5%;width:clamp(56px,8%,108px);display:block;background:transparent;border:0;padding:0;cursor:pointer;transform-origin:50% 100%;will-change:transform;z-index:4}
-.pepe:focus-visible{outline:1.5px solid #000;outline-offset:2px}
-.roomcap{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:center;margin:8px 2px 22px;font-size:11.5px;color:var(--dim)}
-.roomcap .key{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
-.roomcap .key i{display:inline-block;width:9px;height:9px;background:#d6d6d2;border:1px solid #141414}
-.roomcap .key i.ok{background:#3ecf7a}.roomcap .key i.ref{background:#ffcf5a}
-/* start: what do you want */
-.goals{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:var(--rule);border-left:var(--rule);margin-bottom:12px}
-@media (max-width:1100px){.goals{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:560px){.goals{grid-template-columns:minmax(0,1fr)}}
-.goal{display:block;text-align:left;background:var(--paper);border:0;border-right:var(--rule);border-bottom:var(--rule);padding:14px 16px 15px;cursor:pointer}
-.goal b{display:block;font-size:13px;margin-bottom:3px}
-.goal span{display:block;font-size:11px;color:var(--dim);line-height:1.45}
-.goal:hover{background:var(--hover)}
-.goal.on{background:var(--ink);color:var(--paper)}
-.goal.on span{color:color-mix(in srgb,var(--paper) 72%,var(--ink))}
-.goal:focus-visible,.linkbtn:focus-visible{outline:2px solid var(--ink);outline-offset:-4px}
-.start{margin-bottom:18px}
-.start>h2{margin-bottom:12px}
+.pepe{position:absolute;left:1.2%;bottom:8px;width:clamp(56px,6.4%,98px);display:block;background:transparent;border:0;padding:0;cursor:pointer;transform-origin:50% 100%;will-change:transform;z-index:3}
+/* before a pick: the marquee chases and the keypad lamps call for a press */
+@keyframes chase{0%,100%{background:#3a3a36}20%{background:#3ecf7a;box-shadow:0 0 6px #3ecf7a}}
+@keyframes call{0%,100%{background:#b9b9b4}50%{background:#ffcf5a;box-shadow:0 0 6px #ffcf5a}}
+.scene:not(.picked) .m-lamps i{animation:chase 1.5s infinite}
+.scene:not(.picked) .m-lamps i:nth-child(2){animation-delay:.15s}.scene:not(.picked) .m-lamps i:nth-child(3){animation-delay:.3s}.scene:not(.picked) .m-lamps i:nth-child(4){animation-delay:.45s}.scene:not(.picked) .m-lamps i:nth-child(5){animation-delay:.6s}
+.scene:not(.picked) .pk .lamp{animation:call 2.4s infinite}
+.scene:not(.picked) .pk:nth-child(2n) .lamp{animation-delay:.3s}.scene:not(.picked) .pk:nth-child(3n) .lamp{animation-delay:.6s}
+.scene.picked .m-lamps i{background:#3ecf7a}
+@media (prefers-reduced-motion:reduce){.scene *{animation:none!important;transition:none!important}}
+@media (max-width:900px){.m-body{grid-template-columns:minmax(0,1fr)}.m-keypad{order:-1;grid-template-columns:repeat(2,minmax(0,1fr))}.pk .d{display:none}.m-controls{grid-template-columns:minmax(0,1fr)}.m-sub{margin-left:0}}
+@media (max-width:420px){.m-keypad{grid-template-columns:minmax(0,1fr)}.pk .d{display:block}.d-extra .two{grid-template-columns:minmax(0,1fr)}.scene{padding-top:22px}}
+/* the full form and the fine-tune under the machine */
+.compose.machine-mode #typeBox,.compose.machine-mode .side>.box{display:none}
+.compose.machine-mode .side>#jsonBox{display:block}
 .start-alt{color:var(--dim);margin:4px 0 10px}
 .linkbtn{background:none;border:0;padding:0;color:var(--ink);font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .chosen{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;border:var(--rule);padding:12px 16px;margin-bottom:16px}
@@ -232,19 +286,36 @@ input,textarea{caret-color:var(--ink)}
 <main>
 <!-- ============ COMPOSE ============ -->
 <section id="tab-compose">
-  <div class="room" id="room">
-    <div class="wall" id="wallBox"><canvas id="wall" role="img" aria-label="the skills wall: one module per skill of the network, lit when your request uses it; the screen shows your request"></canvas><div class="wtip" id="wtip"></div></div>
-    <div class="desk"><div class="deskScene"><canvas class="pepe" id="pepe" aria-hidden="true" title="poke Pepe"></canvas><a class="credit" href="https://imd.fun" target="_blank" rel="noopener">art by imd.fun · used with permission</a></div></div>
-  </div>
-  <div class="roomcap"><span class="key"><i class="ok"></i>does your request</span><span class="key"><i class="ref"></i>knowledge it brings</span><span class="key"><i></i>other skills on the network</span><span>Hover a module for the skill. Poke Pepe.</span></div>
   <h1>Ask the swarm</h1>
   <p class="lede" id="lede">Machines run by identity.md holders pick up work: reports, smart contracts, websites, images, answers to questions. Say what you want, check it for free, then pay 0.5 IMD from your wallet.</p>
 
-  <div class="start" id="startBox">
-    <h2>1 · What do you want?</h2>
-    <div class="goals" id="goals" role="list"></div>
-    <p class="start-alt small">Rather describe it in your own words? <button type="button" class="linkbtn" id="openAgent">Let your AI write the request</button>. Know the API? <button type="button" class="linkbtn" id="toExpert">Open the full form</button>.</p>
+  <div class="scene" id="scene">
+    <div class="machine" role="group" aria-label="The request machine">
+      <div class="m-marquee"><span class="m-name">Ask the swarm</span><span class="m-lamps" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="m-sub">machines of identity.md holders do the work</span></div>
+      <div class="m-body">
+        <div class="m-front">
+          <div class="m-display" id="mDisplay">
+            <div class="d-product" id="mProduct"></div>
+            <label class="d-label" for="mAsk" id="mAskLabel">What do you want?</label>
+            <textarea id="mAsk" class="d-ask" rows="5" spellcheck="true" disabled></textarea>
+            <div class="d-extra" id="mExtra"></div>
+            <div class="d-check" id="mCheck" aria-live="polite"></div>
+          </div>
+          <div class="m-controls">
+            <div class="m-price" aria-label="Price: 0.5 IMD, the quote is free"><span>price</span><b>0.5 IMD</b><small>the quote is free</small></div>
+            <button type="button" class="key" id="mQuote" disabled><em>1</em><span>Get a quote</span><small>free, checks it can run</small></button>
+            <div class="coin"><i class="slot" aria-hidden="true"></i><button type="button" class="key coin-key" id="mPay" disabled><em>2</em><span>Insert coin</span><small>pay 0.5 IMD from your wallet</small></button></div>
+          </div>
+          <div class="m-tray"><div class="receipt" id="mReceipt"><div id="mStatus" class="r-status">Your receipt comes out here: the quote, then the order.</div></div></div>
+
+        </div>
+        <div class="m-keypad" id="mKeypad" role="group" aria-label="Pick what you want"></div>
+      </div>
+      <a class="credit" href="https://imd.fun" target="_blank" rel="noopener">pepe by imd.fun · used with permission</a>
+    </div>
+    <canvas class="pepe" id="pepe" aria-hidden="true" title="poke Pepe"></canvas>
   </div>
+  <p class="start-alt small">Rather describe it in your own words? <button type="button" class="linkbtn" id="openAgent">Let your AI write the request</button>. Know the API? <button type="button" class="linkbtn" id="toExpert">Open the full form</button>.</p>
   <div class="chosen" id="chosenBar" hidden></div>
 
   <details class="sec agent" id="agentBox">
@@ -841,11 +912,10 @@ function renderForm(){
   const full = () => S.action === "oracle.request" ? renderOracleForm() : renderJobForm(S.action);
   let h;
   if (S.ui.goal && !S.ui.expert) {
-    const simple = renderSimple();
-    SKIP.clear(); simple.keys.forEach(k => SKIP.add(k));
+    SKIP.clear(); machineKeys().forEach(k => SKIP.add(k));
     const rest = full(); SKIP.clear();
     const open = document.querySelector("#expertBox")?.open;
-    h = simple.html + `<details class="expert" id="expertBox"${open ? " open" : ""}><summary><b>Fine-tune</b><span class="small muted">optional · which skills run, in what order, files, publishing. The defaults already work.</span></summary>${rest}</details>`;
+    h = `<details class="expert" id="expertBox"${open ? " open" : ""}><summary><b>Fine-tune</b><span class="small muted">optional · which skills run, in what order, files, publishing. The defaults already work.</span></summary>${rest}</details>`;
   } else h = full();
   $("#form").innerHTML = h;
   $("#typeBox").hidden = !!(S.ui.goal && !S.ui.expert);
@@ -873,7 +943,7 @@ function refresh(){
   document.querySelectorAll(".is-bad").forEach(e => e.classList.remove("is-bad"));
   problems.filter(p => p.lvl === "err").forEach(p => document.querySelectorAll(`[data-k="${CSS.escape(p.path)}"]`).forEach(e => e.classList.add("is-bad")));
   $("#quoteBtn").disabled = errs > 0;
-  roomSync();
+  machineUpdate(); syncKeys();
 }
 
 /* ================= form events ================= */
@@ -984,7 +1054,7 @@ $("#copyJson").onclick = async () => { try { await navigator.clipboard.writeText
 const post = (url, body) => fetch(url, {method:"POST", headers:{"Content-Type":"application/json", "X-Compose":"1"}, body:JSON.stringify(body || {})}).then(r => r.json());
 const get = url => fetch(url).then(r => r.json());
 let currentOrder = null, tick = null;
-function resetQuote(){ if (typeof RM !== "undefined") RM.ticket = {quote:null, pay:null}; currentOrder = null; $("#quoteOut").innerHTML = ""; $("#payBtn").disabled = true; clearInterval(tick); }
+function resetQuote(){ if ($("#mStatus")) roomEvent("reset"); currentOrder = null; $("#quoteOut").innerHTML = ""; $("#payBtn").disabled = true; clearInterval(tick); }
 $("#quoteBtn").onclick = async () => {
   const b = $("#quoteBtn"); b.disabled = true; b.textContent = "Quoting…";
   try {
@@ -1008,7 +1078,7 @@ function showQuote(res){
     currentOrder = o; roomEvent("quote", {ok:true, id:o.id});
     const q = o.quote || {};
     $("#quoteOut").innerHTML = `<div class="warnbox" style="border-color:var(--ok)"><b>Valid.</b> The network accepts the request.
-      <dl class="kv" style="margin-top:8px"><dt>order</dt><dd>${esc(o.id)}</dd><dt>price</dt><dd>${fmtIMD(q.amount)} IMD</dd><dt>to</dt><dd>${esc(q.payTo||"")}</dd><dt>expires</dt><dd id="qExp"></dd></dl></div>`;
+      <dl class="kv" style="margin-top:8px"><dt>order</dt><dd>${esc(o.id)}</dd><dt>price</dt><dd>${fmtIMD((q.payment||q).amount)} IMD</dd><dt>to</dt><dd>${esc((q.payment||q).payTo||"")}</dd><dt>expires</dt><dd id="qExp"></dd></dl></div>`;
     const upd = () => { const s = Math.round((q.expiresAt||0) - Date.now()/1000); const el = $("#qExp"); if (!el) return clearInterval(tick);
       el.textContent = s > 0 ? `in ${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}` : "expired: quote again"; $("#payBtn").disabled = s < 30; };
     clearInterval(tick); upd(); tick = setInterval(upd, 1000);
@@ -1053,7 +1123,7 @@ function plog(msg, cls=""){ const l = $("#payLog"); if (l) { l.insertAdjacentHTM
 
 async function openPay(orderId){
   const row = (await get("/local/orders")).find(r => r.orderId === orderId);
-  const need = BigInt(row?.quote?.amount || CAPS?.actions?.[0]?.payment?.amount || "500000000000000000");
+  const need = BigInt(row?.quote?.payment?.amount || row?.quote?.amount || CAPS?.actions?.[0]?.payment?.amount || "500000000000000000");
   modal(`<h2>Pay and send</h2>
     <p class="small">Order <b>${esc(orderId)}</b> · ${esc(row?.action||"")} · ${fmtIMD(need)} IMD</p>
     <p class="small muted">You will sign twice with the same wallet: the Permit2 payment (x402) and the EIP-712 approval of the quote. The server pays the gas. If the payment already started, a retry reuses the order and never charges twice.</p>
@@ -1355,38 +1425,50 @@ const GOALS = [
    ask:"What is the question?", ph:"Did project X publish a new release on its GitHub page on September 21, 2026 (UTC)?"},
 ];
 const goalOf = id => GOALS.find(g => g.id === id);
-function renderSimple(){
-  const g = goalOf(S.ui.goal), a = S.action, keys = [];
-  const k = x => (keys.push(x), x);
-  let h = `<div class="sec simple"><h2>2 · Describe it</h2>`;
-  if (a === "oracle.request") {
-    h += fld(k("or.question"), g.ask, `${S.or.question.length} / 2,000`, area("or.question", g.ph, "tall"))
-      + `<p class="tip">Ask something with one clear answer, and say exactly which day or period you mean.</p>`
-      + `<div class="row">${fld(k("or.answerType"), "The answer is", "", sel("or.answerType", [["bool","yes or no"],["uint256","a number"],["address","an address"],["address[]","a list of addresses"],["bytes32","a 32-byte value"],["bytes32[]","a list of 32-byte values"]]).replace("<select", '<select data-struct="1"'))}
-        ${fld(k("or.evidence"), "Found in", "", sel("or.evidence", [["panel","public web sources"],["chain","blockchain data"]]).replace("<select", '<select data-struct="1"'))}</div>`;
-  } else if (a === "workflow.open") {
-    h += fld(k("wf.request"), g.ask, `${S.wf.request.length} / 16,000`, area("wf.request", g.ph, "tall"))
-      + `<p class="tip">Name the token, its symbol and supply, what the contracts must never do, and what the site shows.</p>`
-      + fld(k("wf.context"), "Anything already decided", "optional", area("wf.context", "Sepolia only. No owner, no admin, no upgrades."));
-  } else {
-    h += fld(k("job.objective"), g.ask, `${S.job.objective.length} / 8,000`, area("job.objective", g.ph, "tall"))
-      + `<p class="tip">Be specific: names, numbers, what must never happen, and what "done" looks like. Machines cannot ask you questions.</p>`;
-    if (g.id === "site") h += fld(k("job.ipfsLabel"), "Site name", "optional · becomes &lt;name&gt;.site.identitymd.eth", txt("job.ipfsLabel", "my-project"));
-    if (g.id === "repo") h += `<div class="row2">${fld(k("job.repoUrl"), "Repository", "public GitHub URL", txt("job.repoUrl", "https://github.com/owner/repo"))}
-      ${fld(k("job.baseCommit"), "Commit", "the full 40-character id, from the repo's commit list", txt("job.baseCommit", "40 characters, 0-9 and a-f"))}</div>`;
-  }
-  return {html: h + `</div>`, keys};
+const GOAL_CODES = {report:"A1", contract:"A2", launch:"B1", dapp:"B2", site:"C1", repo:"C2", image:"D1", oracle:"D2"};
+const askKey = () => S.action === "oracle.request" ? "or.question" : S.action === "workflow.open" ? "wf.request" : "job.objective";
+const onMachine = () => !S.ui.expert;
+function machineKeys(){  // the fields the machine's display shows; the fine-tune skips them
+  const g = goalOf(S.ui.goal); if (!g) return [];
+  if (S.action === "oracle.request") return ["or.question", "or.answerType", "or.evidence"];
+  if (S.action === "workflow.open") return ["wf.request"];
+  return ["job.objective", ...(g.id === "site" ? ["job.ipfsLabel"] : []), ...(g.id === "repo" ? ["job.repoUrl", "job.baseCommit"] : [])];
+}
+const dIn = (k, label, hint, ph) => `<div><label for="d-${k}"><b>${label}</b><span>${hint}</span></label><input type="text" id="d-${k}" data-k="${k}" data-t="str" value="${esc(getP(k) || "")}" placeholder="${esc(ph)}" spellcheck="false"></div>`;
+const dSel = (k, label, opts) => `<div><label for="d-${k}"><b>${label}</b><span></span></label><select id="d-${k}" data-k="${k}" data-t="str" data-struct="1">${opts.map(([v, l]) => opt(v, getP(k), l)).join("")}</select></div>`;
+function machineFill(){  // puts the state on the machine: keypad, display, extra fields
+  const g = goalOf(S.ui.goal), ta = $("#mAsk");
+  $("#mKeypad").innerHTML = GOALS.map(x => `<button type="button" class="pk" data-goal="${x.id}" aria-pressed="${x.id === S.ui.goal}"><span class="code">${GOAL_CODES[x.id]}</span><span><span class="t">${esc(x.title)}</span><span class="d">${esc(x.blurb)}</span></span><span class="lamp" aria-hidden="true"></span></button>`).join("");
+  $("#mProduct").innerHTML = g ? `<b>${GOAL_CODES[g.id]}</b>${esc(g.title)}` : "Start here: pick what you want on the keypad";
+  $("#mAskLabel").textContent = g ? g.ask : "What do you want?";
+  ta.disabled = !g; ta.placeholder = g ? g.ph : "Pick one of the eight buttons first. Then write here, in your own words, what the machines should do.";
+  ta.value = g ? getP(askKey()) || "" : "";
+  let x = "";
+  if (g?.id === "site") x = dIn("job.ipfsLabel", "Site name", "optional · becomes name.site.identitymd.eth", "my-project");
+  if (g?.id === "repo") x = `<div class="two">${dIn("job.repoUrl", "Repository", "public GitHub address", "https://github.com/owner/repo")}${dIn("job.baseCommit", "Commit", "full 40-character id", "from the repo's commit list")}</div>`;
+  if (g?.id === "oracle") x = `<div class="two">${dSel("or.answerType", "The answer is", [["bool","yes or no"],["uint256","a number"],["address","an address"],["address[]","a list of addresses"],["bytes32","a 32-byte value"],["bytes32[]","a list of 32-byte values"]])}${dSel("or.evidence", "Found in", [["panel","public web sources"],["chain","blockchain data"]])}</div>`;
+  $("#mExtra").innerHTML = x;
+  $("#scene").classList.toggle("picked", !!g);
+  machineUpdate();
+}
+function machineUpdate(){  // the check line, after every change
+  const c = $("#mCheck"), g = goalOf(S.ui.goal); if (!c) return;
+  if (!g) { c.innerHTML = `<span class="st">waiting for a pick</span>`; return; }
+  const errs = lastProblems.filter(p => p.lvl === "err"), warns = lastProblems.filter(p => p.lvl !== "err");
+  if (!(getP(askKey()) || "").trim()) c.innerHTML = `<span class="st">waiting for your words</span>`;
+  else if (errs.length) c.innerHTML = `<span class="st err">${errs.length} thing${errs.length > 1 ? "s" : ""} to fix</span><ul>${errs.slice(0, 3).map(p => `<li><button type="button" data-path="${esc(p.path)}">${esc(p.msg)}</button></li>`).join("")}</ul>`;
+  else c.innerHTML = `<span class="st ok">${currentOrder ? (STATIC ? "quoted" : "quoted · press 2 to insert the coin") : "ready · press 1 for a free quote"}</span>${warns.length ? `<ul>${warns.map(p => `<li class="warn">${esc(p.msg)}</li>`).join("")}</ul>` : ""}`;
 }
 function renderStart(){
-  const g = goalOf(S.ui.goal), picked = !!(g || S.ui.expert);
-  $("#goals").innerHTML = GOALS.map(x => `<button type="button" role="listitem" class="goal${x.id === S.ui.goal ? " on" : ""}" data-goal="${x.id}"><b>${esc(x.title)}</b><span>${esc(x.blurb)}</span></button>`).join("");
-  $("#startBox").hidden = picked;
-  $("#agentBox").hidden = picked;
-  $("#composeGrid").hidden = !picked;
-  $("#chosenBar").hidden = !picked;
-  if (picked) $("#chosenBar").innerHTML = g && !S.ui.expert
-    ? `<span class="small muted">You asked for</span><b>${esc(g.title)}</b><button type="button" class="linkbtn" data-restart="1">change</button><button type="button" class="linkbtn" data-full="1">use the full form</button>`
-    : `<span class="small muted">${S.ui.source === "agent" ? "Written by your AI · check it on the right" : "Full form"}</span><button type="button" class="linkbtn" data-restart="1">back to the simple choices</button>`;
+  const g = goalOf(S.ui.goal), machine = onMachine();
+  $("#scene").hidden = !machine; $(".start-alt").hidden = !machine; $("#agentBox").hidden = !machine;
+  $("#chosenBar").hidden = machine;
+  if (!machine) $("#chosenBar").innerHTML = `<span class="small muted">${S.ui.source === "agent" ? "Written by your AI · the check on the right says what to fix" : "The full form"}</span><button type="button" class="linkbtn" data-restart="1">back to the machine</button>`;
+  $("#composeGrid").hidden = machine && !g;
+  $("#composeGrid").classList.toggle("machine-mode", machine);
+  (machine ? $("#mReceipt") : $("#sendBox")).appendChild($("#quoteOut"));
+  if (STATIC) { const sb = $("#staticBox"); (machine ? $("#mReceipt") : $("#sendBox").parentElement).appendChild(sb); sb.hidden = false; }
+  machineFill();
 }
 function chooseGoal(id){
   const g = goalOf(id); if (!g) return;
@@ -1394,16 +1476,61 @@ function chooseGoal(id){
   if (g.action === "oracle.request") S.or = blankOracle();
   loadInput(g.action, JSON.parse(JSON.stringify(g.input)));
   resetQuote(); renderStart(); roomEvent("goal");
-  const f = $("#form .simple textarea");
-  if (f) { f.focus({preventScroll:true}); $("#chosenBar").scrollIntoView({behavior:"smooth", block:"start"}); }
+  $("#mAsk").focus({preventScroll:true});
+  if (innerWidth < 900) $("#mDisplay").scrollIntoView({behavior:"smooth", block:"center"});
 }
-$("#goals").addEventListener("click", e => { const b = e.target.closest("[data-goal]"); if (b) chooseGoal(b.dataset.goal); });
-$("#chosenBar").addEventListener("click", e => {
-  const b = e.target.closest("button"); if (!b) return;
-  if (b.dataset.restart) { S.ui = {goal:null, expert:false, source:null}; persist(); renderStart(); $("#startBox").scrollIntoView({behavior:"smooth", block:"start"}); }
-  if (b.dataset.full) { S.ui.expert = true; renderAll(); renderStart(); }
+$("#mKeypad").addEventListener("click", e => { const b = e.target.closest("[data-goal]"); if (b) chooseGoal(b.dataset.goal); });
+$("#mDisplay").addEventListener("input", e => {
+  const el = e.target;
+  if (el.id === "mAsk") { setP(askKey(), el.value); roomEvent("typing"); }
+  else if (el.dataset.k && !el.dataset.struct) { setP(el.dataset.k, parseVal(el)); if (el.dataset.k === "job.ipfsLabel") S.job.ipfs = el.value ? "label" : "true"; }
+  else return;
+  refresh();
 });
-$("#toExpert").onclick = () => { S.ui = {goal:null, expert:true, source:null}; renderAll(); renderStart(); };
+$("#mDisplay").addEventListener("change", e => { const el = e.target; if (el.dataset.struct) { setP(el.dataset.k, parseVal(el)); renderForm(); refresh(); } });
+$("#mCheck").addEventListener("click", e => {
+  const b = e.target.closest("button[data-path]"); if (!b) return;
+  const inMachine = $(`#mDisplay [data-k="${CSS.escape(b.dataset.path)}"]`) || (b.dataset.path === askKey() ? $("#mAsk") : null);
+  if (inMachine) return inMachine.focus();
+  const el = document.querySelector(`#form [data-k="${CSS.escape(b.dataset.path)}"]`) || document.querySelector(`#form [data-f="${CSS.escape(b.dataset.path)}"]`);
+  if (el) { el.closest("details")?.setAttribute("open", ""); el.scrollIntoView({behavior:"smooth", block:"center"}); el.focus?.({preventScroll:true}); }
+});
+// the two big keys drive the same quote and pay flow as the full form's buttons
+function mirrorKeys(){
+  const sync = () => {
+    $("#mQuote").disabled = $("#quoteBtn").disabled || !goalOf(S.ui.goal);
+    $("#mPay").disabled = $("#payBtn").disabled || STATIC;
+    $("#mQuote").classList.toggle("next", !$("#mQuote").disabled && !currentOrder);
+    $("#mPay").classList.toggle("next", !$("#mPay").disabled);
+  };
+  const mo = new MutationObserver(sync);
+  ["#quoteBtn", "#payBtn"].forEach(id => mo.observe($(id), {attributes:true, attributeFilter:["disabled"]}));
+  sync(); return sync;
+}
+let syncKeys = () => {};
+$("#mQuote").onclick = () => { const g = goalOf(S.ui.goal); if (!$("#labelIn").value && g) $("#labelIn").value = g.title; $("#quoteBtn").click(); };
+$("#mPay").onclick = () => $("#payBtn").click();
+$("#mReceipt").addEventListener("click", e => { const a = e.target.closest("[data-tab-link]"); if (a) { e.preventDefault(); showTab(a.dataset.tabLink); } });
+function printReceipt(){ const r = $("#mReceipt"); r.classList.remove("printing"); void r.offsetWidth; r.classList.add("printing"); }
+let PEPE = null, lastLook = 0;
+function roomEvent(kind, data){
+  const st = $("#mStatus");
+  if (kind === "reset") st.textContent = "Your receipt comes out here: the quote, then the order.";
+  if (kind === "quote") { st.innerHTML = data.ok ? "<b>Quote ready.</b> Press <b>2 · Insert coin</b> before it expires; your wallet shows what you sign." : "<b>No quote.</b> Nothing was charged. The reason is below."; printReceipt(); }
+  if (kind === "sent") { st.innerHTML = data.ok ? `<b>The swarm has your request.</b> Follow it in <a href="#" data-tab-link="orders">Orders</a>.` : `<b>Not sent</b> (${esc(data.status)}). Get a new quote to try again.`; printReceipt(); }
+  syncKeys(); machineUpdate();
+  if (!PEPE) return;
+  if (kind === "goal") PEPE.react("greet");
+  else if (kind === "typing" && performance.now() - lastLook > 9000) { lastLook = performance.now(); PEPE.react("look"); }
+  else if (kind === "quote") PEPE.react(data.ok ? "jump" : "headshake");
+  else if (kind === "sent") PEPE.react(data.ok ? "dance" : "faint");
+}
+function machineInit(){ PEPE = pepeStart($("#pepe")); syncKeys = mirrorKeys(); }
+$("#chosenBar").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b || !b.dataset.restart) return;
+  S.ui = {goal:null, expert:false, source:null}; renderAll(); renderStart(); $("#scene").scrollIntoView({behavior:"smooth", block:"start"});
+});
+$("#toExpert").onclick = () => { S.ui = {goal:S.ui.goal, expert:true, source:null}; renderAll(); renderStart(); };
 $("#openAgent").onclick = () => { $("#agentBox").open = true; $("#agentBox").scrollIntoView({behavior:"smooth", block:"start"}); };
 function parseLoose(text){  // an AI answer may come wrapped in prose or a code fence
   const t = text.trim(), a = t.indexOf("{"), b = t.lastIndexOf("}");
@@ -1492,241 +1619,11 @@ function applyStatic(){
   $("#helperCmd").textContent = `git clone ${HELPER_REPO}\ncd imd-compose && python3 server.py`;
 }
 
-/* ================= the room: the skills wall, the ticket on phosphor, pepe at the desk ================= */
-// Same idiom as imd-panel's wall, itself after imd.fun's front page: a grey wall of instrument modules on a cell
-// grid and a phosphor monitor. Here every module is a skill of the network. The skills your request will run come
-// forward as big consoles and light up, the knowledge it attaches glows amber, and the monitor types your request
-// out as a ticket: what you asked for, the check, the quote, the payment. Modules are seeded by the skill id, so a
-// skill looks the same on every visit.
-const PAL = {wall:"#7d7d79", face:"#d6d6d2", faceLit:"#e6ecdc", faceHot:"#f4f4f0", stroke:"#141414", screen:"#0a0a0a", glass:"#c9ecbf", phos:"#c9ecbf", phosDim:"#7fb37a", lamp:"#3ecf7a", bad:"#ff6b62", amber:"#ffcf5a", dimFace:"#c4c4bf"};
-const TAU = Math.PI * 2, MONO = '"IBM Plex Mono",ui-monospace,Menlo,monospace';
-const hash32 = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
-const rng = seed => { let e = (Math.imul(2654435761, seed) + 12345) >>> 0; return () => { let t = Math.imul((e += 1831565813) ^ e >>> 15, 1 | e); t ^= t + Math.imul(t ^ t >>> 7, 61 | t); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
-const RM = {canvas:null, ctx:null, cell:40, cols:0, rows:0, width:0, height:0, units:[], grid:[], monitor:null, hot:null, warm:new Map(), flash:new Map(),
-  lastDrift:0, frameN:0, dirty:true, still:false, tip:null, seen:true, used:new Set(), refs:new Set(), usedKey:"", ticket:{quote:null, pay:null}, pepe:null, lastLook:0};
-// what a template runs, as far as the docs describe it
-const TEMPLATE_SKILLS = {single:["implement-contract"], impl_tests:["implement-contract","write-foundry-tests"], impl_tests_review:["implement-contract","write-foundry-tests","adversarial-review"],
-  multi_contract:["implement-one-contract","write-foundry-tests","adversarial-review"], research:["research-report"], fuzz:[]};
-
-function roomInit(){
-  RM.canvas = $("#wall"); if (!RM.canvas) return; RM.ctx = RM.canvas.getContext("2d"); RM.tip = $("#wtip");
-  RM.still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  new ResizeObserver(() => { roomLayout(); RM.dirty = true; }).observe(RM.canvas.parentElement);
-  new IntersectionObserver(es => { RM.seen = es[0].isIntersecting; }).observe(RM.canvas);
-  RM.canvas.addEventListener("mousemove", roomMove);
-  RM.canvas.addEventListener("mouseleave", () => { RM.hot = null; RM.tip.classList.remove("on"); RM.dirty = true; });
-  RM.canvas.addEventListener("click", e => { const u = roomUnitAt(e); if (u && !u.filler) { RM.flash.set(u.id, performance.now() + 90); RM.dirty = true; } });
-  RM.pepe = pepeStart($("#pepe"));
-  roomSync(); roomLayout();
-  if (!RM.still) requestAnimationFrame(roomFrame);
-}
-// the request -> which skills run, which knowledge rides along
-function roomSync(){
-  const used = new Set(), refs = new Set();
-  try {
-    if (S.action === "oracle.request") used.add("oracle-assess");
-    else {
-      const x = buildInput(), j = S.action === "workflow.open" ? x.draft || {} : x;
-      if (j.skill) used.add(j.skill);
-      (TEMPLATE_SKILLS[j.template] || []).forEach(k => used.add(k));
-      (j.steps || []).forEach(s => { if (s.skill) used.add(s.skill); (s.references || []).forEach(r => refs.add(r)); });
-      (j.references || []).forEach(r => refs.add(r));
-    }
-  } catch {}
-  const picked = !!(S.ui.goal || S.ui.expert);
-  if (!picked) { used.clear(); refs.clear(); }
-  const key = [...used].sort().join() + "|" + [...refs].sort().join();
-  RM.used = used; RM.refs = refs; RM.dirty = true;
-  if (key !== RM.usedKey) { RM.usedKey = key; roomLayout(); }
-}
-function roomUnits(){
-  const list = SKILLS.length ? SKILLS : SKILLS_SNAPSHOT;
-  const mk = (s, big) => { const seed = hash32(s.id), g = rng(seed);
-    return {id:s.id, skill:s, w:big ? 2 : 1, h:big ? 2 : 1, seed, kind:big ? Math.floor(g() * 8) : Math.floor(g() * 16), phase:g() * TAU,
-      state:RM.used.has(s.id) ? "use" : RM.refs.has(s.id) ? "ref" : "none", filler:false}; };
-  const used = list.filter(s => RM.used.has(s.id)), rest = list.filter(s => !RM.used.has(s.id));
-  return used.map(s => mk(s, true)).concat(rest.map(s => mk(s, false)));
-}
-function roomLayout(){
-  if (!RM.canvas) return;
-  const width = RM.canvas.parentElement.clientWidth; if (!width) return;
-  const cols = Math.max(8, Math.round(width / (width < 720 ? 30 : 40))), cell = width / cols;
-  const units = roomUnits();
-  const mw = Math.min(cols - 2, Math.max(7, Math.round(cols * .38))), mh = 4;
-  const grid = [];
-  const free = (c, r, w, h) => { if (c + w > cols) return false; for (let y = r; y < r + h; y++) for (let x = c; x < c + w; x++) if (grid[y] && grid[y][x]) return false; return true; };
-  const take = (u, c, r) => { u.c = c; u.r = r; for (let y = r; y < r + u.h; y++) { grid[y] = grid[y] || []; for (let x = c; x < c + u.w; x++) grid[y][x] = u; } };
-  RM.monitor = {c:0, r:0, w:mw, h:mh, mon:true}; take(RM.monitor, 0, 0);
-  for (const u of units) { let placed = false; for (let r = 0; !placed && r < 400; r++) for (let c = 0; c < cols; c++) if (free(c, r, u.w, u.h)) { take(u, c, r); placed = true; break; } }
-  const rows = Math.max(5, grid.length);
-  const fill = [];
-  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) { if (grid[r] && grid[r][c]) continue; const seed = hash32(`seat-${c}-${r}`), g = rng(seed);
-    const u = {id:`seat-${c}-${r}`, skill:null, w:1, h:1, seed, kind:Math.floor(g() * 16), phase:g() * TAU, state:"none", filler:true}; take(u, c, r); fill.push(u); }
-  Object.assign(RM, {units:units.concat(fill), grid, cols, rows, cell, width, height:rows * cell});
-  const dpr = Math.min(2, devicePixelRatio || 1);
-  RM.canvas.width = Math.round(width * dpr); RM.canvas.height = Math.round(RM.height * dpr); RM.canvas.style.height = RM.height + "px";
-  RM.ctx.setTransform(dpr, 0, 0, dpr, 0, 0); RM.ctx.lineJoin = "round"; RM.dirty = true;
-  if (RM.still) roomDraw(performance.now());
-}
-function roomFrame(t){
-  RM.frameN++;
-  if (RM.frameN % 2 || !RM.seen || document.visibilityState !== "visible") { requestAnimationFrame(roomFrame); return; }
-  if (t - RM.lastDrift > 15000) { RM.lastDrift = t; const idle = RM.units.filter(u => u.state === "none"); for (let i = 0; i < Math.max(1, Math.round(idle.length * .06)); i++) { const u = idle[Math.floor(Math.random() * idle.length)]; u.phase = Math.random() * TAU; RM.warm.set(u.id, t + 1400 + Math.random() * 900); } RM.dirty = true; }
-  for (const [k, v] of RM.warm) if (t > v) { RM.warm.delete(k); RM.dirty = true; }
-  for (const [k, v] of RM.flash) if (t > v) { RM.flash.delete(k); RM.dirty = true; }
-  roomDraw(t);  // the monitor's cursor blinks and the used consoles run, so there is always something moving
-  requestAnimationFrame(roomFrame);
-}
-function roomDraw(t){
-  const {ctx} = RM; if (!ctx || !RM.cols) return; RM.dirty = false;
-  ctx.fillStyle = PAL.wall; ctx.fillRect(0, 0, RM.width, RM.height);
-  for (const u of RM.units) drawUnit(u, t);
-  drawTicket(t);
-}
-function drawUnit(u, t){
-  const {ctx, cell} = RM; const x = u.c * cell + 1, y = u.r * cell + 1, w = u.w * cell - 2, h = u.h * cell - 2;
-  const use = u.state === "use", ref = u.state === "ref", anim = use || RM.warm.has(u.id) || RM.flash.has(u.id);
-  ctx.fillStyle = use ? PAL.faceHot : ref ? PAL.faceLit : u.filler ? PAL.dimFace : PAL.face; ctx.fillRect(x, y, w, h);
-  ctx.strokeStyle = PAL.stroke; ctx.lineWidth = 1; ctx.globalAlpha = u.filler ? .55 : .9; ctx.strokeRect(x + .5, y + .5, w - 1, h - 1); ctx.globalAlpha = 1;
-  if (u.w > 1) { ctx.lineWidth = 1.5; ctx.strokeRect(x + .75, y + .75, w - 1.5, h - 1.5); ctx.lineWidth = 1; screws(x, y, w, h); }
-  const P = {x, y, w, h, cx:x + w / 2, cy:y + h / 2, m:Math.min(w, h), g:rng(u.seed + 7), ph:u.phase, anim, t};
-  if (u.w > 1) bigModule(u.kind, P, u); else smallModule(u.kind, P);
-  if (!u.filler) { const lr = Math.max(1.6, cell * .06), lx = x + w - lr * 2.4, ly = y + lr * 2.4; ctx.beginPath(); ctx.arc(lx, ly, lr, 0, TAU);
-    if (use) { ctx.fillStyle = PAL.lamp; ctx.globalAlpha = .55 + .45 * Math.sin(t / 300); ctx.fill(); ctx.globalAlpha = 1; }
-    else if (ref) { ctx.fillStyle = PAL.amber; ctx.fill(); }
-    else { ctx.strokeStyle = PAL.stroke; ctx.lineWidth = 1; ctx.stroke(); } }
-  if (use) { ctx.strokeStyle = PAL.lamp; ctx.lineWidth = 2; ctx.strokeRect(x + 1.5, y + 1.5, w - 3, h - 3); ctx.lineWidth = 1; }
-  else if (ref) { ctx.strokeStyle = PAL.amber; ctx.lineWidth = 1.5; ctx.strokeRect(x + 1.5, y + 1.5, w - 3, h - 3); ctx.lineWidth = 1; }
-  if (RM.hot === u && !u.filler) { ctx.fillStyle = "#fff"; ctx.globalAlpha = .18; ctx.fillRect(x, y, w, h); ctx.globalAlpha = 1; }
-  const f = RM.flash.get(u.id); if (f) { ctx.fillStyle = "#fff"; ctx.globalAlpha = Math.max(0, Math.min(.5, (f - t) / 90 * .5)); ctx.fillRect(x, y, w, h); ctx.globalAlpha = 1; }
-}
-function screws(x, y, w, h){ const {ctx} = RM; const e = Math.max(1.2, RM.cell * .05), o = e * 2.2; ctx.strokeStyle = PAL.stroke; ctx.globalAlpha = .55; ctx.lineWidth = 1;
-  for (const [cx, cy] of [[x + o, y + o], [x + w - o, y + o], [x + o, y + h - o], [x + w - o, y + h - o]]) { ctx.beginPath(); ctx.arc(cx, cy, e, 0, TAU); ctx.stroke(); ctx.beginPath(); ctx.moveTo(cx - .7 * e, cy + .3 * e); ctx.lineTo(cx + .7 * e, cy - .3 * e); ctx.stroke(); } ctx.globalAlpha = 1; }
-// ---- 16 small modules (1x1) and 8 big consoles (2x2), drawn exactly as on the panel's wall
-function smallModule(k, P){
-  const {ctx} = RM; const {cx, cy, m, g, ph, anim, t} = P; const u = m / 20, lw = Math.max(1, Math.min(2, Math.round(m / 22 * 2) / 2));
-  ctx.lineWidth = lw; ctx.strokeStyle = PAL.stroke; ctx.fillStyle = PAL.stroke; ctx.lineCap = "round";
-  if (k === 0) { ctx.beginPath(); ctx.arc(cx, cy, .46 * m, 0, TAU); ctx.stroke(); const a = ph + (anim ? .8 * Math.sin(t / 500) : 0); ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a) * m * .34, cy + Math.sin(a) * m * .34); ctx.stroke(); ctx.beginPath(); ctx.arc(cx, cy, 1.2 * u, 0, TAU); ctx.fill(); }
-  else if (k === 1 || k === 15) { const sq = k === 15; const step = m < 16 ? 3 : 1; for (let i = 0; i < 12; i += step) { const a = i * Math.PI / 6, ca = Math.cos(a), sa = Math.sin(a); let r0, r1; if (sq) { r1 = .44 * m / Math.max(Math.abs(ca), Math.abs(sa)); r0 = r1 * (i % 3 ? .85 : .72); } else { r0 = m * (i % 3 ? .4 : .34); r1 = .46 * m; } ctx.beginPath(); ctx.moveTo(cx + ca * r0, cy + sa * r0); ctx.lineTo(cx + ca * r1, cy + sa * r1); ctx.stroke(); }
-    const h1 = ph + (anim ? t / 6000 : 0), h2 = ph * 1.7 + (anim ? t / 500 : 0); ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(h1) * m * .2, cy + Math.sin(h1) * m * .2); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(h2) * m * .32, cy + Math.sin(h2) * m * .32); ctx.stroke(); }
-  else if (k === 2) { const p = Math.max(2, Math.round(2.5 * u)), x = P.x + p, y = P.y + p, w = P.w - 2 * p, h = P.h - 2 * p; ctx.fillStyle = PAL.screen; ctx.fillRect(x, y, w, h);
-    ctx.save(); ctx.beginPath(); ctx.rect(x + 1, y + 1, w - 2, h - 2); ctx.clip(); ctx.strokeStyle = PAL.glass; ctx.beginPath(); const mg = Math.max(2, .14 * w), mid = y + h / 2;
-    for (let i = 0; i <= 8; i++) { const px = x + mg + (w - 2 * mg) * i / 8, py = mid + (anim ? Math.sin(1.1 * i + t / 260 + ph) : Math.sin(1.1 * i + ph) * .6) * h * .22; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); } ctx.stroke(); ctx.restore(); }
-  else if (k === 3) { const s = .36 * m, e = .08 * m, on = anim ? Math.floor(t / 400) % 4 : Math.floor(ph / TAU * 4); for (let i = 0; i < 4; i++) { const x = cx - s - e / 2 + (i % 2) * (s + e), y = cy - s - e / 2 + Math.floor(i / 2) * (s + e); ctx.strokeRect(x + .5, y + .5, s - 1, s - 1); if (i === on || g() < .25) ctx.fillRect(x + 1, y + 1, s - 2, s - 2); } }
-  else if (k === 4) { const s = .28 * m, r = Math.max(1, 1.6 * u); for (let yy = -1; yy <= 1; yy++) for (let xx = -1; xx <= 1; xx++) { ctx.beginPath(); ctx.arc(cx + xx * s, cy + yy * s, r, 0, TAU); ((xx + yy + 3 + (anim ? Math.floor(t / 350) : Math.floor(ph))) % 3 === 0) ? ctx.fill() : ctx.stroke(); } }
-  else if (k === 5) { ctx.beginPath(); ctx.arc(cx, cy, .36 * m, 0, TAU); ctx.fill(); ctx.strokeStyle = PAL.face; ctx.beginPath(); ctx.arc(cx, cy, .16 * m, 0, TAU); ctx.stroke(); }
-  else if (k === 6) { ctx.lineWidth = Math.max(2, .12 * m); ctx.beginPath(); ctx.arc(cx, cy, .3 * m, 0, TAU); ctx.stroke(); }
-  else if (k === 7) { const s = .3 * m; ctx.beginPath(); ctx.moveTo(cx, cy - s); ctx.lineTo(cx + s, cy); ctx.lineTo(cx, cy + s); ctx.lineTo(cx - s, cy); ctx.closePath(); ctx.stroke(); }
-  else if (k === 8) { const s = .3 * m; ctx.lineWidth = Math.max(2, .16 * m); ctx.lineCap = "butt"; ctx.beginPath(); ctx.moveTo(cx - s, cy); ctx.lineTo(cx + s, cy); ctx.moveTo(cx, cy - s); ctx.lineTo(cx, cy + s); ctx.stroke(); }
-  else if (k === 9) { const top = anim ? Math.floor(t / 900) % 2 === 0 : ph < Math.PI; ctx.fillRect(P.x + 1, top ? P.y + 1 : cy, P.w - 2, P.h / 2 - 1); }
-  else if (k === 10) { const w = .34 * m, h = .62 * m; const up = (ph < Math.PI) !== (anim && Math.floor(t / 700) % 2 === 0); ctx.strokeRect(cx - w / 2 + .5, cy - h / 2 + .5, w - 1, h - 1); ctx.fillRect(cx - w / 2 + 1, up ? cy - h / 2 + 1 : cy, w - 2, h / 2 - 1); }
-  else if (k === 11) { const on = anim ? Math.floor(t / 500 + P.x) % 3 === 0 : ph < 2; ctx.beginPath(); ctx.arc(cx, cy, .14 * m, 0, TAU); on ? ctx.fill() : ctx.stroke(); }
-  else if (k === 12) { const on = anim ? Math.floor(t / 500 + P.x) % 3 === 0 : ph < 2, e = .14 * m; on ? ctx.fillRect(Math.round(cx - e), Math.round(cy - e), Math.round(2 * e), Math.round(2 * e)) : ctx.strokeRect(Math.round(cx - e) + .5, Math.round(cy - e) + .5, Math.round(2 * e) - 1, Math.round(2 * e) - 1); }
-  else if (k === 13) { const s = .36 * m; ctx.fillRect(Math.round(cx - s), Math.round(cy - s), Math.round(2 * s), Math.round(2 * s)); ctx.strokeStyle = PAL.face; const e = .16 * m; ctx.strokeRect(Math.round(cx - e) + .5, Math.round(cy - e) + .5, Math.round(2 * e) - 1, Math.round(2 * e) - 1); }
-  else { const s = .3 * m; ctx.lineWidth = Math.max(2, .12 * m); ctx.strokeRect(Math.round(cx - s) + .5, Math.round(cy - s) + .5, Math.round(2 * s) - 1, Math.round(2 * s) - 1); }
-  ctx.lineCap = "butt"; ctx.lineWidth = 1;
-}
-function bigModule(k, P, u){
-  const {ctx} = RM; const {x, y, w, h, cx, cy, m, g, ph, anim, t} = P; const pad = Math.max(4, m * .09);
-  ctx.strokeStyle = PAL.stroke; ctx.fillStyle = PAL.stroke; ctx.lineWidth = 1.2; ctx.lineCap = "round";
-  if (k === 0) { const r = m * .16, dx = m * .26; for (let i = 0; i < 4; i++) { const kx = cx + (i % 2 ? dx : -dx), ky = cy + (i < 2 ? -dx : dx); ctx.beginPath(); ctx.arc(kx, ky, r, 0, TAU); ctx.fillStyle = PAL.face; ctx.fill(); ctx.stroke();
-    for (let j = 0; j < 8; j++) { const a = j * TAU / 8; ctx.beginPath(); ctx.moveTo(kx + Math.cos(a) * r * 1.18, ky + Math.sin(a) * r * 1.18); ctx.lineTo(kx + Math.cos(a) * r * 1.32, ky + Math.sin(a) * r * 1.32); ctx.stroke(); }
-    const a = ph * (i + 1) + (anim ? Math.sin(t / 700 + i) * .6 : 0); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(kx, ky); ctx.lineTo(kx + Math.cos(a) * r * .8, ky + Math.sin(a) * r * .8); ctx.stroke(); ctx.lineWidth = 1.2; } ctx.fillStyle = PAL.stroke; }
-  else if (k === 1) { const fx = x + pad, fy = y + pad, fw = w - 2 * pad, fh = h * .62 - pad; ctx.fillStyle = "#f3f0e4"; ctx.fillRect(fx, fy, fw, fh); ctx.strokeRect(fx + .5, fy + .5, fw - 1, fh - 1);
-    const px = cx, py = fy + fh * .95, R = fh * .85; for (let i = 0; i <= 10; i++) { const a = Math.PI * (1 - i / 10) * .75 + Math.PI * .125; const r0 = R * (i % 5 ? .9 : .84); ctx.strokeStyle = i >= 8 ? PAL.bad : PAL.stroke; ctx.beginPath(); ctx.moveTo(px + Math.cos(a) * r0, py - Math.sin(a) * r0); ctx.lineTo(px + Math.cos(a) * R, py - Math.sin(a) * R); ctx.stroke(); }
-    const lvl = anim ? .5 + .4 * Math.sin(t / 230 + ph) * Math.sin(t / 1700) : g(); const a = Math.PI * (1 - lvl) * .75 + Math.PI * .125; ctx.strokeStyle = "#b3261e"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + Math.cos(a) * R * .95, py - Math.sin(a) * R * .95); ctx.stroke(); ctx.fillStyle = PAL.stroke; ctx.beginPath(); ctx.arc(px, py, 2.5, 0, TAU); ctx.fill();
-    ctx.font = `${Math.max(7, m * .09)}px ${MONO}`; ctx.textAlign = "center"; ctx.fillText("VU", cx, fy + fh * .55); const kr = m * .08; for (let i = 0; i < 3; i++) { const kx = x + w * (.25 + .25 * i), ky = y + h * .8; ctx.beginPath(); ctx.arc(kx, ky, kr, 0, TAU); ctx.stroke(); const a = ph * (i + 2); ctx.beginPath(); ctx.moveTo(kx, ky); ctx.lineTo(kx + Math.cos(a) * kr * .8, ky + Math.sin(a) * kr * .8); ctx.stroke(); } }
-  else if (k === 2) { const r = m * .4; ctx.fillStyle = PAL.screen; ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.fill(); ctx.strokeStyle = PAL.glass; ctx.globalAlpha = .35; for (let i = 1; i <= 3; i++) { ctx.beginPath(); ctx.arc(cx, cy, r * i / 3, 0, TAU); ctx.stroke(); } ctx.beginPath(); ctx.moveTo(cx - r, cy); ctx.lineTo(cx + r, cy); ctx.moveTo(cx, cy - r); ctx.lineTo(cx, cy + r); ctx.stroke(); ctx.globalAlpha = 1;
-    const a = anim ? t / 900 : ph; const grd = ctx.createConicGradient ? ctx.createConicGradient(a - 1.2, cx, cy) : null; if (grd) { grd.addColorStop(0, "rgba(62,207,122,0)"); grd.addColorStop(.19, "rgba(62,207,122,.55)"); grd.addColorStop(.191, "rgba(62,207,122,0)"); grd.addColorStop(1, "rgba(62,207,122,0)"); ctx.fillStyle = grd; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, 0, TAU); ctx.fill(); }
-    ctx.strokeStyle = PAL.lamp; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); ctx.stroke(); const gg = rng(u.seed + 3); for (let i = 0; i < 3; i++) { const ba = gg() * TAU, br = gg() * r * .85; ctx.fillStyle = PAL.lamp; ctx.globalAlpha = .5 + .5 * ((Math.cos(ba - a) + 1) / 2); ctx.beginPath(); ctx.arc(cx + Math.cos(ba) * br, cy + Math.sin(ba) * br, 1.8, 0, TAU); ctx.fill(); } ctx.globalAlpha = 1; ctx.fillStyle = PAL.stroke; }
-  else if (k === 3) { const sx = x + pad, sy = y + pad * 1.4, sw = w - 2 * pad, sh = h * .42; ctx.fillStyle = PAL.screen; ctx.fillRect(sx, sy, sw, sh); const rec = u.skill && u.skill.record; const val = anim ? Math.round((t / 50 + ph * 100) % 10000) : rec ? rec.accepted || 0 : Math.round(ph * 1000);
-    sevenSeg(String(val).padStart(4, "0").slice(-4), sx + sw * .1, sy + sh * .18, sw * .8, sh * .64, u.state === "use" ? PAL.lamp : PAL.bad);
-    ctx.fillStyle = PAL.stroke; ctx.font = `${Math.max(7, m * .085)}px ${MONO}`; ctx.textAlign = "left"; ctx.fillText(rec ? "DONE" : "COUNT", sx, y + h - pad * 1.2); const br = m * .05; for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.arc(x + w - pad - i * br * 3.2, y + h - pad * 1.6, br, 0, TAU); (i === 0 && anim) || (g() < .4) ? ctx.fill() : ctx.stroke(); } }
-  else if (k === 4) { const r = m * .2, dx = m * .24; for (const s of [-1, 1]) { const rx = cx + s * dx, ry = cy - m * .06; ctx.beginPath(); ctx.arc(rx, ry, r, 0, TAU); ctx.fillStyle = "#2a2a28"; ctx.fill(); ctx.strokeStyle = PAL.stroke; ctx.stroke();
-    const a = (anim ? t / 700 : 0) * s + ph; ctx.strokeStyle = PAL.face; ctx.lineWidth = 1.2; for (let i = 0; i < 3; i++) { const aa = a + i * TAU / 3; ctx.beginPath(); ctx.moveTo(rx + Math.cos(aa) * r * .3, ry + Math.sin(aa) * r * .3); ctx.lineTo(rx + Math.cos(aa) * r * .85, ry + Math.sin(aa) * r * .85); ctx.stroke(); } ctx.beginPath(); ctx.arc(rx, ry, r * .22, 0, TAU); ctx.fillStyle = PAL.face; ctx.fill(); }
-    ctx.strokeStyle = PAL.stroke; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cx - dx, cy - m * .06 + r); ctx.quadraticCurveTo(cx, cy + m * .22, cx + dx, cy - m * .06 + r); ctx.stroke(); for (let i = 0; i < 3; i++) { const bx = x + w * (.3 + .2 * i), by = y + h * .86; ctx.strokeRect(bx - m * .05, by - m * .04, m * .1, m * .08); } ctx.fillStyle = PAL.stroke; }
-  else if (k === 5) { const n = 5, gap = (w - 2 * pad) / n; for (let i = 0; i < n; i++) { const sx = x + pad + gap * (i + .5), top = y + pad, bot = y + h - pad; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(sx, top); ctx.lineTo(sx, bot); ctx.stroke(); for (let j = 0; j <= 6; j++) { const ty = top + (bot - top) * j / 6; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(sx - 3, ty); ctx.lineTo(sx + 3, ty); ctx.stroke(); }
-    const lv = anim ? (Math.sin(t / 900 + i + ph) + 1) / 2 : g(); const ky = top + (bot - top) * lv; ctx.fillStyle = PAL.stroke; ctx.fillRect(sx - gap * .28, ky - m * .045, gap * .56, m * .09); ctx.fillStyle = "#fff"; ctx.fillRect(sx - gap * .28, ky - .75, gap * .56, 1.5); ctx.fillStyle = PAL.stroke; } }
-  else if (k === 6) { const n = 4, gap = (w - 2 * pad) / n, rows = 8; for (let i = 0; i < n; i++) { const lv = anim ? Math.round(rows * ((Math.sin(t / 300 + i * 1.3 + ph) + 1) / 2)) : Math.round(rows * g()); for (let j = 0; j < rows; j++) { const bx = x + pad + gap * i + gap * .2, by = y + h - pad - (j + 1) * ((h - 2 * pad) / rows) + 2, bw = gap * .6, bh = (h - 2 * pad) / rows - 4; const on = j < lv; ctx.fillStyle = on ? (j >= rows - 2 ? PAL.bad : j >= rows - 4 ? PAL.amber : PAL.lamp) : "#b9b9b4"; ctx.fillRect(bx, by, bw, bh); } } ctx.fillStyle = PAL.stroke; }
-  else { const sx = x + pad, sy = y + pad, sw = w - 2 * pad, sh = h - 2 * pad; ctx.fillStyle = PAL.screen; ctx.fillRect(sx, sy, sw, sh); ctx.save(); ctx.beginPath(); ctx.rect(sx + 1, sy + 1, sw - 2, sh - 2); ctx.clip(); ctx.strokeStyle = PAL.glass; ctx.globalAlpha = .25; ctx.lineWidth = 1; for (let i = 1; i < 4; i++) { ctx.beginPath(); ctx.moveTo(sx, sy + sh * i / 4); ctx.lineTo(sx + sw, sy + sh * i / 4); ctx.moveTo(sx + sw * i / 4, sy); ctx.lineTo(sx + sw * i / 4, sy + sh); ctx.stroke(); } ctx.globalAlpha = 1;
-    ctx.strokeStyle = PAL.lamp; ctx.lineWidth = 1.5; ctx.shadowColor = PAL.lamp; ctx.shadowBlur = 4; ctx.beginPath(); const N = 40; for (let i = 0; i <= N; i++) { const px = sx + sw * i / N, py = sy + sh / 2 + Math.sin(i / N * TAU * 2 + (anim ? t / 250 : 0) + ph) * sh * .3 * Math.sin(i / N * Math.PI); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); } ctx.stroke(); ctx.shadowBlur = 0; ctx.restore(); ctx.fillStyle = PAL.stroke; }
-  ctx.lineCap = "butt"; ctx.lineWidth = 1; ctx.textAlign = "left";
-}
-const SEG = ["1111110","0110000","1101101","1111001","0110011","1011011","1011111","1110000","1111111","1111011"];
-function sevenSeg(str, x, y, w, h, col){ const {ctx} = RM; const dw = w / str.length, t = Math.max(1, h * .12); for (let i = 0; i < str.length; i++) { const s = SEG[+str[i]] || "0000000", gx = x + dw * i + dw * .1, gw = dw * .7;
-  [[gx, y, gw, t], [gx + gw - t, y, t, h / 2], [gx + gw - t, y + h / 2, t, h / 2], [gx, y + h - t, gw, t], [gx, y + h / 2, t, h / 2], [gx, y, t, h / 2], [gx, y + h / 2 - t / 2, gw, t]].forEach((r, j) => { ctx.fillStyle = col; ctx.globalAlpha = s[j] === "1" ? 1 : .1; ctx.fillRect(r[0], r[1], r[2], r[3]); }); } ctx.globalAlpha = 1; }
-// ---- the monitor: your request, typed out as a ticket
-function ticketLines(){
-  const L = [], push = (lead, who, what, col) => L.push({lead, who, what, col});
-  const g = goalOf(S.ui.goal), picked = !!(g || S.ui.expert);
-  const text = S.action === "oracle.request" ? S.or.question : S.action === "workflow.open" ? S.wf.request : S.job.objective;
-  push("⏺", "desk", !picked ? "waiting for your request · pick what you want below" : g && !S.ui.expert ? `composing · ${g.title.toLowerCase()}` : S.ui.source === "agent" ? "composing · written by your AI" : `composing · ${S.action}`, PAL.phosDim);
-  if (!picked) { push("⎿", "fleet", "machines of identity.md holders, each with its own skills", PAL.phos); push("⎿", "price", "0.5 IMD a request · the quote is free", PAL.phos); return {L, text:null}; }
-  const used = [...RM.used]; push("⎿", "runs", used.length ? used.join(" → ") : "—", "#e8ffe9");
-  const errs = lastProblems.filter(p => p.lvl === "err");
-  push("⎿", "check", errs.length ? `${errs.length} to fix · ${errs[0].msg}` : lastProblems.length ? `ready · ${lastProblems.length} note${lastProblems.length > 1 ? "s" : ""}` : "ready", errs.length ? PAL.bad : PAL.lamp);
-  const q = RM.ticket.quote, p = RM.ticket.pay;
-  push("⎿", "quote", q ? (q.ok ? `0.5 IMD · order ${q.id.slice(0, 8)}` : `refused · ${q.code}`) : "free · not asked yet", q ? (q.ok ? PAL.amber : PAL.bad) : PAL.phosDim);
-  if (p) push("⎿", "sent", p.ok ? "admitted · the swarm has it" : `not sent · ${p.status}`, p.ok ? PAL.lamp : PAL.bad);
-  return {L, text};
-}
-function wrapText(ctx, s, maxW){ const out = []; let line = ""; for (const word of String(s).replace(/\s+/g, " ").split(" ")) { const tryL = line ? line + " " + word : word; if (ctx.measureText(tryL).width > maxW && line) { out.push(line); line = word; } else line = tryL; } if (line) out.push(line); return out; }
-function drawTicket(t){
-  const {ctx, cell} = RM, b = RM.monitor; if (!b) return; const x = b.c * cell + 1, y = b.r * cell + 1, w = b.w * cell - 2, h = b.h * cell - 2;
-  ctx.fillStyle = PAL.face; ctx.fillRect(x, y, w, h); ctx.strokeStyle = PAL.stroke; ctx.lineWidth = 1.5; ctx.strokeRect(x + .75, y + .75, w - 1.5, h - 1.5); ctx.lineWidth = 1; screws(x, y, w, h);
-  const p = Math.max(6, cell * .22), sx = x + p, sy = y + p, sw = w - 2 * p, sh = h - 2 * p; ctx.fillStyle = PAL.screen; ctx.fillRect(sx, sy, sw, sh); ctx.strokeStyle = PAL.glass; ctx.globalAlpha = .18; ctx.strokeRect(sx + 1.5, sy + 1.5, sw - 3, sh - 3); ctx.globalAlpha = 1;
-  const fs = Math.max(8.5, Math.min(12, cell * .29)), lh = fs * 1.42; ctx.font = `${fs}px ${MONO}`; ctx.textBaseline = "top";
-  const {L, text} = ticketLines();
-  const c0 = sx + fs * .7, c1 = c0 + fs * 1.2, c2 = c1 + fs * 4.6, maxW = sx + sw - c2 - fs;
-  const maxLines = Math.floor((sh - fs) / lh);
-  // the request itself sits right under the desk line and takes what room the status lines leave
-  const askRows = text != null ? Math.max(1, maxLines - L.length) : 0;
-  let ask = text != null ? (text.trim() ? wrapText(ctx, text.trim(), maxW) : [""]) : [];
-  if (ask.length > askRows) { ask = ask.slice(ask.length - askRows); ask[0] = "…" + ask[0].slice(1); }  // keep the end in view while typing
-  const rows = [L[0], ...ask.map((s, i) => ({lead:i ? " " : "⎿", who:i ? "" : "ask", what:s, col:"#e8ffe9", ask:true})), ...L.slice(1)].slice(0, maxLines);
-  ctx.save(); ctx.beginPath(); ctx.rect(sx + 3, sy + 3, sw - 6, sh - 6); ctx.clip();
-  let cursor = null;
-  rows.forEach((l, i) => { const ly = sy + fs * .6 + i * lh; ctx.fillStyle = l.col === PAL.bad ? PAL.bad : PAL.phosDim; ctx.fillText(l.lead, c0, ly); ctx.fillText(l.who, c1, ly); ctx.fillStyle = l.col;
-    let s = l.what; if (!l.ask) { while (s.length > 2 && ctx.measureText(s).width > maxW) s = s.slice(0, -2); if (s !== l.what) s = s.slice(0, -1) + "…"; }
-    if (l.ask && !l.what) { ctx.fillStyle = PAL.phosDim; ctx.fillText("type it below", c2, ly); cursor = {x:c2, y:ly}; } else { ctx.fillText(s, c2, ly); if (l.ask) cursor = {x:c2 + ctx.measureText(s).width + fs * .3, y:ly}; } });
-  if (!cursor) cursor = {x:c0, y:sy + fs * .6 + rows.length * lh};
-  if (Math.floor(t / 500) % 2 === 0 && cursor.y + fs < sy + sh) { ctx.fillStyle = PAL.lamp; ctx.fillRect(cursor.x, cursor.y, fs * .6, fs); }
-  ctx.restore(); ctx.textBaseline = "alphabetic";
-}
-// ---- pointer: the skill under the mouse
-function roomUnitAt(e){ const r = RM.canvas.getBoundingClientRect(); const c = Math.floor((e.clientX - r.left) / RM.cell), row = Math.floor((e.clientY - r.top) / RM.cell); return (RM.grid[row] || [])[c] || null; }
-function roomMove(e){
-  const u = roomUnitAt(e); const on = u && u.skill ? u : null;
-  if (on !== RM.hot) { RM.hot = on; RM.dirty = true; }
-  RM.canvas.style.cursor = on ? "help" : "";
-  if (!on) { RM.tip.classList.remove("on"); return; }
-  const s = on.skill, needs = (s.requires || []).filter(x => x !== "network");
-  RM.tip.innerHTML = `<div class="th"><b>${esc(s.id)}</b><span>${esc(s.role)}</span></div><div class="tt">${esc(s.description)}</div>`
-    + (needs.length ? `<div class="tt">needs ${esc(needs.join(", "))}</div>` : "")
-    + (on.state === "use" ? `<div class="tk">runs in your request</div>` : on.state === "ref" ? `<div class="tk ref">knowledge attached to your request</div>` : "");
-  const box = RM.canvas.parentElement.getBoundingClientRect(), cx = (on.c + on.w / 2) * RM.cell, top = on.r * RM.cell;
-  const below = top < 120; RM.tip.classList.toggle("below", below);
-  RM.tip.style.left = Math.max(120, Math.min(box.width - 120, cx)) + "px"; RM.tip.style.top = (below ? (on.r + on.h) * RM.cell + 6 : top - 6) + "px";
-  RM.tip.classList.add("on");
-}
-// ---- what happens in the room when something happens on the page
-function roomEvent(kind, data){
-  if (kind === "quote") RM.ticket.quote = data;
-  if (kind === "sent") RM.ticket.pay = data;
-  if (kind === "reset") RM.ticket = {quote:null, pay:null};
-  RM.dirty = true;
-  const P = RM.pepe; if (!P) return;
-  if (kind === "goal") P.react("greet");
-  else if (kind === "typing" && performance.now() - RM.lastLook > 9000) { RM.lastLook = performance.now(); P.react("look"); }
-  else if (kind === "quote") P.react(data.ok ? "jump" : "headshake");
-  else if (kind === "sent") { if (data.ok) { P.react("dance"); const t = performance.now(); RM.units.forEach(u => RM.flash.set(u.id, t + 90 + u.c * 35 + u.r * 20)); } else P.react("faint"); }
-}
-
 /* ---- pepe: the sprite from imd.fun's front page, as on the panel. 17 frames of 480 x 520 in one row; at load the shirt
    is recoloured from blue to charcoal so he matches the black-and-white room. Idles on his own, does a trick when poked,
    and reacts to the page through react(). */
 const PEPE_FRAMES = ["stand","walk1","walk2","lookup_mid","lookup","scratch1","scratch2","side_stand","side_walk1","side_walk2","side_walk3","side_walk4","q34_back","q34_front","front_stand","front_lookup","front_scratch"];
-const PEPE_FW = 480, PEPE_FH = 520; let PEPE_SHEET = null;
+const PEPE_FW = 480, PEPE_FH = 520, TAU = Math.PI * 2; let PEPE_SHEET = null;
 function pepeSheet(){ return new Promise(res => { const img = new Image(); img.onload = () => { try { const c = document.createElement("canvas"); c.width = img.width; c.height = img.height; const x = c.getContext("2d", {willReadFrequently:true}); x.drawImage(img, 0, 0);
     const d = x.getImageData(0, 0, c.width, c.height), p = d.data;
     for (let i = 0; i < p.length; i += 4) { const r = p[i], g = p[i + 1], b = p[i + 2]; if (p[i + 3] > 0 && b > r + 50 && b > g + 30) { const l = Math.min(1, (r * .3 + g * .59 + b * .11) / 170); const v = Math.round(44 + l * 100); p[i] = v; p[i + 1] = v; p[i + 2] = v; } }
@@ -1791,7 +1688,7 @@ $("#themeBtn").onclick = () => { const r = document.documentElement, cur = r.dat
 try { const th = localStorage.getItem("imd-compose-theme"); if (th) document.documentElement.dataset.theme = th; } catch {}
 
 (async function boot(){
-  SKILLS = SKILLS_SNAPSHOT; renderAll(); renderPrompt(); roomInit();
+  SKILLS = SKILLS_SNAPSHOT; machineInit(); renderAll(); renderPrompt(); renderStart();
   let helper = false;
   try { helper = Array.isArray(await get("/local/orders")); } catch {}
   if (!helper) {  // no local server behind this page (e.g. IPFS): compose and check only
