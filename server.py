@@ -101,6 +101,15 @@ class H(BaseHTTPRequestHandler):
         if path in ("/", "/index.html"):
             with open(os.path.join(HERE, "index.html"), "rb") as f:
                 return self.send(200, f.read(), "text/html; charset=utf-8")
+        if path in ("/assets/pepe.webp",):  # the room's artwork; fixed list, nothing else under assets is served
+            with open(os.path.join(HERE, path.lstrip("/")), "rb") as f:
+                body = f.read()
+            self.send_response(200)
+            self.send_header("Content-Type", "image/webp")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Cache-Control", "max-age=86400")
+            self.end_headers()
+            return self.wfile.write(body)
         if path == "/local/orders":
             with _lock:
                 rows = load_orders()

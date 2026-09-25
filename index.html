@@ -149,8 +149,32 @@ tr.click:hover td{background:var(--hover)}
 .subnav{margin-bottom:14px}
 .warnbox{border:1.5px solid var(--lamp);padding:10px 12px;font-size:12px;margin-bottom:12px}
 .errbox{border:1.5px solid var(--alarm);padding:10px 12px;font-size:12px;margin-bottom:12px}
+/* the room (same idiom as imd-panel's wall, after imd.fun's front page): the skills wall, the ticket, pepe at the desk */
+.room{position:relative;border:var(--rule);background:var(--paper);overflow:hidden;margin-bottom:6px}
+.wall{position:relative;background:#7d7d79;margin:0}
+.wall canvas{display:block;width:100%}
+.wtip{position:absolute;z-index:6;transform:translate(-50%,-100%);min-width:220px;max-width:340px;padding:8px 10px;background:#0a0a0a;color:#c9ecbf;border:1.5px solid #141414;box-shadow:0 0 0 1px rgba(201,236,191,.15);font-size:11px;line-height:1.55;pointer-events:none;opacity:0;transition:opacity .12s}
+.wtip.on{opacity:1}.wtip.below{transform:translate(-50%,0)}
+.wtip .th{display:flex;justify-content:space-between;gap:10px;color:#e8ffe9}.wtip .th span{color:#7fb37a;text-transform:uppercase;letter-spacing:.08em;font-size:10px}
+.wtip .tt{color:#7fb37a;white-space:normal}.wtip .tk{color:#3ecf7a;font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-top:4px}.wtip .tk.ref{color:#ffcf5a}
+.desk{position:relative;margin-top:-1px;height:clamp(84px,9vw,128px);clip-path:inset(-100vh 0 0 0);
+  background:linear-gradient(180deg,#0b0b0b 0,#0b0b0b 34%,#2a2a28 34%,#2a2a28 calc(34% + 2px),#0b0b0b calc(34% + 2px),#0b0b0b 46%,#d9d9d3 46%,#f1f1ec 56%,#f1f1ec 100%)}
+.desk::before{content:"";position:absolute;left:0;right:0;top:46%;bottom:0;background:repeating-linear-gradient(90deg,transparent 0 9.5%,rgba(0,0,0,.14) 9.5% calc(9.5% + 1.5px)),linear-gradient(180deg,rgba(0,0,0,.28),transparent 30%)}
+.desk::after{content:"";position:absolute;left:8%;right:8%;top:34%;height:2px;background:rgba(255,255,255,.08)}
+.deskScene{position:absolute;inset:0}
+.credit{position:absolute;right:1.6%;bottom:9%;padding:3px 8px;font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#141414;background:#ffcf5a;border:1.5px solid #141414;box-shadow:2px 2px 0 #141414;text-decoration:none;z-index:3;transform:rotate(2deg);transform-origin:right bottom}
+.credit:hover{background:#3ecf7a;transform:rotate(0)}
+@media (max-width:720px){.credit{font-size:7px;letter-spacing:.08em;bottom:6%;right:2%;padding:2px 5px}.pepe{left:9%}}
+.pepe{position:absolute;left:18%;bottom:5%;width:clamp(56px,8%,108px);display:block;background:transparent;border:0;padding:0;cursor:pointer;transform-origin:50% 100%;will-change:transform;z-index:4}
+.pepe:focus-visible{outline:1.5px solid #000;outline-offset:2px}
+.roomcap{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:center;margin:8px 2px 22px;font-size:11.5px;color:var(--dim)}
+.roomcap .key{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.roomcap .key i{display:inline-block;width:9px;height:9px;background:#d6d6d2;border:1px solid #141414}
+.roomcap .key i.ok{background:#3ecf7a}.roomcap .key i.ref{background:#ffcf5a}
 /* start: what do you want */
-.goals{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));border-top:var(--rule);border-left:var(--rule);margin-bottom:12px}
+.goals{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:var(--rule);border-left:var(--rule);margin-bottom:12px}
+@media (max-width:1100px){.goals{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.goals{grid-template-columns:minmax(0,1fr)}}
 .goal{display:block;text-align:left;background:var(--paper);border:0;border-right:var(--rule);border-bottom:var(--rule);padding:14px 16px 15px;cursor:pointer}
 .goal b{display:block;font-size:13px;margin-bottom:3px}
 .goal span{display:block;font-size:11px;color:var(--dim);line-height:1.45}
@@ -208,6 +232,11 @@ input,textarea{caret-color:var(--ink)}
 <main>
 <!-- ============ COMPOSE ============ -->
 <section id="tab-compose">
+  <div class="room" id="room">
+    <div class="wall" id="wallBox"><canvas id="wall" role="img" aria-label="the skills wall: one module per skill of the network, lit when your request uses it; the screen shows your request"></canvas><div class="wtip" id="wtip"></div></div>
+    <div class="desk"><div class="deskScene"><canvas class="pepe" id="pepe" aria-hidden="true" title="poke Pepe"></canvas><a class="credit" href="https://imd.fun" target="_blank" rel="noopener">art by imd.fun · used with permission</a></div></div>
+  </div>
+  <div class="roomcap"><span class="key"><i class="ok"></i>does your request</span><span class="key"><i class="ref"></i>knowledge it brings</span><span class="key"><i></i>other skills on the network</span><span>Hover a module for the skill. Poke Pepe.</span></div>
   <h1>Ask the swarm</h1>
   <p class="lede" id="lede">Machines run by identity.md holders pick up work: reports, smart contracts, websites, images, answers to questions. Say what you want, check it for free, then pay 0.5 IMD from your wallet.</p>
 
@@ -844,6 +873,7 @@ function refresh(){
   document.querySelectorAll(".is-bad").forEach(e => e.classList.remove("is-bad"));
   problems.filter(p => p.lvl === "err").forEach(p => document.querySelectorAll(`[data-k="${CSS.escape(p.path)}"]`).forEach(e => e.classList.add("is-bad")));
   $("#quoteBtn").disabled = errs > 0;
+  roomSync();
 }
 
 /* ================= form events ================= */
@@ -862,6 +892,7 @@ $("#form").addEventListener("input", e => {
     const mk = el.dataset.k.replace(/path$/, "mediaType"), ext = (el.value.match(/\.[a-z0-9]+$/i)||[""])[0].toLowerCase();
     if (!getP(mk) && MEDIA[ext]) { setP(mk, MEDIA[ext]); const m = document.querySelector(`[data-k="${mk}"]`); if (m) m.value = MEDIA[ext]; }
   }
+  if (["job.objective","or.question","wf.request"].includes(el.dataset.k)) roomEvent("typing");
   if (el.dataset.k === "job.ipfsLabel" && S.ui.goal === "site") S.job.ipfs = el.value ? "label" : "true";
   if (el.dataset.k === "job.objective" || el.dataset.k === "or.question") { const lab = el.closest(".f").querySelector("label span"); if (lab) lab.textContent = `${el.value.length} / ${el.dataset.k === "or.question" ? "2,000" : "8,000"}`; }
   refresh();
@@ -953,7 +984,7 @@ $("#copyJson").onclick = async () => { try { await navigator.clipboard.writeText
 const post = (url, body) => fetch(url, {method:"POST", headers:{"Content-Type":"application/json", "X-Compose":"1"}, body:JSON.stringify(body || {})}).then(r => r.json());
 const get = url => fetch(url).then(r => r.json());
 let currentOrder = null, tick = null;
-function resetQuote(){ currentOrder = null; $("#quoteOut").innerHTML = ""; $("#payBtn").disabled = true; clearInterval(tick); }
+function resetQuote(){ if (typeof RM !== "undefined") RM.ticket = {quote:null, pay:null}; currentOrder = null; $("#quoteOut").innerHTML = ""; $("#payBtn").disabled = true; clearInterval(tick); }
 $("#quoteBtn").onclick = async () => {
   const b = $("#quoteBtn"); b.disabled = true; b.textContent = "Quoting…";
   try {
@@ -974,7 +1005,7 @@ function explainError(body){
 function showQuote(res){
   const o = res.body?.order;
   if ((res.status === 200 || res.status === 201) && o) {
-    currentOrder = o;
+    currentOrder = o; roomEvent("quote", {ok:true, id:o.id});
     const q = o.quote || {};
     $("#quoteOut").innerHTML = `<div class="warnbox" style="border-color:var(--ok)"><b>Valid.</b> The network accepts the request.
       <dl class="kv" style="margin-top:8px"><dt>order</dt><dd>${esc(o.id)}</dd><dt>price</dt><dd>${fmtIMD(q.amount)} IMD</dd><dt>to</dt><dd>${esc(q.payTo||"")}</dd><dt>expires</dt><dd id="qExp"></dd></dl></div>`;
@@ -983,6 +1014,7 @@ function showQuote(res){
     clearInterval(tick); upd(); tick = setInterval(upd, 1000);
   } else {
     $("#quoteOut").innerHTML = explainError(res.body) + `<div class="small muted">HTTP ${res.status}. Nothing charged.</div>`;
+    roomEvent("quote", {ok:false, code:res.body?.error || "HTTP " + res.status});
     $("#payBtn").disabled = true;
   }
 }
@@ -1148,8 +1180,8 @@ async function followOrder(orderId){
     const r = await get(`/local/order/${orderId}`);
     const st = r.body?.status;
     plog(`status: ${st}`);
-    if (st === "admitted") { const a = r.body.admission?.result; plog("✓ admitted: " + JSON.stringify(a)); refreshOrders(); return; }
-    if (["payment_failed","expired"].includes(st)) { plog("✗ " + st + " " + JSON.stringify(r.body.payment || {}), "err"); refreshOrders(); return; }
+    if (st === "admitted") { const a = r.body.admission?.result; plog("✓ admitted: " + JSON.stringify(a)); refreshOrders(); roomEvent("sent", {ok:true}); return; }
+    if (["payment_failed","expired"].includes(st)) { plog("✗ " + st + " " + JSON.stringify(r.body.payment || {}), "err"); refreshOrders(); roomEvent("sent", {ok:false, status:st}); return; }
     await sleep(5000);
   }
 }
@@ -1361,7 +1393,7 @@ function chooseGoal(id){
   S.ui = {goal:id, expert:false, source:null};
   if (g.action === "oracle.request") S.or = blankOracle();
   loadInput(g.action, JSON.parse(JSON.stringify(g.input)));
-  resetQuote(); renderStart();
+  resetQuote(); renderStart(); roomEvent("goal");
   const f = $("#form .simple textarea");
   if (f) { f.focus({preventScroll:true}); $("#chosenBar").scrollIntoView({behavior:"smooth", block:"start"}); }
 }
@@ -1460,6 +1492,291 @@ function applyStatic(){
   $("#helperCmd").textContent = `git clone ${HELPER_REPO}\ncd imd-compose && python3 server.py`;
 }
 
+/* ================= the room: the skills wall, the ticket on phosphor, pepe at the desk ================= */
+// Same idiom as imd-panel's wall, itself after imd.fun's front page: a grey wall of instrument modules on a cell
+// grid and a phosphor monitor. Here every module is a skill of the network. The skills your request will run come
+// forward as big consoles and light up, the knowledge it attaches glows amber, and the monitor types your request
+// out as a ticket: what you asked for, the check, the quote, the payment. Modules are seeded by the skill id, so a
+// skill looks the same on every visit.
+const PAL = {wall:"#7d7d79", face:"#d6d6d2", faceLit:"#e6ecdc", faceHot:"#f4f4f0", stroke:"#141414", screen:"#0a0a0a", glass:"#c9ecbf", phos:"#c9ecbf", phosDim:"#7fb37a", lamp:"#3ecf7a", bad:"#ff6b62", amber:"#ffcf5a", dimFace:"#c4c4bf"};
+const TAU = Math.PI * 2, MONO = '"IBM Plex Mono",ui-monospace,Menlo,monospace';
+const hash32 = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+const rng = seed => { let e = (Math.imul(2654435761, seed) + 12345) >>> 0; return () => { let t = Math.imul((e += 1831565813) ^ e >>> 15, 1 | e); t ^= t + Math.imul(t ^ t >>> 7, 61 | t); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; };
+const RM = {canvas:null, ctx:null, cell:40, cols:0, rows:0, width:0, height:0, units:[], grid:[], monitor:null, hot:null, warm:new Map(), flash:new Map(),
+  lastDrift:0, frameN:0, dirty:true, still:false, tip:null, seen:true, used:new Set(), refs:new Set(), usedKey:"", ticket:{quote:null, pay:null}, pepe:null, lastLook:0};
+// what a template runs, as far as the docs describe it
+const TEMPLATE_SKILLS = {single:["implement-contract"], impl_tests:["implement-contract","write-foundry-tests"], impl_tests_review:["implement-contract","write-foundry-tests","adversarial-review"],
+  multi_contract:["implement-one-contract","write-foundry-tests","adversarial-review"], research:["research-report"], fuzz:[]};
+
+function roomInit(){
+  RM.canvas = $("#wall"); if (!RM.canvas) return; RM.ctx = RM.canvas.getContext("2d"); RM.tip = $("#wtip");
+  RM.still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  new ResizeObserver(() => { roomLayout(); RM.dirty = true; }).observe(RM.canvas.parentElement);
+  new IntersectionObserver(es => { RM.seen = es[0].isIntersecting; }).observe(RM.canvas);
+  RM.canvas.addEventListener("mousemove", roomMove);
+  RM.canvas.addEventListener("mouseleave", () => { RM.hot = null; RM.tip.classList.remove("on"); RM.dirty = true; });
+  RM.canvas.addEventListener("click", e => { const u = roomUnitAt(e); if (u && !u.filler) { RM.flash.set(u.id, performance.now() + 90); RM.dirty = true; } });
+  RM.pepe = pepeStart($("#pepe"));
+  roomSync(); roomLayout();
+  if (!RM.still) requestAnimationFrame(roomFrame);
+}
+// the request -> which skills run, which knowledge rides along
+function roomSync(){
+  const used = new Set(), refs = new Set();
+  try {
+    if (S.action === "oracle.request") used.add("oracle-assess");
+    else {
+      const x = buildInput(), j = S.action === "workflow.open" ? x.draft || {} : x;
+      if (j.skill) used.add(j.skill);
+      (TEMPLATE_SKILLS[j.template] || []).forEach(k => used.add(k));
+      (j.steps || []).forEach(s => { if (s.skill) used.add(s.skill); (s.references || []).forEach(r => refs.add(r)); });
+      (j.references || []).forEach(r => refs.add(r));
+    }
+  } catch {}
+  const picked = !!(S.ui.goal || S.ui.expert);
+  if (!picked) { used.clear(); refs.clear(); }
+  const key = [...used].sort().join() + "|" + [...refs].sort().join();
+  RM.used = used; RM.refs = refs; RM.dirty = true;
+  if (key !== RM.usedKey) { RM.usedKey = key; roomLayout(); }
+}
+function roomUnits(){
+  const list = SKILLS.length ? SKILLS : SKILLS_SNAPSHOT;
+  const mk = (s, big) => { const seed = hash32(s.id), g = rng(seed);
+    return {id:s.id, skill:s, w:big ? 2 : 1, h:big ? 2 : 1, seed, kind:big ? Math.floor(g() * 8) : Math.floor(g() * 16), phase:g() * TAU,
+      state:RM.used.has(s.id) ? "use" : RM.refs.has(s.id) ? "ref" : "none", filler:false}; };
+  const used = list.filter(s => RM.used.has(s.id)), rest = list.filter(s => !RM.used.has(s.id));
+  return used.map(s => mk(s, true)).concat(rest.map(s => mk(s, false)));
+}
+function roomLayout(){
+  if (!RM.canvas) return;
+  const width = RM.canvas.parentElement.clientWidth; if (!width) return;
+  const cols = Math.max(8, Math.round(width / (width < 720 ? 30 : 40))), cell = width / cols;
+  const units = roomUnits();
+  const mw = Math.min(cols - 2, Math.max(7, Math.round(cols * .38))), mh = 4;
+  const grid = [];
+  const free = (c, r, w, h) => { if (c + w > cols) return false; for (let y = r; y < r + h; y++) for (let x = c; x < c + w; x++) if (grid[y] && grid[y][x]) return false; return true; };
+  const take = (u, c, r) => { u.c = c; u.r = r; for (let y = r; y < r + u.h; y++) { grid[y] = grid[y] || []; for (let x = c; x < c + u.w; x++) grid[y][x] = u; } };
+  RM.monitor = {c:0, r:0, w:mw, h:mh, mon:true}; take(RM.monitor, 0, 0);
+  for (const u of units) { let placed = false; for (let r = 0; !placed && r < 400; r++) for (let c = 0; c < cols; c++) if (free(c, r, u.w, u.h)) { take(u, c, r); placed = true; break; } }
+  const rows = Math.max(5, grid.length);
+  const fill = [];
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) { if (grid[r] && grid[r][c]) continue; const seed = hash32(`seat-${c}-${r}`), g = rng(seed);
+    const u = {id:`seat-${c}-${r}`, skill:null, w:1, h:1, seed, kind:Math.floor(g() * 16), phase:g() * TAU, state:"none", filler:true}; take(u, c, r); fill.push(u); }
+  Object.assign(RM, {units:units.concat(fill), grid, cols, rows, cell, width, height:rows * cell});
+  const dpr = Math.min(2, devicePixelRatio || 1);
+  RM.canvas.width = Math.round(width * dpr); RM.canvas.height = Math.round(RM.height * dpr); RM.canvas.style.height = RM.height + "px";
+  RM.ctx.setTransform(dpr, 0, 0, dpr, 0, 0); RM.ctx.lineJoin = "round"; RM.dirty = true;
+  if (RM.still) roomDraw(performance.now());
+}
+function roomFrame(t){
+  RM.frameN++;
+  if (RM.frameN % 2 || !RM.seen || document.visibilityState !== "visible") { requestAnimationFrame(roomFrame); return; }
+  if (t - RM.lastDrift > 15000) { RM.lastDrift = t; const idle = RM.units.filter(u => u.state === "none"); for (let i = 0; i < Math.max(1, Math.round(idle.length * .06)); i++) { const u = idle[Math.floor(Math.random() * idle.length)]; u.phase = Math.random() * TAU; RM.warm.set(u.id, t + 1400 + Math.random() * 900); } RM.dirty = true; }
+  for (const [k, v] of RM.warm) if (t > v) { RM.warm.delete(k); RM.dirty = true; }
+  for (const [k, v] of RM.flash) if (t > v) { RM.flash.delete(k); RM.dirty = true; }
+  roomDraw(t);  // the monitor's cursor blinks and the used consoles run, so there is always something moving
+  requestAnimationFrame(roomFrame);
+}
+function roomDraw(t){
+  const {ctx} = RM; if (!ctx || !RM.cols) return; RM.dirty = false;
+  ctx.fillStyle = PAL.wall; ctx.fillRect(0, 0, RM.width, RM.height);
+  for (const u of RM.units) drawUnit(u, t);
+  drawTicket(t);
+}
+function drawUnit(u, t){
+  const {ctx, cell} = RM; const x = u.c * cell + 1, y = u.r * cell + 1, w = u.w * cell - 2, h = u.h * cell - 2;
+  const use = u.state === "use", ref = u.state === "ref", anim = use || RM.warm.has(u.id) || RM.flash.has(u.id);
+  ctx.fillStyle = use ? PAL.faceHot : ref ? PAL.faceLit : u.filler ? PAL.dimFace : PAL.face; ctx.fillRect(x, y, w, h);
+  ctx.strokeStyle = PAL.stroke; ctx.lineWidth = 1; ctx.globalAlpha = u.filler ? .55 : .9; ctx.strokeRect(x + .5, y + .5, w - 1, h - 1); ctx.globalAlpha = 1;
+  if (u.w > 1) { ctx.lineWidth = 1.5; ctx.strokeRect(x + .75, y + .75, w - 1.5, h - 1.5); ctx.lineWidth = 1; screws(x, y, w, h); }
+  const P = {x, y, w, h, cx:x + w / 2, cy:y + h / 2, m:Math.min(w, h), g:rng(u.seed + 7), ph:u.phase, anim, t};
+  if (u.w > 1) bigModule(u.kind, P, u); else smallModule(u.kind, P);
+  if (!u.filler) { const lr = Math.max(1.6, cell * .06), lx = x + w - lr * 2.4, ly = y + lr * 2.4; ctx.beginPath(); ctx.arc(lx, ly, lr, 0, TAU);
+    if (use) { ctx.fillStyle = PAL.lamp; ctx.globalAlpha = .55 + .45 * Math.sin(t / 300); ctx.fill(); ctx.globalAlpha = 1; }
+    else if (ref) { ctx.fillStyle = PAL.amber; ctx.fill(); }
+    else { ctx.strokeStyle = PAL.stroke; ctx.lineWidth = 1; ctx.stroke(); } }
+  if (use) { ctx.strokeStyle = PAL.lamp; ctx.lineWidth = 2; ctx.strokeRect(x + 1.5, y + 1.5, w - 3, h - 3); ctx.lineWidth = 1; }
+  else if (ref) { ctx.strokeStyle = PAL.amber; ctx.lineWidth = 1.5; ctx.strokeRect(x + 1.5, y + 1.5, w - 3, h - 3); ctx.lineWidth = 1; }
+  if (RM.hot === u && !u.filler) { ctx.fillStyle = "#fff"; ctx.globalAlpha = .18; ctx.fillRect(x, y, w, h); ctx.globalAlpha = 1; }
+  const f = RM.flash.get(u.id); if (f) { ctx.fillStyle = "#fff"; ctx.globalAlpha = Math.max(0, Math.min(.5, (f - t) / 90 * .5)); ctx.fillRect(x, y, w, h); ctx.globalAlpha = 1; }
+}
+function screws(x, y, w, h){ const {ctx} = RM; const e = Math.max(1.2, RM.cell * .05), o = e * 2.2; ctx.strokeStyle = PAL.stroke; ctx.globalAlpha = .55; ctx.lineWidth = 1;
+  for (const [cx, cy] of [[x + o, y + o], [x + w - o, y + o], [x + o, y + h - o], [x + w - o, y + h - o]]) { ctx.beginPath(); ctx.arc(cx, cy, e, 0, TAU); ctx.stroke(); ctx.beginPath(); ctx.moveTo(cx - .7 * e, cy + .3 * e); ctx.lineTo(cx + .7 * e, cy - .3 * e); ctx.stroke(); } ctx.globalAlpha = 1; }
+// ---- 16 small modules (1x1) and 8 big consoles (2x2), drawn exactly as on the panel's wall
+function smallModule(k, P){
+  const {ctx} = RM; const {cx, cy, m, g, ph, anim, t} = P; const u = m / 20, lw = Math.max(1, Math.min(2, Math.round(m / 22 * 2) / 2));
+  ctx.lineWidth = lw; ctx.strokeStyle = PAL.stroke; ctx.fillStyle = PAL.stroke; ctx.lineCap = "round";
+  if (k === 0) { ctx.beginPath(); ctx.arc(cx, cy, .46 * m, 0, TAU); ctx.stroke(); const a = ph + (anim ? .8 * Math.sin(t / 500) : 0); ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a) * m * .34, cy + Math.sin(a) * m * .34); ctx.stroke(); ctx.beginPath(); ctx.arc(cx, cy, 1.2 * u, 0, TAU); ctx.fill(); }
+  else if (k === 1 || k === 15) { const sq = k === 15; const step = m < 16 ? 3 : 1; for (let i = 0; i < 12; i += step) { const a = i * Math.PI / 6, ca = Math.cos(a), sa = Math.sin(a); let r0, r1; if (sq) { r1 = .44 * m / Math.max(Math.abs(ca), Math.abs(sa)); r0 = r1 * (i % 3 ? .85 : .72); } else { r0 = m * (i % 3 ? .4 : .34); r1 = .46 * m; } ctx.beginPath(); ctx.moveTo(cx + ca * r0, cy + sa * r0); ctx.lineTo(cx + ca * r1, cy + sa * r1); ctx.stroke(); }
+    const h1 = ph + (anim ? t / 6000 : 0), h2 = ph * 1.7 + (anim ? t / 500 : 0); ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(h1) * m * .2, cy + Math.sin(h1) * m * .2); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(h2) * m * .32, cy + Math.sin(h2) * m * .32); ctx.stroke(); }
+  else if (k === 2) { const p = Math.max(2, Math.round(2.5 * u)), x = P.x + p, y = P.y + p, w = P.w - 2 * p, h = P.h - 2 * p; ctx.fillStyle = PAL.screen; ctx.fillRect(x, y, w, h);
+    ctx.save(); ctx.beginPath(); ctx.rect(x + 1, y + 1, w - 2, h - 2); ctx.clip(); ctx.strokeStyle = PAL.glass; ctx.beginPath(); const mg = Math.max(2, .14 * w), mid = y + h / 2;
+    for (let i = 0; i <= 8; i++) { const px = x + mg + (w - 2 * mg) * i / 8, py = mid + (anim ? Math.sin(1.1 * i + t / 260 + ph) : Math.sin(1.1 * i + ph) * .6) * h * .22; i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); } ctx.stroke(); ctx.restore(); }
+  else if (k === 3) { const s = .36 * m, e = .08 * m, on = anim ? Math.floor(t / 400) % 4 : Math.floor(ph / TAU * 4); for (let i = 0; i < 4; i++) { const x = cx - s - e / 2 + (i % 2) * (s + e), y = cy - s - e / 2 + Math.floor(i / 2) * (s + e); ctx.strokeRect(x + .5, y + .5, s - 1, s - 1); if (i === on || g() < .25) ctx.fillRect(x + 1, y + 1, s - 2, s - 2); } }
+  else if (k === 4) { const s = .28 * m, r = Math.max(1, 1.6 * u); for (let yy = -1; yy <= 1; yy++) for (let xx = -1; xx <= 1; xx++) { ctx.beginPath(); ctx.arc(cx + xx * s, cy + yy * s, r, 0, TAU); ((xx + yy + 3 + (anim ? Math.floor(t / 350) : Math.floor(ph))) % 3 === 0) ? ctx.fill() : ctx.stroke(); } }
+  else if (k === 5) { ctx.beginPath(); ctx.arc(cx, cy, .36 * m, 0, TAU); ctx.fill(); ctx.strokeStyle = PAL.face; ctx.beginPath(); ctx.arc(cx, cy, .16 * m, 0, TAU); ctx.stroke(); }
+  else if (k === 6) { ctx.lineWidth = Math.max(2, .12 * m); ctx.beginPath(); ctx.arc(cx, cy, .3 * m, 0, TAU); ctx.stroke(); }
+  else if (k === 7) { const s = .3 * m; ctx.beginPath(); ctx.moveTo(cx, cy - s); ctx.lineTo(cx + s, cy); ctx.lineTo(cx, cy + s); ctx.lineTo(cx - s, cy); ctx.closePath(); ctx.stroke(); }
+  else if (k === 8) { const s = .3 * m; ctx.lineWidth = Math.max(2, .16 * m); ctx.lineCap = "butt"; ctx.beginPath(); ctx.moveTo(cx - s, cy); ctx.lineTo(cx + s, cy); ctx.moveTo(cx, cy - s); ctx.lineTo(cx, cy + s); ctx.stroke(); }
+  else if (k === 9) { const top = anim ? Math.floor(t / 900) % 2 === 0 : ph < Math.PI; ctx.fillRect(P.x + 1, top ? P.y + 1 : cy, P.w - 2, P.h / 2 - 1); }
+  else if (k === 10) { const w = .34 * m, h = .62 * m; const up = (ph < Math.PI) !== (anim && Math.floor(t / 700) % 2 === 0); ctx.strokeRect(cx - w / 2 + .5, cy - h / 2 + .5, w - 1, h - 1); ctx.fillRect(cx - w / 2 + 1, up ? cy - h / 2 + 1 : cy, w - 2, h / 2 - 1); }
+  else if (k === 11) { const on = anim ? Math.floor(t / 500 + P.x) % 3 === 0 : ph < 2; ctx.beginPath(); ctx.arc(cx, cy, .14 * m, 0, TAU); on ? ctx.fill() : ctx.stroke(); }
+  else if (k === 12) { const on = anim ? Math.floor(t / 500 + P.x) % 3 === 0 : ph < 2, e = .14 * m; on ? ctx.fillRect(Math.round(cx - e), Math.round(cy - e), Math.round(2 * e), Math.round(2 * e)) : ctx.strokeRect(Math.round(cx - e) + .5, Math.round(cy - e) + .5, Math.round(2 * e) - 1, Math.round(2 * e) - 1); }
+  else if (k === 13) { const s = .36 * m; ctx.fillRect(Math.round(cx - s), Math.round(cy - s), Math.round(2 * s), Math.round(2 * s)); ctx.strokeStyle = PAL.face; const e = .16 * m; ctx.strokeRect(Math.round(cx - e) + .5, Math.round(cy - e) + .5, Math.round(2 * e) - 1, Math.round(2 * e) - 1); }
+  else { const s = .3 * m; ctx.lineWidth = Math.max(2, .12 * m); ctx.strokeRect(Math.round(cx - s) + .5, Math.round(cy - s) + .5, Math.round(2 * s) - 1, Math.round(2 * s) - 1); }
+  ctx.lineCap = "butt"; ctx.lineWidth = 1;
+}
+function bigModule(k, P, u){
+  const {ctx} = RM; const {x, y, w, h, cx, cy, m, g, ph, anim, t} = P; const pad = Math.max(4, m * .09);
+  ctx.strokeStyle = PAL.stroke; ctx.fillStyle = PAL.stroke; ctx.lineWidth = 1.2; ctx.lineCap = "round";
+  if (k === 0) { const r = m * .16, dx = m * .26; for (let i = 0; i < 4; i++) { const kx = cx + (i % 2 ? dx : -dx), ky = cy + (i < 2 ? -dx : dx); ctx.beginPath(); ctx.arc(kx, ky, r, 0, TAU); ctx.fillStyle = PAL.face; ctx.fill(); ctx.stroke();
+    for (let j = 0; j < 8; j++) { const a = j * TAU / 8; ctx.beginPath(); ctx.moveTo(kx + Math.cos(a) * r * 1.18, ky + Math.sin(a) * r * 1.18); ctx.lineTo(kx + Math.cos(a) * r * 1.32, ky + Math.sin(a) * r * 1.32); ctx.stroke(); }
+    const a = ph * (i + 1) + (anim ? Math.sin(t / 700 + i) * .6 : 0); ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(kx, ky); ctx.lineTo(kx + Math.cos(a) * r * .8, ky + Math.sin(a) * r * .8); ctx.stroke(); ctx.lineWidth = 1.2; } ctx.fillStyle = PAL.stroke; }
+  else if (k === 1) { const fx = x + pad, fy = y + pad, fw = w - 2 * pad, fh = h * .62 - pad; ctx.fillStyle = "#f3f0e4"; ctx.fillRect(fx, fy, fw, fh); ctx.strokeRect(fx + .5, fy + .5, fw - 1, fh - 1);
+    const px = cx, py = fy + fh * .95, R = fh * .85; for (let i = 0; i <= 10; i++) { const a = Math.PI * (1 - i / 10) * .75 + Math.PI * .125; const r0 = R * (i % 5 ? .9 : .84); ctx.strokeStyle = i >= 8 ? PAL.bad : PAL.stroke; ctx.beginPath(); ctx.moveTo(px + Math.cos(a) * r0, py - Math.sin(a) * r0); ctx.lineTo(px + Math.cos(a) * R, py - Math.sin(a) * R); ctx.stroke(); }
+    const lvl = anim ? .5 + .4 * Math.sin(t / 230 + ph) * Math.sin(t / 1700) : g(); const a = Math.PI * (1 - lvl) * .75 + Math.PI * .125; ctx.strokeStyle = "#b3261e"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px + Math.cos(a) * R * .95, py - Math.sin(a) * R * .95); ctx.stroke(); ctx.fillStyle = PAL.stroke; ctx.beginPath(); ctx.arc(px, py, 2.5, 0, TAU); ctx.fill();
+    ctx.font = `${Math.max(7, m * .09)}px ${MONO}`; ctx.textAlign = "center"; ctx.fillText("VU", cx, fy + fh * .55); const kr = m * .08; for (let i = 0; i < 3; i++) { const kx = x + w * (.25 + .25 * i), ky = y + h * .8; ctx.beginPath(); ctx.arc(kx, ky, kr, 0, TAU); ctx.stroke(); const a = ph * (i + 2); ctx.beginPath(); ctx.moveTo(kx, ky); ctx.lineTo(kx + Math.cos(a) * kr * .8, ky + Math.sin(a) * kr * .8); ctx.stroke(); } }
+  else if (k === 2) { const r = m * .4; ctx.fillStyle = PAL.screen; ctx.beginPath(); ctx.arc(cx, cy, r, 0, TAU); ctx.fill(); ctx.strokeStyle = PAL.glass; ctx.globalAlpha = .35; for (let i = 1; i <= 3; i++) { ctx.beginPath(); ctx.arc(cx, cy, r * i / 3, 0, TAU); ctx.stroke(); } ctx.beginPath(); ctx.moveTo(cx - r, cy); ctx.lineTo(cx + r, cy); ctx.moveTo(cx, cy - r); ctx.lineTo(cx, cy + r); ctx.stroke(); ctx.globalAlpha = 1;
+    const a = anim ? t / 900 : ph; const grd = ctx.createConicGradient ? ctx.createConicGradient(a - 1.2, cx, cy) : null; if (grd) { grd.addColorStop(0, "rgba(62,207,122,0)"); grd.addColorStop(.19, "rgba(62,207,122,.55)"); grd.addColorStop(.191, "rgba(62,207,122,0)"); grd.addColorStop(1, "rgba(62,207,122,0)"); ctx.fillStyle = grd; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, 0, TAU); ctx.fill(); }
+    ctx.strokeStyle = PAL.lamp; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(a) * r, cy + Math.sin(a) * r); ctx.stroke(); const gg = rng(u.seed + 3); for (let i = 0; i < 3; i++) { const ba = gg() * TAU, br = gg() * r * .85; ctx.fillStyle = PAL.lamp; ctx.globalAlpha = .5 + .5 * ((Math.cos(ba - a) + 1) / 2); ctx.beginPath(); ctx.arc(cx + Math.cos(ba) * br, cy + Math.sin(ba) * br, 1.8, 0, TAU); ctx.fill(); } ctx.globalAlpha = 1; ctx.fillStyle = PAL.stroke; }
+  else if (k === 3) { const sx = x + pad, sy = y + pad * 1.4, sw = w - 2 * pad, sh = h * .42; ctx.fillStyle = PAL.screen; ctx.fillRect(sx, sy, sw, sh); const rec = u.skill && u.skill.record; const val = anim ? Math.round((t / 50 + ph * 100) % 10000) : rec ? rec.accepted || 0 : Math.round(ph * 1000);
+    sevenSeg(String(val).padStart(4, "0").slice(-4), sx + sw * .1, sy + sh * .18, sw * .8, sh * .64, u.state === "use" ? PAL.lamp : PAL.bad);
+    ctx.fillStyle = PAL.stroke; ctx.font = `${Math.max(7, m * .085)}px ${MONO}`; ctx.textAlign = "left"; ctx.fillText(rec ? "DONE" : "COUNT", sx, y + h - pad * 1.2); const br = m * .05; for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.arc(x + w - pad - i * br * 3.2, y + h - pad * 1.6, br, 0, TAU); (i === 0 && anim) || (g() < .4) ? ctx.fill() : ctx.stroke(); } }
+  else if (k === 4) { const r = m * .2, dx = m * .24; for (const s of [-1, 1]) { const rx = cx + s * dx, ry = cy - m * .06; ctx.beginPath(); ctx.arc(rx, ry, r, 0, TAU); ctx.fillStyle = "#2a2a28"; ctx.fill(); ctx.strokeStyle = PAL.stroke; ctx.stroke();
+    const a = (anim ? t / 700 : 0) * s + ph; ctx.strokeStyle = PAL.face; ctx.lineWidth = 1.2; for (let i = 0; i < 3; i++) { const aa = a + i * TAU / 3; ctx.beginPath(); ctx.moveTo(rx + Math.cos(aa) * r * .3, ry + Math.sin(aa) * r * .3); ctx.lineTo(rx + Math.cos(aa) * r * .85, ry + Math.sin(aa) * r * .85); ctx.stroke(); } ctx.beginPath(); ctx.arc(rx, ry, r * .22, 0, TAU); ctx.fillStyle = PAL.face; ctx.fill(); }
+    ctx.strokeStyle = PAL.stroke; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cx - dx, cy - m * .06 + r); ctx.quadraticCurveTo(cx, cy + m * .22, cx + dx, cy - m * .06 + r); ctx.stroke(); for (let i = 0; i < 3; i++) { const bx = x + w * (.3 + .2 * i), by = y + h * .86; ctx.strokeRect(bx - m * .05, by - m * .04, m * .1, m * .08); } ctx.fillStyle = PAL.stroke; }
+  else if (k === 5) { const n = 5, gap = (w - 2 * pad) / n; for (let i = 0; i < n; i++) { const sx = x + pad + gap * (i + .5), top = y + pad, bot = y + h - pad; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(sx, top); ctx.lineTo(sx, bot); ctx.stroke(); for (let j = 0; j <= 6; j++) { const ty = top + (bot - top) * j / 6; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(sx - 3, ty); ctx.lineTo(sx + 3, ty); ctx.stroke(); }
+    const lv = anim ? (Math.sin(t / 900 + i + ph) + 1) / 2 : g(); const ky = top + (bot - top) * lv; ctx.fillStyle = PAL.stroke; ctx.fillRect(sx - gap * .28, ky - m * .045, gap * .56, m * .09); ctx.fillStyle = "#fff"; ctx.fillRect(sx - gap * .28, ky - .75, gap * .56, 1.5); ctx.fillStyle = PAL.stroke; } }
+  else if (k === 6) { const n = 4, gap = (w - 2 * pad) / n, rows = 8; for (let i = 0; i < n; i++) { const lv = anim ? Math.round(rows * ((Math.sin(t / 300 + i * 1.3 + ph) + 1) / 2)) : Math.round(rows * g()); for (let j = 0; j < rows; j++) { const bx = x + pad + gap * i + gap * .2, by = y + h - pad - (j + 1) * ((h - 2 * pad) / rows) + 2, bw = gap * .6, bh = (h - 2 * pad) / rows - 4; const on = j < lv; ctx.fillStyle = on ? (j >= rows - 2 ? PAL.bad : j >= rows - 4 ? PAL.amber : PAL.lamp) : "#b9b9b4"; ctx.fillRect(bx, by, bw, bh); } } ctx.fillStyle = PAL.stroke; }
+  else { const sx = x + pad, sy = y + pad, sw = w - 2 * pad, sh = h - 2 * pad; ctx.fillStyle = PAL.screen; ctx.fillRect(sx, sy, sw, sh); ctx.save(); ctx.beginPath(); ctx.rect(sx + 1, sy + 1, sw - 2, sh - 2); ctx.clip(); ctx.strokeStyle = PAL.glass; ctx.globalAlpha = .25; ctx.lineWidth = 1; for (let i = 1; i < 4; i++) { ctx.beginPath(); ctx.moveTo(sx, sy + sh * i / 4); ctx.lineTo(sx + sw, sy + sh * i / 4); ctx.moveTo(sx + sw * i / 4, sy); ctx.lineTo(sx + sw * i / 4, sy + sh); ctx.stroke(); } ctx.globalAlpha = 1;
+    ctx.strokeStyle = PAL.lamp; ctx.lineWidth = 1.5; ctx.shadowColor = PAL.lamp; ctx.shadowBlur = 4; ctx.beginPath(); const N = 40; for (let i = 0; i <= N; i++) { const px = sx + sw * i / N, py = sy + sh / 2 + Math.sin(i / N * TAU * 2 + (anim ? t / 250 : 0) + ph) * sh * .3 * Math.sin(i / N * Math.PI); i ? ctx.lineTo(px, py) : ctx.moveTo(px, py); } ctx.stroke(); ctx.shadowBlur = 0; ctx.restore(); ctx.fillStyle = PAL.stroke; }
+  ctx.lineCap = "butt"; ctx.lineWidth = 1; ctx.textAlign = "left";
+}
+const SEG = ["1111110","0110000","1101101","1111001","0110011","1011011","1011111","1110000","1111111","1111011"];
+function sevenSeg(str, x, y, w, h, col){ const {ctx} = RM; const dw = w / str.length, t = Math.max(1, h * .12); for (let i = 0; i < str.length; i++) { const s = SEG[+str[i]] || "0000000", gx = x + dw * i + dw * .1, gw = dw * .7;
+  [[gx, y, gw, t], [gx + gw - t, y, t, h / 2], [gx + gw - t, y + h / 2, t, h / 2], [gx, y + h - t, gw, t], [gx, y + h / 2, t, h / 2], [gx, y, t, h / 2], [gx, y + h / 2 - t / 2, gw, t]].forEach((r, j) => { ctx.fillStyle = col; ctx.globalAlpha = s[j] === "1" ? 1 : .1; ctx.fillRect(r[0], r[1], r[2], r[3]); }); } ctx.globalAlpha = 1; }
+// ---- the monitor: your request, typed out as a ticket
+function ticketLines(){
+  const L = [], push = (lead, who, what, col) => L.push({lead, who, what, col});
+  const g = goalOf(S.ui.goal), picked = !!(g || S.ui.expert);
+  const text = S.action === "oracle.request" ? S.or.question : S.action === "workflow.open" ? S.wf.request : S.job.objective;
+  push("⏺", "desk", !picked ? "waiting for your request · pick what you want below" : g && !S.ui.expert ? `composing · ${g.title.toLowerCase()}` : S.ui.source === "agent" ? "composing · written by your AI" : `composing · ${S.action}`, PAL.phosDim);
+  if (!picked) { push("⎿", "fleet", "machines of identity.md holders, each with its own skills", PAL.phos); push("⎿", "price", "0.5 IMD a request · the quote is free", PAL.phos); return {L, text:null}; }
+  const used = [...RM.used]; push("⎿", "runs", used.length ? used.join(" → ") : "—", "#e8ffe9");
+  const errs = lastProblems.filter(p => p.lvl === "err");
+  push("⎿", "check", errs.length ? `${errs.length} to fix · ${errs[0].msg}` : lastProblems.length ? `ready · ${lastProblems.length} note${lastProblems.length > 1 ? "s" : ""}` : "ready", errs.length ? PAL.bad : PAL.lamp);
+  const q = RM.ticket.quote, p = RM.ticket.pay;
+  push("⎿", "quote", q ? (q.ok ? `0.5 IMD · order ${q.id.slice(0, 8)}` : `refused · ${q.code}`) : "free · not asked yet", q ? (q.ok ? PAL.amber : PAL.bad) : PAL.phosDim);
+  if (p) push("⎿", "sent", p.ok ? "admitted · the swarm has it" : `not sent · ${p.status}`, p.ok ? PAL.lamp : PAL.bad);
+  return {L, text};
+}
+function wrapText(ctx, s, maxW){ const out = []; let line = ""; for (const word of String(s).replace(/\s+/g, " ").split(" ")) { const tryL = line ? line + " " + word : word; if (ctx.measureText(tryL).width > maxW && line) { out.push(line); line = word; } else line = tryL; } if (line) out.push(line); return out; }
+function drawTicket(t){
+  const {ctx, cell} = RM, b = RM.monitor; if (!b) return; const x = b.c * cell + 1, y = b.r * cell + 1, w = b.w * cell - 2, h = b.h * cell - 2;
+  ctx.fillStyle = PAL.face; ctx.fillRect(x, y, w, h); ctx.strokeStyle = PAL.stroke; ctx.lineWidth = 1.5; ctx.strokeRect(x + .75, y + .75, w - 1.5, h - 1.5); ctx.lineWidth = 1; screws(x, y, w, h);
+  const p = Math.max(6, cell * .22), sx = x + p, sy = y + p, sw = w - 2 * p, sh = h - 2 * p; ctx.fillStyle = PAL.screen; ctx.fillRect(sx, sy, sw, sh); ctx.strokeStyle = PAL.glass; ctx.globalAlpha = .18; ctx.strokeRect(sx + 1.5, sy + 1.5, sw - 3, sh - 3); ctx.globalAlpha = 1;
+  const fs = Math.max(8.5, Math.min(12, cell * .29)), lh = fs * 1.42; ctx.font = `${fs}px ${MONO}`; ctx.textBaseline = "top";
+  const {L, text} = ticketLines();
+  const c0 = sx + fs * .7, c1 = c0 + fs * 1.2, c2 = c1 + fs * 4.6, maxW = sx + sw - c2 - fs;
+  const maxLines = Math.floor((sh - fs) / lh);
+  // the request itself sits right under the desk line and takes what room the status lines leave
+  const askRows = text != null ? Math.max(1, maxLines - L.length) : 0;
+  let ask = text != null ? (text.trim() ? wrapText(ctx, text.trim(), maxW) : [""]) : [];
+  if (ask.length > askRows) { ask = ask.slice(ask.length - askRows); ask[0] = "…" + ask[0].slice(1); }  // keep the end in view while typing
+  const rows = [L[0], ...ask.map((s, i) => ({lead:i ? " " : "⎿", who:i ? "" : "ask", what:s, col:"#e8ffe9", ask:true})), ...L.slice(1)].slice(0, maxLines);
+  ctx.save(); ctx.beginPath(); ctx.rect(sx + 3, sy + 3, sw - 6, sh - 6); ctx.clip();
+  let cursor = null;
+  rows.forEach((l, i) => { const ly = sy + fs * .6 + i * lh; ctx.fillStyle = l.col === PAL.bad ? PAL.bad : PAL.phosDim; ctx.fillText(l.lead, c0, ly); ctx.fillText(l.who, c1, ly); ctx.fillStyle = l.col;
+    let s = l.what; if (!l.ask) { while (s.length > 2 && ctx.measureText(s).width > maxW) s = s.slice(0, -2); if (s !== l.what) s = s.slice(0, -1) + "…"; }
+    if (l.ask && !l.what) { ctx.fillStyle = PAL.phosDim; ctx.fillText("type it below", c2, ly); cursor = {x:c2, y:ly}; } else { ctx.fillText(s, c2, ly); if (l.ask) cursor = {x:c2 + ctx.measureText(s).width + fs * .3, y:ly}; } });
+  if (!cursor) cursor = {x:c0, y:sy + fs * .6 + rows.length * lh};
+  if (Math.floor(t / 500) % 2 === 0 && cursor.y + fs < sy + sh) { ctx.fillStyle = PAL.lamp; ctx.fillRect(cursor.x, cursor.y, fs * .6, fs); }
+  ctx.restore(); ctx.textBaseline = "alphabetic";
+}
+// ---- pointer: the skill under the mouse
+function roomUnitAt(e){ const r = RM.canvas.getBoundingClientRect(); const c = Math.floor((e.clientX - r.left) / RM.cell), row = Math.floor((e.clientY - r.top) / RM.cell); return (RM.grid[row] || [])[c] || null; }
+function roomMove(e){
+  const u = roomUnitAt(e); const on = u && u.skill ? u : null;
+  if (on !== RM.hot) { RM.hot = on; RM.dirty = true; }
+  RM.canvas.style.cursor = on ? "help" : "";
+  if (!on) { RM.tip.classList.remove("on"); return; }
+  const s = on.skill, needs = (s.requires || []).filter(x => x !== "network");
+  RM.tip.innerHTML = `<div class="th"><b>${esc(s.id)}</b><span>${esc(s.role)}</span></div><div class="tt">${esc(s.description)}</div>`
+    + (needs.length ? `<div class="tt">needs ${esc(needs.join(", "))}</div>` : "")
+    + (on.state === "use" ? `<div class="tk">runs in your request</div>` : on.state === "ref" ? `<div class="tk ref">knowledge attached to your request</div>` : "");
+  const box = RM.canvas.parentElement.getBoundingClientRect(), cx = (on.c + on.w / 2) * RM.cell, top = on.r * RM.cell;
+  const below = top < 120; RM.tip.classList.toggle("below", below);
+  RM.tip.style.left = Math.max(120, Math.min(box.width - 120, cx)) + "px"; RM.tip.style.top = (below ? (on.r + on.h) * RM.cell + 6 : top - 6) + "px";
+  RM.tip.classList.add("on");
+}
+// ---- what happens in the room when something happens on the page
+function roomEvent(kind, data){
+  if (kind === "quote") RM.ticket.quote = data;
+  if (kind === "sent") RM.ticket.pay = data;
+  if (kind === "reset") RM.ticket = {quote:null, pay:null};
+  RM.dirty = true;
+  const P = RM.pepe; if (!P) return;
+  if (kind === "goal") P.react("greet");
+  else if (kind === "typing" && performance.now() - RM.lastLook > 9000) { RM.lastLook = performance.now(); P.react("look"); }
+  else if (kind === "quote") P.react(data.ok ? "jump" : "headshake");
+  else if (kind === "sent") { if (data.ok) { P.react("dance"); const t = performance.now(); RM.units.forEach(u => RM.flash.set(u.id, t + 90 + u.c * 35 + u.r * 20)); } else P.react("faint"); }
+}
+
+/* ---- pepe: the sprite from imd.fun's front page, as on the panel. 17 frames of 480 x 520 in one row; at load the shirt
+   is recoloured from blue to charcoal so he matches the black-and-white room. Idles on his own, does a trick when poked,
+   and reacts to the page through react(). */
+const PEPE_FRAMES = ["stand","walk1","walk2","lookup_mid","lookup","scratch1","scratch2","side_stand","side_walk1","side_walk2","side_walk3","side_walk4","q34_back","q34_front","front_stand","front_lookup","front_scratch"];
+const PEPE_FW = 480, PEPE_FH = 520; let PEPE_SHEET = null;
+function pepeSheet(){ return new Promise(res => { const img = new Image(); img.onload = () => { try { const c = document.createElement("canvas"); c.width = img.width; c.height = img.height; const x = c.getContext("2d", {willReadFrequently:true}); x.drawImage(img, 0, 0);
+    const d = x.getImageData(0, 0, c.width, c.height), p = d.data;
+    for (let i = 0; i < p.length; i += 4) { const r = p[i], g = p[i + 1], b = p[i + 2]; if (p[i + 3] > 0 && b > r + 50 && b > g + 30) { const l = Math.min(1, (r * .3 + g * .59 + b * .11) / 170); const v = Math.round(44 + l * 100); p[i] = v; p[i + 1] = v; p[i + 2] = v; } }
+    x.putImageData(d, 0, 0); res(c); } catch (e) { res(img); } }; img.onerror = () => res(null); img.src = "assets/pepe.webp"; }); }
+function drawPepe(ctx, pose, Wd){ const H = Wd * PEPE_FH / PEPE_FW; ctx.clearRect(0, 0, Wd, H); if (!PEPE_SHEET) return; const i = Math.max(0, PEPE_FRAMES.indexOf(pose));
+  ctx.beginPath(); ctx.ellipse(Wd / 2, H * .985, Wd * .28, H * .035, 0, 0, TAU); ctx.fillStyle = "rgba(0,0,0,.22)"; ctx.fill();
+  ctx.drawImage(PEPE_SHEET, i * PEPE_FW, 0, PEPE_FW, PEPE_FH, 0, 0, Wd, H); }
+function pepeStart(cv){
+  const dpr = Math.min(2, devicePixelRatio || 1); let cw = 0;
+  const fit = () => { const w = cv.clientWidth || 60, h = w * PEPE_FH / PEPE_FW; if (w === cw) return; cw = w; cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); cv.style.height = h + "px"; cv.getContext("2d").setTransform(dpr, 0, 0, dpr, 0, 0); };
+  let cur = "stand"; const face = n => { cur = n; fit(); drawPepe(cv.getContext("2d"), n, cw); };
+  new ResizeObserver(() => { fit(); face(cur); }).observe(cv);
+  const pos = {x:0, y:0, s:1, sy:1, r:0, f:1}; const place = () => { cv.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.r}deg) scale(${pos.s * pos.f}, ${pos.s * pos.sy})`; };
+  const home = () => { Object.assign(pos, {x:0, y:0, s:1, sy:1, r:0, f:1}); place(); face("stand"); };
+  pepeSheet().then(s => { PEPE_SHEET = s; cw = 0; face(cur); });
+  face("stand"); place();
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return {react(){}};
+  const H = () => cv.offsetHeight || 60, Wd = () => cv.offsetWidth || 50;
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const play = async seq => { for (const [n, ms] of seq) { face(n); await sleep(ms); } };
+  const visible = () => document.visibilityState === "visible";
+  const ease = {lin:k => k, out:k => 1 - (1 - k) * (1 - k), inq:k => k * k, arc:k => 4 * k * (1 - k)};
+  const tw = (to, ms, o = {}) => new Promise(res => { const from = {...pos}; let last = -1, acc = 0, t0 = performance.now(); const e = ease[o.ease || "lin"]; const step = now => { acc += Math.min(100, now - t0); t0 = now; const k = Math.min(1, acc / ms), ek = e(k);
+    for (const key in to) pos[key] = from[key] + (to[key] - from[key]) * ek; if (o.arc) pos.y = from.y + (to.y != null ? (to.y - from.y) * ek : 0) - o.arc * ease.arc(k);
+    if (o.frames) { const f = Math.floor(acc / (o.fms || 140)); if (f !== last) face(o.frames[(last = f) % o.frames.length]); } else if (o.frame && last < 0) { last = 0; face(o.frame); }
+    place(); k >= 1 ? (o.end && face(o.end), res()) : requestAnimationFrame(step); }; requestAnimationFrame(step); });
+  const SIDE = ["side_walk1","side_walk2","side_walk3","side_walk4"];
+  const look = [["lookup_mid",140],["lookup",1300],["lookup_mid",140],["stand",300]];
+  const idles = [look, [["scratch1",220],["scratch2",220],["scratch1",220],["scratch2",220],["stand",300]], [["walk1",170],["stand",170],["walk2",170],["stand",300]]];
+  const turnFront = [["q34_back",200],["side_stand",200],["q34_front",220],["front_stand",500]], turnBack = [["q34_front",220],["side_stand",200],["q34_back",200],["stand",300]];
+  const hop = async h => { await tw({sy:.86}, 110, {frame:"stand", ease:"out"}); await tw({sy:1.06, y:-h}, 240, {frame:"lookup", ease:"out"}); await tw({y:0, sy:1}, 230, {frame:"lookup_mid", ease:"inq"}); await tw({sy:.88}, 80, {frame:"stand"}); await tw({sy:1}, 140); };
+  const tricks = {
+    look: () => play(look),
+    jump: async () => { await hop(H() * .8); await sleep(150); await hop(H() * 1.1); await play([["stand",200]]); },
+    dance: async () => { for (let i = 0; i < 8; i++) { const sd = i % 2 ? 1 : -1; await tw({x:sd * Wd() * .12, r:sd * 9, sy:.94}, 150, {frame:i % 2 ? "walk1" : "walk2", ease:"out"}); await tw({sy:1}, 90); } await tw({x:0, r:0}, 160, {end:"stand"}); await sleep(200); },
+    moonwalk: async () => { await play([["q34_front",180],["side_stand",200]]); await tw({x:-Wd() * 1.4}, 1300, {frames:SIDE, fms:150}); await play([["side_stand",300]]); pos.f = -1; place(); await tw({x:0}, 1000, {frames:SIDE, fms:140}); pos.f = 1; place(); await play([["side_stand",200],["q34_back",200],["stand",300]]); },
+    headshake: async () => { await play(turnFront); for (let i = 0; i < 5; i++) await tw({r:i % 2 ? -9 : 9}, 110, {frame:"front_stand"}); await tw({r:0}, 110); await play([["front_lookup",700],["front_stand",300]]); await play(turnBack); },
+    faint: async () => { await play(turnFront); await play([["front_lookup",500]]); await tw({r:-88, x:-Wd() * .35}, 420, {frame:"front_stand", ease:"inq"}); await sleep(1400); await tw({r:0, x:0}, 550, {frame:"front_scratch", ease:"out"}); await play([["front_scratch",240],["front_stand",400]]); await play(turnBack); },
+    greet: async () => { await play(turnFront); await play([["front_lookup",900],["front_stand",400]]); await play(turnBack); },
+  };
+  // one act at a time: the idle loop, a poke and the page's reactions queue on the same lock
+  let acting = false, queued = null;
+  const act = async name => { while (acting) await sleep(60); acting = true; try { await tricks[name](); } catch {} home(); acting = false; };
+  const pokeable = ["jump","dance","moonwalk","headshake","faint","greet"]; let lastPoke = "";
+  cv.addEventListener("click", () => { let n; do n = pokeable[Math.floor(Math.random() * pokeable.length)]; while (n === lastPoke); lastPoke = n; act(n); });
+  (async () => { let i = 0; for (;;) { await sleep(4000 + 5000 * Math.random()); if (!visible() || acting || queued) continue;
+    acting = true; try { if (Math.random() < .12) await hop(H() * .35); else { i = (i + 1 + Math.floor(Math.random() * (idles.length - 1))) % idles.length; await play(idles[i]); } } catch {} acting = false; } })();
+  return {react(name){ if (!tricks[name] || queued === name) return; queued = name; act(name).then(() => { if (queued === name) queued = null; }); }};
+}
+
 /* ================= shell ================= */
 function showTab(t){
   document.querySelectorAll("[data-tab]").forEach(b => b.classList.toggle("is-here", b.dataset.tab === t));
@@ -1474,7 +1791,7 @@ $("#themeBtn").onclick = () => { const r = document.documentElement, cur = r.dat
 try { const th = localStorage.getItem("imd-compose-theme"); if (th) document.documentElement.dataset.theme = th; } catch {}
 
 (async function boot(){
-  SKILLS = SKILLS_SNAPSHOT; renderAll(); renderPrompt();
+  SKILLS = SKILLS_SNAPSHOT; renderAll(); renderPrompt(); roomInit();
   let helper = false;
   try { helper = Array.isArray(await get("/local/orders")); } catch {}
   if (!helper) {  // no local server behind this page (e.g. IPFS): compose and check only

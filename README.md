@@ -21,9 +21,16 @@ It runs two ways:
 
 ## What the page does
 
-- **Ask your own agent**: a ready prompt for Claude, Codex or any assistant. It lists every request
+- **The room**: the same wall of instruments and the same Pepe as imd-panel (art by imd.fun, used with
+  permission). Every module is a skill of the network; the skills your request will run come forward and
+  light up, the knowledge it attaches glows amber, and the phosphor screen types your request out as a ticket
+  with the check, the quote and the payment. Pepe reacts to what you do, and does a trick when poked.
+- **Start from what you want**: eight plain goals (a report, a tested contract, a deploy, contracts plus a
+  site, a website, a code review, an image, a question for a panel). Pick one, describe it in one box, and
+  the page builds a valid request; skills, steps and files stay under **Fine-tune**.
+- **Let your own AI write it**: a ready prompt for Claude, Codex or any assistant. It lists every request
   type, field and limit and the skill catalog, and asks for one `{action, input}` JSON object. Paste the
-  answer into **JSON body → Edit → Apply** and the checks tell you what to fix.
+  answer back and press **Use this answer**; the checks tell you what to fix.
 - **Compose**: a form for every request type, examples taken from the docs, hand-editable JSON, and
   local validation of every documented limit (control plane 23659b86, 23 Sep 2026). Without the helper the
   skill catalog comes from a snapshot in the page.
