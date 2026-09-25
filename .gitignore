@@ -1,0 +1,5 @@
+# local backups and caches, never commit
+*.bak*
+__pycache__/
+*.pyc
+orders.json

@@ -1,0 +1,1339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IMD Compose</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap">
+<style>
+:root{color-scheme:light;--paper:#fff;--ink:#000;--dim:#555;--faint:#999;--soft:#e6e6e6;--hover:#f4f4f4;
+  --alarm:#b3261e;--ok:#1f9d55;--lamp:#b7860b;--rule:1.5px solid var(--ink);--gutter:clamp(16px,4vw,34px);--pill-h:40px;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;--code:#f6f6f4}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--paper:#000;--ink:#fff;--dim:#9a9a9a;--faint:#666;--soft:#262626;--hover:#141414;--alarm:#ff6b62;--ok:#3ecf7a;--lamp:#ffcf5a;--rule:1.5px solid #fff;--code:#0c0c0c}}
+:root[data-theme="dark"]{color-scheme:dark;--paper:#000;--ink:#fff;--dim:#9a9a9a;--faint:#666;--soft:#262626;--hover:#141414;--alarm:#ff6b62;--ok:#3ecf7a;--lamp:#ffcf5a;--rule:1.5px solid #fff;--code:#0c0c0c}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper)}
+body{color:var(--ink);font-family:var(--mono);font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:clip}
+a{color:inherit}
+[hidden]{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+
+/* nav */
+.nav{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center;justify-content:space-between;padding:16px var(--gutter) 0}
+.pill{display:flex;align-items:stretch;height:var(--pill-h);border:var(--rule);background:var(--paper)}
+.pill-brand{display:flex;align-items:center;padding:0 16px;font-weight:600;letter-spacing:.3em}
+.pill-cell{display:flex;align-items:center;gap:7px;padding:0 14px;font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;background:var(--paper);border:0;white-space:nowrap;cursor:pointer}
+.pill-cell+.pill-cell,.pill-brand+.pill-cell{border-left:var(--rule)}
+.pill-cell:hover{background:color-mix(in srgb,var(--ink) 14%,var(--paper))}
+.pill-cell.is-here{background:var(--ink);color:var(--paper)}
+.dot{display:inline-block;width:7px;height:7px;background:var(--faint)}
+.dot.on{background:var(--ok)}.dot.warn{background:var(--lamp)}.dot.off{background:var(--alarm)}
+
+main{padding:22px var(--gutter) 60px;max-width:1500px;margin:0 auto}
+h1{font-size:22px;letter-spacing:-.01em;margin:0 0 4px}
+.lede{color:var(--dim);margin:0 0 20px;max-width:820px}
+h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 10px;font-weight:600}
+h3{font-size:12px;margin:0 0 8px;font-weight:600}
+
+/* layout */
+.compose{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:1000px){.compose{grid-template-columns:minmax(0,1fr)}}
+.compose>*{min-width:0}
+select{min-width:0;max-width:100%}
+.f>label,.lbl{flex-wrap:wrap}
+.side{position:sticky;top:12px;display:flex;flex-direction:column;gap:16px}
+@media (max-width:1000px){.side{position:static}}
+.box{border:var(--rule);padding:16px}
+.box+.box{margin-top:16px}
+.sec{border:var(--rule);padding:16px 16px 6px;margin-bottom:16px}
+.sec>h2{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.sec>h2 small{font-size:10px;letter-spacing:.06em;color:var(--dim);text-transform:none;font-weight:400}
+
+/* segmented control */
+.seg{display:flex;flex-wrap:wrap;border:var(--rule);width:max-content;max-width:100%}
+.seg button{border:0;background:var(--paper);padding:8px 14px;cursor:pointer;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:500}
+.seg button+button{border-left:var(--rule)}
+.seg button:hover{background:var(--hover)}
+.seg button.on{background:var(--ink);color:var(--paper)}
+.seg.small button{padding:5px 10px}
+
+/* fields */
+.f{margin-bottom:12px}
+.f>label,.lbl{display:flex;justify-content:space-between;gap:8px;font-size:11px;color:var(--dim);margin-bottom:4px}
+.f>label b,.lbl b{color:var(--ink);font-weight:600}
+.f .hint{font-size:11px;color:var(--faint);margin-top:3px}
+input[type=text],input[type=number],select,textarea{width:100%;background:var(--paper);border:1.5px solid color-mix(in srgb,var(--ink) 35%,var(--paper));padding:7px 9px;border-radius:0;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--ink)}
+textarea{resize:vertical;min-height:38px}
+textarea.tall{min-height:110px}
+.row{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.row2{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+@media (max-width:560px){.row2{grid-template-columns:1fr}}
+.check{display:flex;gap:8px;align-items:center;font-size:12px;cursor:pointer}
+.is-bad{border-color:var(--alarm)!important}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1.5px solid color-mix(in srgb,var(--ink) 35%,var(--paper));background:var(--paper);padding:3px 8px;font-size:11px;cursor:pointer}
+.chip.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip:hover{border-color:var(--ink)}
+
+/* steps */
+.step{border:1.5px solid color-mix(in srgb,var(--ink) 35%,var(--paper));padding:12px;margin-bottom:12px;position:relative}
+.step-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.step-head .n{font-weight:700}
+.step-tools{display:flex;gap:4px}
+.ibtn{border:1.5px solid color-mix(in srgb,var(--ink) 35%,var(--paper));background:var(--paper);width:28px;height:26px;cursor:pointer;font-size:12px;padding:0}
+.ibtn:hover{border-color:var(--ink)}
+details.more>summary{cursor:pointer;font-size:11px;color:var(--dim);margin:4px 0 10px;list-style:none}
+details.more>summary::before{content:"+ "}
+details.more[open]>summary::before{content:"− "}
+.filerow{display:grid;grid-template-columns:1fr 1.4fr 1fr 28px;gap:6px;margin-bottom:6px}
+.filerow.in{grid-template-columns:1fr 1.4fr 1fr 28px}
+@media (max-width:560px){.filerow,.filerow.in{grid-template-columns:1fr}}
+
+/* buttons */
+.btn{border:var(--rule);background:var(--paper);padding:9px 14px;cursor:pointer;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+.btn:hover{background:var(--hover)}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.primary:hover{background:color-mix(in srgb,var(--ink) 80%,var(--paper))}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.sm{padding:5px 9px;font-size:10px}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+
+/* preview + problems */
+pre,.code{background:var(--code);border:1.5px solid var(--soft);padding:12px;overflow:auto;font-size:11.5px;line-height:1.45;margin:0;white-space:pre}
+#json{max-height:46vh}
+#jsonEdit{min-height:46vh;font-size:11.5px;white-space:pre;background:var(--code)}
+.probs{list-style:none;margin:0;padding:0}
+.probs li{padding:6px 0 6px 18px;border-top:1px solid var(--soft);position:relative;cursor:pointer;font-size:12px}
+.probs li:first-child{border-top:0}
+.probs li::before{content:"";position:absolute;left:0;top:12px;width:8px;height:8px}
+.probs li.err::before{background:var(--alarm)}
+.probs li.warn::before{background:var(--lamp)}
+.probs li.ok{cursor:default}
+.probs li.ok::before{background:var(--ok)}
+.probs code{font-size:11px;color:var(--dim)}
+.status-line{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:11px;color:var(--dim);margin-bottom:8px}
+.tag{display:inline-block;border:1.5px solid currentColor;padding:0 6px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.tag.ok{color:var(--ok)}.tag.err{color:var(--alarm)}.tag.warn{color:var(--lamp)}.tag.dim{color:var(--dim)}
+.muted{color:var(--dim)}
+.small{font-size:11px}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:3px 14px;font-size:12px}
+.kv dt{color:var(--dim)}.kv dd{margin:0;word-break:break-all}
+
+/* tables */
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);font-weight:600;padding:6px 8px;border-bottom:var(--rule)}
+td{padding:7px 8px;border-bottom:1px solid var(--soft);vertical-align:top}
+tr.click{cursor:pointer}
+tr.click:hover td{background:var(--hover)}
+.tbl-wrap{overflow-x:auto}
+.clip{max-width:520px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* stat strip */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));border:var(--rule);margin-bottom:18px}
+.stat{padding:12px 14px;border-right:1px solid var(--soft)}
+.stat:last-child{border-right:0}
+.stat .v{font-size:20px;font-weight:600}
+.stat .k{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+
+/* drawer */
+.drawer{position:fixed;inset:0 0 0 auto;width:min(720px,100%);background:var(--paper);border-left:var(--rule);z-index:20;overflow:auto;padding:20px var(--gutter);box-shadow:-20px 0 60px rgba(0,0,0,.18)}
+.drawer .close{position:sticky;top:0;float:right}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:19}
+.modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(640px,calc(100% - 32px));max-height:calc(100% - 40px);overflow:auto;background:var(--paper);border:var(--rule);z-index:21;padding:20px}
+.log{font-size:11.5px;max-height:220px;overflow:auto;background:var(--code);border:1.5px solid var(--soft);padding:10px;white-space:pre-wrap;word-break:break-all}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;font-size:12px;z-index:30;max-width:calc(100% - 32px)}
+.subnav{margin-bottom:14px}
+.warnbox{border:1.5px solid var(--lamp);padding:10px 12px;font-size:12px;margin-bottom:12px}
+.errbox{border:1.5px solid var(--alarm);padding:10px 12px;font-size:12px;margin-bottom:12px}
+.agent>summary{cursor:pointer;list-style:none;margin-bottom:10px}
+.agent>summary::-webkit-details-marker{display:none}
+.agent>summary::before{content:"▸ ";color:var(--dim)}
+.agent[open]>summary::before{content:"▾ "}
+.agent-steps{margin:0 0 10px;padding-left:18px;color:var(--dim)}
+#agentPrompt{width:100%;min-height:220px;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;resize:vertical;box-sizing:border-box}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="pill">
+    <span class="pill-brand">IMD</span>
+    <button class="pill-cell is-here" data-tab="compose">Compose</button>
+    <button class="pill-cell" data-tab="orders">Orders <span id="ordCount" class="muted"></span></button>
+    <button class="pill-cell" data-tab="net">Network</button>
+  </div>
+  <div class="pill">
+    <span class="pill-cell" id="netDot" title="api.imd.fun"><span class="dot"></span><span>api</span></span>
+    <button class="pill-cell" id="walletBtn">Connect wallet</button>
+    <button class="pill-cell" id="themeBtn" title="Theme">◐</button>
+  </div>
+</nav>
+
+<main>
+<!-- ============ COMPOSE ============ -->
+<section id="tab-compose">
+  <h1>Compose a request for the swarm</h1>
+  <p class="lede">Pick what to ask for, fill in the fields and check the problems on the right. <b>Quote</b> is free: the control plane rebuilds the request and tells you whether it is valid. You only pay with <b>Pay</b>, signing from your wallet (0.5 IMD).</p>
+
+  <details class="sec agent" id="agentBox" open>
+    <summary><h2 style="display:inline">Or ask your own agent <small>Claude, Codex or any assistant writes the JSON for you</small></h2></summary>
+    <ol class="small agent-steps">
+      <li>Copy the prompt below and paste it into your agent.</li>
+      <li>Replace the last line with what you want the swarm to do.</li>
+      <li>Paste the JSON it answers with into <b>JSON body → Edit</b> and press <b>Apply to form</b>. The checks on the right tell you what to fix.</li>
+    </ol>
+    <textarea id="agentPrompt" readonly spellcheck="false"></textarea>
+    <div class="btns" style="margin:8px 0 10px"><button class="btn sm primary" id="copyPrompt">Copy prompt</button><span id="promptInfo" class="small muted"></span></div>
+  </details>
+
+  <div class="compose">
+    <div>
+      <div class="sec">
+        <h2>Request type <small id="actionHelp"></small></h2>
+        <div class="seg" id="actionSeg">
+          <button data-action="job.open">Job</button>
+          <button data-action="launch.open">Launch</button>
+          <button data-action="workflow.open">Workflow</button>
+          <button data-action="oracle.request">Oracle</button>
+        </div>
+        <div class="f" style="margin-top:14px">
+          <label for="presetSel"><b>Start from an example</b><span>from the docs examples</span></label>
+          <select id="presetSel"></select>
+        </div>
+      </div>
+      <div id="form"></div>
+    </div>
+
+    <aside class="side">
+      <div class="box">
+        <div class="status-line"><h2 style="margin:0">Check</h2><span id="probSummary"></span></div>
+        <ul class="probs" id="probs"></ul>
+      </div>
+      <div class="box">
+        <div class="status-line">
+          <h2 style="margin:0">JSON body</h2>
+          <span class="btns"><span id="bytes" class="small muted"></span>
+            <button class="btn sm" id="copyJson">Copy</button>
+            <button class="btn sm" id="editJson">Edit</button></span>
+        </div>
+        <pre id="json"></pre>
+        <div id="jsonEditWrap" hidden>
+          <textarea id="jsonEdit" spellcheck="false"></textarea>
+          <div class="btns" style="margin-top:8px"><button class="btn sm primary" id="applyJson">Apply to form</button><button class="btn sm" id="cancelJson">Cancel</button></div>
+          <div class="hint small muted" style="margin-top:6px">Accepts just the <code>input</code> or the full body of <code>/requests/quote</code> (<code>{requestKey, action, input}</code>).</div>
+        </div>
+      </div>
+      <div class="box" id="staticBox" hidden>
+        <h2>Quote and pay</h2>
+        <p class="small">api.imd.fun refuses quotes and payments from web pages on other domains, so this hosted copy can only compose and check. To send the request, run the same page locally (Python 3, no dependencies):</p>
+        <pre class="small" id="helperCmd"></pre>
+        <p class="small muted">Then open <code>http://127.0.0.1:8790</code>, paste your JSON with <b>Edit → Apply</b>, press <b>Quote (free)</b> and pay from your wallet.</p>
+      </div>
+      <div class="box" id="sendBox">
+        <h2>Send</h2>
+        <div class="f"><label for="labelIn"><b>Label</b><span>local only, to find it later</span></label><input type="text" id="labelIn" placeholder="e.g. ERC-8004 report"></div>
+        <div class="btns">
+          <button class="btn" id="quoteBtn">Quote (free)</button>
+          <button class="btn primary" id="payBtn" disabled>Pay and send</button>
+        </div>
+        <div id="quoteOut" style="margin-top:12px"></div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ ORDERS ============ -->
+<section id="tab-orders" hidden>
+  <h1>Your orders</h1>
+  <p class="lede">Every quote created here, saved in <code>~/.config/imd-compose/orders.json</code> with the token that reads it back. Open orders refresh on their own.</p>
+  <div class="tbl-wrap"><table>
+    <thead><tr><th>Created</th><th>Label / objective</th><th>Action</th><th>Status</th><th>Result</th><th></th></tr></thead>
+    <tbody id="ordRows"></tbody>
+  </table></div>
+</section>
+
+<!-- ============ NETWORK ============ -->
+<section id="tab-net" hidden>
+  <h1>The network</h1>
+  <p class="lede">Public reads from the control plane. From a completed job you can reuse an accepted file as an <code>input</code> or start again from its repository.</p>
+  <div class="stats" id="stats"></div>
+  <div class="seg small subnav" id="netSeg">
+    <button data-net="jobs" class="on">Job</button><button data-net="workflows">Workflow</button><button data-net="oracle">Oracle</button><button data-net="skills">Skill</button>
+  </div>
+  <div id="netBody"></div>
+</section>
+</main>
+
+<div id="overlay" hidden></div>
+
+<script>
+"use strict";
+/* ================= constants from the docs (api.imd.fun, control plane 23659b86) ================= */
+const TEMPLATES = ["single","impl_tests","impl_tests_review","multi_contract","fuzz","research"];
+const SHAPES = ["chain","fan_out_join","dag"];
+const NEEDS_PATHS = ["implement-contract","implement-one-contract","implement-and-test","implement-component","write-foundry-tests","refine-project","write-readme-and-docs","deploy-script","gas-and-size-report"];
+const NAMED_OUTPUT = ["research-report","write-readme-and-docs","create-image","create-audio","create-video"];
+const INTERNAL = ["oracle-assess","workflow-planner"];
+const FRONTEND = ["frontend-for-contract","build-website"];
+const REFUSED = ["parentJobId","projectId","deploymentLaunchId","submissionKey"];
+const ANSWER_TYPES = ["bool","address","bytes32","uint256","address[]","bytes32[]"];
+const WF_CHAIN = 11155111;
+const IMD = "0xd34a99bc0f67ae1bbd63c660e6d0b0dd03e263b7";
+const PERMIT2 = "0x000000000022D473030F116dDEE9F6B43aC78BA3";
+const RE = {
+  key:/^[a-z][a-z0-9_]{0,31}$/, fname:/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/, hex64:/^[0-9a-f]{64}$/, commit:/^[0-9a-f]{40}$/,
+  label:/^[a-z0-9](?:[a-z0-9-]{0,30}[a-z0-9])?$/, addr:/^0x[0-9a-fA-F]{40}$/, b32:/^0x[0-9a-fA-F]{64}$/, dec:/^\d+$/, uri:/^https?:\/\/\S+$/
+};
+const MEDIA = {".md":"text/markdown",".json":"application/json",".png":"image/png",".jpg":"image/jpeg",".webp":"image/webp",".svg":"image/svg+xml",".mp3":"audio/mpeg",".wav":"audio/wav",".mp4":"video/mp4",".csv":"text/csv",".txt":"text/plain",".html":"text/html",".pdf":"application/pdf"};
+
+let SKILLS = [];          // live catalog from /skills
+let CAPS = null;          // /requests/capabilities
+const SKILLS_SNAPSHOT = [{"id":"adversarial-review","role":"review","kind":"code","description":"Read the implementation and its tests as an attacker would, and write nothing.","requires":[],"judge":"verifier-rerun"},{"id":"build-contract-project","role":"implement","kind":"code","description":"Build and test a complete standalone Foundry project without assuming a Uniswap hook.","requires":[],"judge":"verifier-rerun"},{"id":"build-ponder-indexer","role":"implement","kind":"code","description":"Build a Ponder indexer for a specific contract or project, so its events are queryable as tables and GraphQL.","requires":["network"],"judge":"verifier-paths"},{"id":"build-website","role":"implement","kind":"code","description":"Build a responsive Vite and React website, validate it on the worker, and deliver its source and static export.","requires":["network"],"judge":"verifier-paths"},{"id":"create-audio","role":"implement","kind":"code","description":"Produce narration, speech or music with the contributor's explicitly installed audio tool.","requires":["tool:audio"],"judge":"verifier-paths"},{"id":"create-image","role":"implement","kind":"code","description":"Produce the requested image with the contributor's explicitly installed image tool.","requires":["tool:image"],"judge":"verifier-paths"},{"id":"create-video","role":"implement","kind":"code","description":"Produce a video using the contributor's explicitly installed video tool.","requires":["tool:video"],"judge":"verifier-paths"},{"id":"defi-native","role":"reference","kind":"code","description":"DeFi capital-markets foundations for vaults, yield, lending, stablecoins, oracles, RWAs, and liquidity risk.","requires":[],"judge":null},{"id":"deploy-script","role":"implement","kind":"code","description":"Write a Foundry deployment script whose parameters come from configuration, and prove it runs.","requires":[],"judge":"verifier-rerun"},{"id":"evm-project-launch","role":"reference","kind":"code","description":"Constructor-only EVM projects with a launch token, a hookless pool, and contributor rewards.","requires":[],"judge":null},{"id":"fix-findings","role":"implement","kind":"code","description":"Address the blocking findings of a review, exactly those, and answer the ones that do not hold.","requires":[],"judge":"verifier-rerun"},{"id":"frontend-for-contract","role":"implement","kind":"code","description":"Build and validate a wallet-connected frontend for deployed contracts, delivering source and a static export.","requires":["network"],"judge":"verifier-paths"},{"id":"gas-and-size-report","role":"tests","kind":"code","description":"Measure a project's gas use and contract sizes, record them as artifacts, and refuse a contract that will not deploy.","requires":[],"judge":"verifier-rerun"},{"id":"implement-and-test","role":"implement","kind":"code","description":"One worker writes the contract and its tests, for a change small enough not to need a second pair of hands.","requires":[],"judge":"verifier-rerun"},{"id":"implement-component","role":"implement","kind":"code","description":"Implement a scoped component against agreed interfaces while other contributors build independent components.","requires":["network"],"judge":"verifier-paths"},{"id":"implement-contract","role":"implement","kind":"code","description":"Write the contract, and leave the tests to somebody who did not write it.","requires":[],"judge":"verifier-rerun"},{"id":"implement-one-contract","role":"implement","kind":"code","description":"Write one contract out of several being built in parallel by different workers.","requires":[],"judge":"verifier-rerun"},{"id":"integrate-project","role":"integrate","kind":"code","description":"Integrate accepted parallel branches and validate the combined project against its original requirements.","requires":["network"],"judge":"verifier-paths"},{"id":"oracle-assess","role":"implement","kind":"code","description":"Answer a typed on-chain question from a pinned request, with the recipe that reproduces it.","requires":["network"],"judge":"verifier-paths"},{"id":"pashov-skill","role":"reference","kind":"code","description":"Pashov Solidity audit methodology with twelve specialties and evidence-based finding validation.","requires":[],"judge":null},{"id":"public-rpcs","role":"reference","kind":"code","description":"Public JSON-RPC endpoints and chain ids for every chain Chainlist knows, ordered for rotation, and how a keyed endpoint reaches a task.","requires":[],"judge":null},{"id":"refine-project","role":"implement","kind":"code","description":"Change an existing project to address specific reported problems, without rebuilding it.","requires":[],"judge":"verifier-paths"},{"id":"research-report","role":"implement","kind":"code","description":"Research a question and deliver a reusable report with sources and uncertainty.","requires":["network"],"judge":"verifier-paths"},{"id":"scaffold-project","role":"implement","kind":"code","description":"Build a working project from an empty tree \u2014 its layout, its build configuration, and the thing itself.","requires":[],"judge":"verifier-paths"},{"id":"solidity-security-review","role":"reference","kind":"code","description":"Lightweight Solidity threat-model reference for a scoped review; does not create a review assignment.","requires":[],"judge":null},{"id":"uniswap-v4-hooks","role":"reference","kind":"code","description":"'Generate Uniswap v4 hook contracts via OpenZeppelin MCP.","requires":[],"judge":null},{"id":"uniswap-v4-security","role":"reference","kind":"code","description":"Security-first Uniswap v4 hook development.","requires":[],"judge":null},{"id":"workflow-planner","role":"implement","kind":"code","description":"Propose a bounded parallel workflow as JSON for control-plane validation, without executing it.","requires":[],"judge":"verifier-paths"},{"id":"write-foundry-tests","role":"tests","kind":"code","description":"Test somebody else's accepted implementation, including the paths it would rather you did not take.","requires":[],"judge":"verifier-rerun"},{"id":"write-readme-and-docs","role":"implement","kind":"code","description":"Document a delivered project for a stranger who has to run it, use it and change it.","requires":[],"judge":"verifier-paths"}];  // api.imd.fun/skills, 2026-09-26
+let STATIC = false;       // served without the local helper (e.g. IPFS): no quote, pay, orders or live network reads
+const $ = s => document.querySelector(s);
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const isRef = id => SKILLS.find(s => s.id === id)?.role === "reference";
+const runnable = () => SKILLS.filter(s => s.role !== "reference" && !INTERNAL.includes(s.id));
+const refs = () => SKILLS.filter(s => s.role === "reference");
+const skillDesc = id => SKILLS.find(s => s.id === id)?.description || "";
+
+/* ================= state ================= */
+const blankStep = (skill="build-contract-project") => ({skill, key:"", dependsOn:[], objective:"", acceptanceCriteria:[], paths:[], references:[], inputs:[], outputs:[], variables:[]});
+const blankJob = () => ({mode:"skill", objective:"", skill:"research-report", template:"research", shape:"chain", steps:[],
+  references:[], repoUrl:"", baseCommit:"", contracts:[], paths:[], inputs:[], outputs:[{name:"report", path:"artifacts/report.md", mediaType:"text/markdown"}],
+  github:"default", ipfs:"off", ipfsLabel:"", onchain:"", minCitations:"", projectPath:"", runs:"", rubricContains:[], rubricMayNot:[], panelSize:"", panelQuorum:""});
+const blankOracle = () => ({question:"", chainId:"1", windowMode:"hours", hours:"24", fromBlock:"", toBlock:"", answerType:"bool", evidence:"chain",
+  panelSize:"5", quorum:"4", validForSeconds:"86400", head:"", toleranceBps:"", definitions:[], allow:[], deny:[], mustHaveCode:false,
+  min:"", max:"", sources:[], minSources:"", consumerChainId:"", consumerContract:""});
+let S = {action:"job.open", job:blankJob(), wf:{request:"", context:""}, or:blankOracle()};
+try { const saved = JSON.parse(localStorage.getItem("imd-compose-draft") || "null"); if (saved && saved.job) S = Object.assign(S, saved); } catch {}
+const persist = () => { try { localStorage.setItem("imd-compose-draft", JSON.stringify(S)); } catch {} };
+
+/* path get/set: "job.steps.0.objective" */
+function getP(p){ return p.split(".").reduce((o,k) => o?.[k], S); }
+function setP(p, v){ const ks = p.split("."); let o = S; for (let i=0;i<ks.length-1;i++) o = o[ks[i]]; o[ks.at(-1)] = v; }
+const lines = t => t.split("\n").map(s => s.trim()).filter(Boolean);
+const kvParse = t => lines(t).map(l => { const i = l.indexOf("="); return i < 0 ? [l, ""] : [l.slice(0,i).trim(), l.slice(i+1).trim()]; });
+const kvText = a => (a||[]).map(([k,v]) => `${k} = ${v}`).join("\n");
+
+/* ================= build: state -> request input ================= */
+function num(v){ return v === "" || v == null ? undefined : Number(v); }
+function prune(o){ for (const k of Object.keys(o)) if (o[k] === undefined || (Array.isArray(o[k]) && !o[k].length)) delete o[k]; return o; }
+function buildFiles(a, withHash){ return (a||[]).map(f => withHash
+  ? {name:f.name, path:f.path, hash:f.hash, mediaType:f.mediaType, bytes:num(f.bytes), submissionHash:f.submissionHash}
+  : {name:f.name, path:f.path, mediaType:f.mediaType}); }
+function buildStep(s, dag){
+  const o = {skill:s.skill};
+  if (dag || s.key) o.key = s.key || undefined;
+  if (dag) o.dependsOn = s.dependsOn || [];
+  if (s.objective) o.objective = s.objective;
+  o.acceptanceCriteria = s.acceptanceCriteria; o.paths = s.paths; o.references = s.references;
+  o.inputs = buildFiles(s.inputs, true); o.outputs = buildFiles(s.outputs);
+  if (s.variables?.length) o.variables = Object.fromEntries(s.variables);
+  const r = prune(o); if (dag) r.dependsOn = s.dependsOn || []; return r;
+}
+function buildJob(j, action){
+  const o = {objective:j.objective};
+  if (j.mode === "skill") o.skill = j.skill;
+  else if (j.mode === "template") o.template = j.template;
+  else { o.shape = j.shape; o.steps = j.steps.map(s => buildStep(s, j.shape === "dag")); }
+  o.references = j.references;
+  if (j.repoUrl || j.baseCommit) { o.repoUrl = j.repoUrl; o.baseCommit = j.baseCommit; }
+  o.contracts = j.contracts; o.paths = j.paths;
+  o.inputs = buildFiles(j.inputs, true);
+  o.outputs = buildFiles(j.outputs);
+  if (j.mode === "template" && j.template === "fuzz") { if (j.projectPath) o.projectPath = j.projectPath; o.runs = num(j.runs); }
+  if (j.mode === "template" && j.template === "research") {
+    if (j.rubricContains.length || j.rubricMayNot.length) o.rubric = prune({contains:j.rubricContains, mayNotRestOn:j.rubricMayNot});
+    o.panelSize = num(j.panelSize); o.panelQuorum = num(j.panelQuorum);
+  }
+  o.minCitations = num(j.minCitations);
+  if (j.github !== "default") o.github = j.github === "true";
+  if (j.ipfs === "true") o.ipfs = true; else if (j.ipfs === "false") o.ipfs = false; else if (j.ipfs === "label") o.ipfs = j.ipfsLabel;
+  if (action !== "job.open" && j.onchain) o.onchain = j.onchain === "true" ? true : j.onchain;
+  return prune(o);
+}
+function buildOracle(r){
+  const o = {v:1, question:r.question, chainId:num(r.chainId),
+    window: r.windowMode === "hours" ? {hours:num(r.hours)} : {fromBlock:num(r.fromBlock), toBlock:num(r.toBlock)},
+    answerType:r.answerType, evidence:r.evidence, panelSize:num(r.panelSize), quorum:num(r.quorum), validForSeconds:num(r.validForSeconds)};
+  if (r.answerType.endsWith("[]")) o.head = num(r.head);
+  if (r.answerType === "uint256") o.toleranceBps = num(r.toleranceBps);
+  if (r.definitions.length) o.definitions = Object.fromEntries(r.definitions);
+  const g = prune({allow:r.allow, deny:r.deny, mustHaveCode:r.mustHaveCode || undefined, min:r.min || undefined, max:r.max || undefined, sources:r.sources, minSources:num(r.minSources)});
+  if (Object.keys(g).length) o.guards = g;
+  if (r.consumerChainId || r.consumerContract) o.consumer = {chainId:num(r.consumerChainId), verifyingContract:r.consumerContract};
+  return prune(o);
+}
+function buildInput(){
+  if (S.action === "oracle.request") return buildOracle(S.or);
+  if (S.action === "workflow.open") {
+    const d = buildJob(S.job, "workflow.open");
+    const perm = {github: d.github === true, ipfs: d.ipfs ?? false, onchain:{kind: typeof d.onchain === "string" ? d.onchain : "", chainId: WF_CHAIN}};
+    return {request:S.wf.request, context:S.wf.context || undefined, draft:d, permissions:perm};
+  }
+  return buildJob(S.job, S.action);
+}
+
+/* ================= import: request input -> state ================= */
+function fromFiles(a){ return (a||[]).map(f => ({name:f.name||"", path:f.path||"", mediaType:f.mediaType||"", hash:f.hash||"", bytes:f.bytes ?? "", submissionHash:f.submissionHash||""})); }
+function fromJob(b){
+  const j = blankJob(); j.outputs = [];
+  j.objective = b.objective || "";
+  if (b.steps) { j.mode = "steps"; j.shape = b.shape || "chain";
+    j.steps = b.steps.map(s => ({...blankStep(s.skill), key:s.key||"", dependsOn:s.dependsOn||[], objective:s.objective||"",
+      acceptanceCriteria:s.acceptanceCriteria||[], paths:s.paths||[], references:s.references||[], inputs:fromFiles(s.inputs), outputs:fromFiles(s.outputs),
+      variables:Object.entries(s.variables||{})}));
+  } else if (b.template) { j.mode = "template"; j.template = b.template; }
+  else { j.mode = "skill"; j.skill = b.skill || ""; }
+  j.references = b.references || []; j.repoUrl = b.repoUrl || ""; j.baseCommit = b.baseCommit || "";
+  j.contracts = b.contracts || []; j.paths = b.paths || []; j.inputs = fromFiles(b.inputs); j.outputs = fromFiles(b.outputs);
+  j.github = b.github === undefined ? "default" : String(!!b.github);
+  j.ipfs = b.ipfs === undefined ? "off" : b.ipfs === true ? "true" : b.ipfs === false ? "false" : "label";
+  j.ipfsLabel = typeof b.ipfs === "string" ? b.ipfs : "";
+  j.onchain = b.onchain === undefined ? "" : String(b.onchain);
+  j.minCitations = b.minCitations ?? ""; j.projectPath = b.projectPath || ""; j.runs = b.runs ?? "";
+  j.rubricContains = b.rubric?.contains || []; j.rubricMayNot = b.rubric?.mayNotRestOn || [];
+  j.panelSize = b.panelSize ?? ""; j.panelQuorum = b.panelQuorum ?? "";
+  const extra = Object.keys(b).filter(k => !["objective","skill","template","shape","steps","references","repoUrl","baseCommit","contracts","paths","inputs","outputs","github","ipfs","onchain","minCitations","projectPath","runs","rubric","panelSize","panelQuorum"].includes(k));
+  if (extra.length) toast("Campi ignorati: " + extra.join(", "));
+  return j;
+}
+function fromOracle(b){
+  const r = blankOracle();
+  Object.assign(r, {question:b.question||"", chainId:String(b.chainId ?? ""), answerType:b.answerType||"bool", evidence:b.evidence||"chain",
+    panelSize:String(b.panelSize ?? ""), quorum:String(b.quorum ?? ""), validForSeconds:String(b.validForSeconds ?? ""),
+    head:String(b.head ?? ""), toleranceBps:String(b.toleranceBps ?? ""), definitions:Object.entries(b.definitions||{})});
+  if (b.window?.hours !== undefined) { r.windowMode = "hours"; r.hours = String(b.window.hours); }
+  else if (b.window) { r.windowMode = "blocks"; r.fromBlock = String(b.window.fromBlock ?? ""); r.toBlock = String(b.window.toBlock ?? ""); }
+  const g = b.guards || {};
+  Object.assign(r, {allow:g.allow||[], deny:g.deny||[], mustHaveCode:!!g.mustHaveCode, min:g.min||"", max:g.max||"", sources:g.sources||[], minSources:String(g.minSources ?? "")});
+  if (b.consumer) { r.consumerChainId = String(b.consumer.chainId ?? ""); r.consumerContract = b.consumer.verifyingContract || ""; }
+  return r;
+}
+function loadInput(action, input){
+  S.action = action;
+  if (action === "oracle.request") S.or = fromOracle(input);
+  else if (action === "workflow.open") { S.wf = {request:input.request||"", context:input.context||""}; S.job = fromJob(input.draft||{}); }
+  else S.job = fromJob(input);
+  renderAll();
+}
+
+/* ================= validation (every documented limit) ================= */
+function validate(action, x){
+  const P = [];
+  const err = (path, msg) => P.push({lvl:"err", path, msg});
+  const warn = (path, msg) => P.push({lvl:"warn", path, msg});
+  const strLen = (v, lo, hi, path, name) => { if (typeof v !== "string" || v.length < lo) err(path, `${name}: required`); else if (v.length > hi) err(path, `${name}: ${v.length} characters, max ${hi}`); };
+  const known = id => SKILLS.some(s => s.id === id);
+
+  function files(arr, path, withHash){
+    if (!arr) return;
+    if (arr.length > 32) err(path, `max 32 files (${arr.length})`);
+    const seen = new Set();
+    arr.forEach((f, i) => {
+      const p = `${path}.${i}`;
+      if (!RE.fname.test(f.name || "")) err(p+".name", `${withHash?"input":"output"} ${i+1}: name must match ^[a-zA-Z][a-zA-Z0-9_-]{0,63}$`);
+      if (seen.has(f.name)) err(p+".name", `duplicate name "${f.name}"`); seen.add(f.name);
+      if (!f.path) err(p+".path", `${f.name||"file "+(i+1)}: path is required`);
+      if (!f.mediaType) err(p+".mediaType", `${f.name||"file "+(i+1)}: mediaType is required`);
+      if (!withHash && f.path && !f.path.startsWith("artifacts/")) err(p+".path", `output "${f.name}": the path must be under artifacts/`);
+      if (withHash) {
+        if (!RE.hex64.test(f.hash||"")) err(p+".hash", `input "${f.name}": hash = 64 lowercase hex`);
+        if (!RE.hex64.test(f.submissionHash||"")) err(p+".submissionHash", `input "${f.name}": submissionHash = 64 lowercase hex`);
+        if (!Number.isInteger(f.bytes) || f.bytes < 0 || f.bytes > 64*1024*1024) err(p+".bytes", `input "${f.name}": bytes: integer 0–64 MiB`);
+      }
+    });
+  }
+  function refList(arr, path){
+    if (!arr) return;
+    if (arr.length > 8) err(path, `max 8 references (${arr.length})`);
+    arr.forEach(r => { if (!known(r)) err(path, `unknown reference "${r}"`); else if (!isRef(r)) err(path, `"${r}" is not a reference skill: use it as a step, not in references`); });
+  }
+  function paths(arr, path){ if (arr && arr.length > 16) err(path, `max 16 paths (${arr.length})`); (arr||[]).forEach(p => { if (p.startsWith("/") || p.includes("..")) err(path, `path "${p}" must be relative to the repository`); }); }
+  function runnableSkill(id, path, label){
+    if (!id) return err(path, `${label}: skill is required`);
+    if (!known(id)) return err(path, `${label}: unknown skill "${id}"`);
+    if (isRef(id)) return err(path, `${label}: "${id}" is reference-only and cannot run`);
+    if (INTERNAL.includes(id)) warn(path, `${label}: "${id}" is internal to the network, probably refused`);
+    const req = SKILLS.find(s => s.id === id)?.requires || [];
+    const tools = req.filter(r => r.startsWith("tool:") || r.startsWith("runtime:"));
+    if (tools.length) warn(path, `${label}: "${id}" needs ${tools.join(", ")}: few seats have it, the quote may fail with "no capable worker"`);
+  }
+
+  function job(j, jp, ctx){
+    const base = jp ? jp + "." : "";
+    const J = "job.";
+    strLen(j.objective, 1, 8000, J+"objective", "objective");
+    for (const k of REFUSED) if (k in j) err(J+"objective", `${k} is not accepted on paid requests`);
+    const modes = ["skill","template","steps"].filter(k => j[k] !== undefined);
+    if (modes.length === 0) err(J+"mode", "pick a skill, a template or steps");
+    if (modes.length > 1) err(J+"mode", "only one of skill, template, steps");
+    if (j.skill !== undefined) {
+      runnableSkill(j.skill, J+"skill", "skill");
+      if (NEEDS_PATHS.includes(j.skill) && !(j.paths||[]).length) err(J+"paths", `"${j.skill}" has no write budget of its own: list the paths it may write`);
+      if (NAMED_OUTPUT.includes(j.skill) && !(j.outputs||[]).length) warn(J+"outputs", `"${j.skill}" delivers named files: add at least one output (e.g. artifacts/report.md)`);
+      if (j.skill === "implement-one-contract") err(J+"skill", "implement-one-contract needs variables.contract: use it as a step");
+    }
+    if (j.template !== undefined) {
+      if (!TEMPLATES.includes(j.template)) err(J+"template", `unknown template "${j.template}"`);
+      if (j.template === "fuzz") {
+        if (!Number.isInteger(j.runs) || j.runs < 1000 || j.runs > 1e7) err(J+"runs", "runs: integer 1,000–10,000,000");
+        if ((j.contracts||[]).length !== 1) err(J+"contracts", "fuzz: exactly one harness in contracts");
+        if (!j.repoUrl) warn(J+"repoUrl", "fuzz without a repository: usually you start from repoUrl + baseCommit");
+        if (j.projectPath && j.projectPath.length > 512) err(J+"projectPath", "projectPath max 512");
+      }
+      if (j.template === "research") {
+        if (!j.rubric) warn(J+"rubricContains", "research: a rubric.contains makes the panel checkable");
+      }
+      if (["impl_tests","impl_tests_review","multi_contract","single"].includes(j.template) && !(j.contracts||[]).length) warn(J+"contracts", `template ${j.template}: list the contracts in contracts`);
+    }
+    if (j.steps !== undefined) {
+      const st = j.steps;
+      if (!SHAPES.includes(j.shape)) err(J+"shape", "shape is required with steps: chain, fan_out_join or dag");
+      if (!st.length || st.length > 6) err(J+"steps", `1 to 6 steps (${st.length})`);
+      const keys = st.map(s => s.key).filter(Boolean);
+      st.forEach((s, i) => {
+        const sp = `${J}steps.${i}`, L = `step ${i+1}`;
+        runnableSkill(s.skill, sp+".skill", L);
+        if (s.key !== undefined && !RE.key.test(s.key)) err(sp+".key", `${L}: key must match ^[a-z][a-z0-9_]{0,31}$`);
+        if (j.shape === "dag" && !s.key) err(sp+".key", `${L}: key is required in a dag`);
+        if (s.key && keys.filter(k => k === s.key).length > 1) err(sp+".key", `${L}: duplicate key "${s.key}"`);
+        if (s.objective !== undefined && s.objective.length > 3000) err(sp+".objective", `${L}: objective max 3,000 characters`);
+        if (s.acceptanceCriteria) { if (s.acceptanceCriteria.length > 8) err(sp+".acceptanceCriteria", `${L}: max 8 acceptanceCriteria`);
+          s.acceptanceCriteria.forEach(c => { if (c.length > 500) err(sp+".acceptanceCriteria", `${L}: a criterion exceeds 500 characters`); }); }
+        if (NEEDS_PATHS.includes(s.skill) && !(s.paths||[]).length) err(sp+".paths", `${L}: "${s.skill}" needs paths (what it may write)`);
+        paths(s.paths, sp+".paths"); refList(s.references, sp+".references");
+        files(s.inputs, sp+".inputs", true); files(s.outputs, sp+".outputs", false);
+        if (NAMED_OUTPUT.includes(s.skill) && !(s.outputs||[]).length && !(j.outputs||[]).length) warn(sp+".outputs", `${L}: "${s.skill}" delivers named files: add an output`);
+        if (s.skill === "implement-one-contract" && !s.variables?.contract) err(sp+".variables", `${L}: implement-one-contract needs variables.contract`);
+        for (const [k,v] of Object.entries(s.variables||{})) { if (!k || k.length > 64) err(sp+".variables", `${L}: variable key 1–64 characters`); if (String(v).length > 2000) err(sp+".variables", `${L}: value of "${k}" over 2,000 characters`); }
+        if (j.shape === "dag") {
+          if (!Array.isArray(s.dependsOn)) err(sp+".dependsOn", `${L}: dependsOn is required in a dag ([] for a root)`);
+          else { if (s.dependsOn.length > 6) err(sp+".dependsOn", `${L}: max 6 dependencies`);
+            s.dependsOn.forEach(d => { if (!keys.includes(d)) err(sp+".dependsOn", `${L}: depends on "${d}", which does not exist`); if (d === s.key) err(sp+".dependsOn", `${L}: depends on itself`); }); }
+        }
+      });
+      if (j.shape === "dag" && st.length) {
+        const deps = Object.fromEntries(st.map(s => [s.key, s.dependsOn||[]]));
+        const seen = {}; let cyc = false;
+        const visit = k => { if (seen[k] === 1) { cyc = true; return; } if (seen[k] === 2) return; seen[k] = 1; (deps[k]||[]).forEach(visit); seen[k] = 2; };
+        Object.keys(deps).forEach(visit);
+        if (cyc) err(J+"steps", "the dag has a cycle");
+        const used = new Set(st.flatMap(s => s.dependsOn||[]));
+        const sinks = st.filter(s => s.key && !used.has(s.key));
+        if (sinks.length > 1) err(J+"steps", `branches must join into one final step (now they end in: ${sinks.map(s=>s.key).join(", ")})`);
+        if (!st.some(s => (s.dependsOn||[]).length === 0)) err(J+"steps", "at least one root is needed (dependsOn: [])");
+      }
+      if (j.shape === "fan_out_join" && st.length) {
+        if (st.length < 3) warn(J+"steps", "fan_out_join: at least two parallel branches and a final join");
+        if (st.at(-1).skill !== "integrate-project") warn(J+"steps", "fan_out_join: the last step is usually integrate-project (the join)");
+      }
+    }
+    refList(j.references, J+"references");
+    if ((j.repoUrl === undefined) !== (j.baseCommit === undefined) || (!!j.repoUrl) !== (!!j.baseCommit)) err(J+"repoUrl", "repoUrl and baseCommit go together (both or neither)");
+    if (j.repoUrl && (!RE.uri.test(j.repoUrl) || j.repoUrl.length > 512)) err(J+"repoUrl", "repoUrl: http(s) URL, max 512");
+    if (j.baseCommit && !RE.commit.test(j.baseCommit)) err(J+"baseCommit", "baseCommit: 40 lowercase hex (full commit)");
+    if (j.contracts) { if (j.contracts.length > 4) err(J+"contracts", "max 4 contracts"); j.contracts.forEach(c => { if (c.length > 512) err(J+"contracts", "contract name/path max 512"); }); }
+    paths(j.paths, J+"paths");
+    files(j.inputs, J+"inputs", true); files(j.outputs, J+"outputs", false);
+    if (j.ipfs !== undefined && typeof j.ipfs === "string" && !RE.label.test(j.ipfs)) err(J+"ipfsLabel", "site label: lowercase letters, digits and hyphens, 1–32, no hyphen at the ends");
+    if (j.minCitations !== undefined && (!Number.isInteger(j.minCitations) || j.minCitations < 0 || j.minCitations > 20)) err(J+"minCitations", "minCitations: 0–20");
+    if (j.panelSize !== undefined && (!Number.isInteger(j.panelSize) || j.panelSize < 1 || j.panelSize > 9)) err(J+"panelSize", "panelSize: 1–9");
+    if (j.panelQuorum !== undefined && (!Number.isInteger(j.panelQuorum) || j.panelQuorum < 1 || j.panelQuorum > 9)) err(J+"panelQuorum", "panelQuorum: 1–9");
+    if (j.panelSize && j.panelQuorum && j.panelQuorum > j.panelSize) err(J+"panelQuorum", "panelQuorum cannot exceed panelSize");
+    if (j.rubric) { const c = j.rubric.contains||[]; if (!c.length || c.length > 8) err(J+"rubricContains", "rubric.contains: 1–8 entries");
+      c.forEach(s => { if (s.length > 500) err(J+"rubricContains", "rubric.contains: entry over 500"); });
+      (j.rubric.mayNotRestOn||[]).forEach(s => { if (s.length > 200) err(J+"rubricMayNot", "mayNotRestOn: entry over 200"); });
+      if ((j.rubric.mayNotRestOn||[]).length > 8) err(J+"rubricMayNot", "mayNotRestOn: max 8"); }
+    if (ctx === "job.open" && j.onchain !== undefined) err(J+"onchain", "onchain is not allowed on job.open: use Launch");
+    if (ctx === "launch.open" && j.onchain === undefined) err(J+"onchain", "a launch needs onchain (true, univ4_hook or evm_project)");
+    if (ctx === "launch.open" && j.onchain === "univ4_hook" && !(j.references||[]).some(r => r.startsWith("uniswap-v4"))) warn(J+"references", "for a hook, add uniswap-v4-hooks and uniswap-v4-security");
+    if (ctx === "launch.open" && !stepSkills(j).includes("adversarial-review")) warn(J+"steps", "a launch without adversarial-review: the network usually wants one before deploying");
+  }
+  const stepSkills = j => (j.steps||[]).map(s => s.skill).concat(j.skill ? [j.skill] : []);
+
+  if (action === "oracle.request") {
+    const o = x, O = "or.";
+    strLen(o.question, 1, 2000, O+"question", "question");
+    if (!Number.isInteger(o.chainId) || o.chainId < 1) err(O+"chainId", "chainId: positive integer");
+    if (o.window?.hours !== undefined) { if (!Number.isInteger(o.window.hours) || o.window.hours < 1 || o.window.hours > 720) err(O+"hours", "window.hours: 1–720"); }
+    else if (!Number.isInteger(o.window?.fromBlock) || !Number.isInteger(o.window?.toBlock)) err(O+"fromBlock", "window: integer fromBlock and toBlock");
+    else if (o.window.fromBlock > o.window.toBlock) err(O+"toBlock", "window: fromBlock is after toBlock");
+    if (!ANSWER_TYPES.includes(o.answerType)) err(O+"answerType", "invalid answerType");
+    if (!Number.isInteger(o.panelSize) || o.panelSize < 2) err(O+"panelSize", "panelSize: at least 2");
+    else if (o.panelSize > 10) warn(O+"panelSize", "the docs say 2–10 on the paid route (larger panels exist on the network): the free quote will tell you whether it is accepted");
+    if (!Number.isInteger(o.quorum) || o.quorum < 2 || o.quorum > (o.panelSize||10)) err(O+"quorum", "quorum: 2 to panelSize");
+    if (o.quorum && o.panelSize && o.quorum === o.panelSize && o.panelSize > 4) warn(O+"quorum", "quorum = panelSize: one disagreeing seat means no answer");
+    if (!Number.isInteger(o.validForSeconds) || o.validForSeconds < 60 || o.validForSeconds > 2592000) err(O+"validForSeconds", "validForSeconds: 60–2,592,000");
+    if (o.head !== undefined && (!Number.isInteger(o.head) || o.head < 1 || o.head > 32)) err(O+"head", "head: 1–32");
+    if (o.answerType?.endsWith("[]") && o.head === undefined) warn(O+"head", "list answer: set head (how many leading entries must agree)");
+    if (o.toleranceBps !== undefined && (!Number.isInteger(o.toleranceBps) || o.toleranceBps < 0 || o.toleranceBps > 10000)) err(O+"toleranceBps", "toleranceBps: 0–10,000");
+    for (const [k,v] of Object.entries(o.definitions||{})) { if (!k || k.length > 64) err(O+"definitions", `definition: key 1–64 (${k})`); if (!v || v.length > 512) err(O+"definitions", `definition "${k}": value 1–512 characters`); }
+    if (o.evidence === "panel" && !o.definitions) warn(O+"definitions", "panel evidence: define the sources, the period and what to do when data is missing");
+    const g = o.guards || {};
+    const valT = o.answerType?.startsWith("address") ? RE.addr : RE.b32;
+    if (g.allow) { if (g.allow.length > 256) err(O+"allow", "guards.allow max 256"); g.allow.forEach(a => { if (!RE.addr.test(a) && !RE.b32.test(a)) err(O+"allow", `allow: "${a}" is neither an address nor bytes32`); }); }
+    if (g.deny) { if (g.deny.length > 1024) err(O+"deny", "guards.deny max 1,024"); g.deny.forEach(a => { if (!RE.addr.test(a) && !RE.b32.test(a)) err(O+"deny", `deny: "${a}" is neither an address nor bytes32`); }); }
+    if (g.mustHaveCode && !o.answerType?.startsWith("address")) warn(O+"mustHaveCode", "mustHaveCode only applies to address answers");
+    if (g.min !== undefined && !RE.dec.test(g.min)) err(O+"min", "guards.min: decimal string");
+    if (g.max !== undefined && !RE.dec.test(g.max)) err(O+"max", "guards.max: decimal string");
+    if (g.min !== undefined && g.max !== undefined && RE.dec.test(g.min) && RE.dec.test(g.max) && BigInt(g.min) > BigInt(g.max)) err(O+"max", "guards.min exceeds guards.max");
+    if ((g.min !== undefined || g.max !== undefined) && o.answerType !== "uint256") warn(O+"min", "min/max only apply to uint256");
+    if (g.sources) { if (g.sources.length > 32) err(O+"sources", "guards.sources max 32"); g.sources.forEach(s => { if (s.length > 512 || !RE.uri.test(s)) err(O+"sources", `source "${s}": URL prefix, max 512`); }); }
+    if (g.minSources !== undefined && (!Number.isInteger(g.minSources) || g.minSources < 1 || g.minSources > 32)) err(O+"minSources", "minSources: 1–32");
+    if (o.consumer) { if (!Number.isInteger(o.consumer.chainId) || o.consumer.chainId < 1) err(O+"consumerChainId", "consumer.chainId: positive integer");
+      if (!RE.addr.test(o.consumer.verifyingContract||"")) err(O+"consumerContract", "consumer.verifyingContract: address 0x…"); }
+  } else if (action === "workflow.open") {
+    strLen(x.request, 1, 16000, "wf.request", "request");
+    if ((x.context||"").length > 16000) err("wf.context", "context max 16,000");
+    const d = x.draft;
+    job(d, "", "workflow.open");
+    if (!["chain","dag"].includes(d.shape) || !d.steps) err("job.mode", "a workflow draft uses steps with shape chain or dag");
+    if (!["evm_project","univ4_hook"].includes(d.onchain)) err("job.onchain", "onchain is required: evm_project (token or Solidity project) or univ4_hook");
+    if (d.ipfs === undefined || d.ipfs === false) err("job.ipfs", "a workflow publishes a site: ipfs true or a label");
+    const sk = (d.steps||[]).map(s => s.skill);
+    const fe = sk.filter(s => FRONTEND.includes(s)).length;
+    if (fe !== 1) err("job.steps", `exactly one frontend-for-contract or build-website step is needed (now ${fe})`);
+    if (!sk.includes("adversarial-review")) err("job.steps", "an independent adversarial-review of the contracts is needed");
+    if (d.shape === "dag" && d.steps) {
+      const byKey = Object.fromEntries(d.steps.map(s => [s.key, s]));
+      const anc = k => { const out = new Set(), st = [...(byKey[k]?.dependsOn||[])]; while (st.length) { const n = st.pop(); if (!out.has(n)) { out.add(n); st.push(...(byKey[n]?.dependsOn||[])); } } return out; };
+      const f = d.steps.find(s => FRONTEND.includes(s.skill)), rv = d.steps.filter(s => s.skill === "adversarial-review");
+      if (f && rv.length && !rv.some(r => anc(f.key).has(r.key))) err("job.steps", "in a dag the front end must depend on the final review");
+    }
+    if (!x.permissions.github && d.github !== false) warn("job.github", "github not allowed: the workflow publishes the contracts to GitHub before deploying, set it to yes");
+  } else {
+    job(x, "", action);
+  }
+  const bytes = new TextEncoder().encode(JSON.stringify({requestKey:"00000000-0000-4000-8000-000000000000", action, input:x})).length;
+  if (bytes > 16384) err("", `body of ${bytes} bytes, limit 16 KiB`);
+  return {problems:P, bytes};
+}
+
+/* ================= form rendering ================= */
+const opt = (v, cur, label) => `<option value="${esc(v)}"${String(v) === String(cur) ? " selected" : ""}>${esc(label ?? v)}</option>`;
+const fld = (k, label, hint, inner) => `<div class="f" data-f="${esc(k)}"><label><b>${label}</b><span>${hint||""}</span></label>${inner}</div>`;
+const txt = (k, ph="", t="str") => `<input type="text" data-k="${k}" data-t="${t}" value="${esc(getP(k))}" placeholder="${esc(ph)}">`;
+const area = (k, ph="", cls="") => `<textarea data-k="${k}" data-t="str" class="${cls}" placeholder="${esc(ph)}">${esc(getP(k))}</textarea>`;
+const linesA = (k, ph="") => `<textarea data-k="${k}" data-t="lines" placeholder="${esc(ph)}">${esc((getP(k)||[]).join("\n"))}</textarea>`;
+const kvA = (k, ph="") => `<textarea data-k="${k}" data-t="kv" placeholder="${esc(ph)}">${esc(kvText(getP(k)))}</textarea>`;
+const sel = (k, opts) => `<select data-k="${k}" data-t="str">${opts.map(o => Array.isArray(o) ? opt(o[0], getP(k), o[1]) : opt(o, getP(k))).join("")}</select>`;
+function chipsFor(k, list){ const cur = getP(k) || []; return `<div class="chips">${list.map(s => `<button type="button" class="chip${cur.includes(s.id)?" on":""}" data-chip="${k}" data-v="${esc(s.id)}" title="${esc(s.description)}">${esc(s.id)}</button>`).join("")}</div>`; }
+function skillSelect(k){
+  const cur = getP(k);
+  const groups = {};
+  runnable().forEach(s => (groups[s.role] ||= []).push(s));
+  const known = SKILLS.some(s => s.id === cur);
+  return `<select data-k="${k}" data-t="str" data-struct="1">${known ? "" : opt(cur, cur, cur ? cur + " (unknown)" : "—")}${Object.entries(groups).map(([r, a]) =>
+    `<optgroup label="${esc(r)}">${a.map(s => opt(s.id, cur, s.id + (s.requires.some(x => x.startsWith("tool:")) ? "  ·  " + s.requires.join(",") : ""))).join("")}</optgroup>`).join("")}</select>`;
+}
+function filesEditor(k, withHash){
+  const arr = getP(k) || [];
+  const rows = arr.map((f, i) => withHash
+    ? `<div class="step" style="padding:10px"><div class="row">${["name","path","mediaType","bytes","hash","submissionHash"].map(c => `<input type="text" data-k="${k}.${i}.${c}" data-t="${c==="bytes"?"int":"str"}" value="${esc(f[c])}" placeholder="${c}">`).join("")}</div>
+       <div style="text-align:right;margin-top:6px"><button type="button" class="btn sm" data-del="${k}" data-i="${i}">Remove</button></div></div>`
+    : `<div class="filerow"><input type="text" data-k="${k}.${i}.name" data-t="str" value="${esc(f.name)}" placeholder="name"><input type="text" data-k="${k}.${i}.path" data-t="path" value="${esc(f.path)}" placeholder="artifacts/…"><input type="text" data-k="${k}.${i}.mediaType" data-t="str" value="${esc(f.mediaType)}" placeholder="mediaType"><button type="button" class="ibtn" data-del="${k}" data-i="${i}" title="Remove">×</button></div>`).join("");
+  return rows + `<div class="btns">${withHash
+    ? `<button type="button" class="btn sm" data-add-in="${k}">+ input by hand</button><button type="button" class="btn sm" data-goto-net="1">Pick from a completed job →</button>`
+    : `<button type="button" class="btn sm" data-add-out="${k}" data-preset="report">+ report.md</button><button type="button" class="btn sm" data-add-out="${k}" data-preset="image">+ image</button><button type="button" class="btn sm" data-add-out="${k}" data-preset="json">+ json</button><button type="button" class="btn sm" data-add-out="${k}" data-preset="blank">+ other</button>`}</div>`;
+}
+
+function stepCard(s, i, j){
+  const k = `job.steps.${i}`, dag = j.shape === "dag";
+  const others = j.steps.map(x => x.key).filter(x => x && x !== s.key);
+  const needs = NEEDS_PATHS.includes(s.skill);
+  const hasMore = s.references.length || s.inputs.length || s.outputs.length || s.variables.length || s.acceptanceCriteria.length;
+  return `<div class="step">
+    <div class="step-head"><span class="n">Step ${i+1}${s.key ? ` · <span class="muted">${esc(s.key)}</span>` : ""}</span>
+      <span class="step-tools"><button type="button" class="ibtn" data-mv="${i}" data-d="-1" title="Up">↑</button><button type="button" class="ibtn" data-mv="${i}" data-d="1" title="Down">↓</button><button type="button" class="ibtn" data-rm-step="${i}" title="Delete">×</button></span></div>
+    <div class="row2">
+      ${fld(k+".skill", "Skill", "", skillSelect(k+".skill"))}
+      ${fld(k+".key", "Key", dag ? "required in a dag" : "optional", txt(k+".key", "e.g. impl"))}
+    </div>
+    <div class="hint small muted" style="margin:-6px 0 10px">${esc(skillDesc(s.skill))}</div>
+    ${dag ? fld(k+".dependsOn", "Depends on", others.length ? "" : "none = root", others.length ? `<div class="chips">${others.map(o => `<button type="button" class="chip${s.dependsOn.includes(o)?" on":""}" data-dep="${i}" data-v="${esc(o)}">${esc(o)}</button>`).join("")}</div>` : `<span class="small muted">[] — root</span>`) : ""}
+    ${fld(k+".objective", "Step objective", "appended to the job objective · max 3,000", area(k+".objective"))}
+    ${needs || s.paths.length ? fld(k+".paths", "Writable paths", needs ? "required for this skill · max 16" : "max 16", linesA(k+".paths", "src/Vault.sol\ntest")) : ""}
+    <details class="more"${hasMore ? " open" : ""}><summary>criteria, references, variables, files</summary>
+      ${fld(k+".acceptanceCriteria", "Acceptance criteria", "one per line · max 8 × 500", linesA(k+".acceptanceCriteria", "release() never pays more than vested"))}
+      ${!needs && !s.paths.length ? fld(k+".paths", "Writable paths", "max 16", linesA(k+".paths")) : ""}
+      ${fld(k+".references", "References for this step", "", chipsFor(k+".references", refs()))}
+      ${fld(k+".variables", "Variables", "key = value, one per line", kvA(k+".variables", s.skill === "implement-one-contract" ? "contract = Vesting" : ""))}
+      ${fld(k+".inputs", "Inputs", "accepted files from other jobs", filesEditor(k+".inputs", true))}
+      ${fld(k+".outputs", "Outputs", "named files the step must produce", filesEditor(k+".outputs", false))}
+    </details>
+  </div>`;
+}
+
+function renderJobForm(ctx){
+  const j = S.job;
+  const wf = ctx === "workflow.open";
+  let h = "";
+  if (wf) h += `<div class="sec"><h2>The request <small>the evaluator reads all of it</small></h2>
+      ${fld("wf.request", "Request", "plain language · 1–16,000", area("wf.request", "Build an ERC-20 token called … deploy it; then publish a small website that …", "tall"))}
+      ${fld("wf.context", "Context", "decisions already made: chain, names, what is approved or ruled out", area("wf.context", "Sepolia only. GitHub publication and IPFS hosting are approved."))}
+    </div>`;
+  h += `<div class="sec"><h2>${wf ? "Job draft" : "The work"}</h2>
+    ${fld("job.objective", "Objective", `${(j.objective||"").length} / 8,000`, area("job.objective", wf ? "Build the … with tests and an independent review, deploy it, then build the website against the live deployment." : "What the swarm should do, in a checkable way.", "tall"))}
+    <div class="f" data-f="job.mode"><label><b>How</b><span>one mode only</span></label>
+      <div class="seg small" id="modeSeg">${(wf ? ["steps"] : ["skill","template","steps"]).map(m => `<button type="button" data-mode="${m}" class="${j.mode===m?"on":""}">${{skill:"One skill",template:"Template",steps:"Steps"}[m]}</button>`).join("")}</div></div>`;
+  if (j.mode === "skill") {
+    h += fld("job.skill", "Skill", "", skillSelect("job.skill")) + `<div class="hint small muted" style="margin:-6px 0 12px">${esc(skillDesc(j.skill))}</div>`;
+    if (NEEDS_PATHS.includes(j.skill) || j.paths.length) h += fld("job.paths", "Writable paths", NEEDS_PATHS.includes(j.skill) ? "required for this skill" : "max 16", linesA("job.paths", "src\ntest"));
+    if (j.skill === "research-report" || j.minCitations !== "") h += fld("job.minCitations", "Minimum citations", "0–20", `<input type="number" min="0" max="20" data-k="job.minCitations" data-t="int" value="${esc(j.minCitations)}">`);
+  } else if (j.mode === "template") {
+    h += fld("job.template", "Template", "", sel("job.template", TEMPLATES).replace("<select", '<select data-struct="1"'));
+    if (j.template === "fuzz") h += `<div class="row2">${fld("job.projectPath", "projectPath", "project folder, e.g. .", txt("job.projectPath", "."))}${fld("job.runs", "Runs", "1,000–10,000,000", `<input type="number" data-k="job.runs" data-t="int" value="${esc(j.runs)}" placeholder="100000">`)}</div>`;
+    if (j.template === "research") h += `
+      ${fld("job.rubricContains", "The answer must contain", "rubric.contains · 1–8 lines", linesA("job.rubricContains", "one row per L2\nthe proof system and whether it is live"))}
+      ${fld("job.rubricMayNot", "May not rest on alone", "rubric.mayNotRestOn · max 8", linesA("job.rubricMayNot", "L2BEAT alone"))}
+      <div class="row">${fld("job.panelSize", "Panel", "1–9 seats", `<input type="number" data-k="job.panelSize" data-t="int" value="${esc(j.panelSize)}" placeholder="5">`)}
+      ${fld("job.panelQuorum", "Quorum", "1–9 matching answers", `<input type="number" data-k="job.panelQuorum" data-t="int" value="${esc(j.panelQuorum)}" placeholder="3">`)}
+      ${fld("job.minCitations", "Min citations", "0–20", `<input type="number" data-k="job.minCitations" data-t="int" value="${esc(j.minCitations)}" placeholder="6">`)}</div>`;
+  } else {
+    h += fld("job.shape", "Shape", {chain:"each step builds on the one before", fan_out_join:"parallel branches, then a join", dag:"explicit dependencies"}[j.shape] || "",
+      `<div class="seg small" id="shapeSeg">${(wf ? ["chain","dag"] : SHAPES).map(s => `<button type="button" data-shape="${s}" class="${j.shape===s?"on":""}">${s}</button>`).join("")}</div>`);
+    h += `<div data-f="job.steps">${j.steps.map((s, i) => stepCard(s, i, j)).join("")}</div>
+      <div class="btns" style="margin-bottom:12px"><button type="button" class="btn sm" id="addStep"${j.steps.length >= 6 ? " disabled" : ""}>+ step (${j.steps.length}/6)</button>
+      <select id="quickStep" style="width:auto"><option value="">quick add…</option>${runnable().map(s => opt(s.id, "", s.id)).join("")}</select></div>`;
+  }
+  h += `</div>`;
+
+  h += `<div class="sec"><h2>Context <small>references, source, files</small></h2>
+    ${fld("job.references", "References for every step", "max 8", chipsFor("job.references", refs()))}
+    <div class="row2">${fld("job.repoUrl", "repoUrl", "to start from existing work", txt("job.repoUrl", "https://github.com/OWNER/REPO"))}
+    ${fld("job.baseCommit", "baseCommit", "40 hex", txt("job.baseCommit", "0123abcd…"))}</div>
+    <div class="row2">${fld("job.contracts", "Contracts", "names or .sol paths · max 4", linesA("job.contracts", wf ? "TipVault" : "src/Vesting.sol"))}
+    ${j.mode === "skill" && NEEDS_PATHS.includes(j.skill) ? "" : fld("job.paths", "Writable paths", "max 16", linesA("job.paths", "src\ntest"))}</div>
+    ${fld("job.inputs", "Inputs", "accepted files from other jobs: they arrive at .imd/reads/artifacts/&lt;name&gt;", filesEditor("job.inputs", true))}
+    ${fld("job.outputs", "Outputs", "the job must produce exactly these", filesEditor("job.outputs", false))}
+  </div>`;
+
+  const isLaunch = ctx === "launch.open" || wf;
+  h += `<div class="sec"><h2>Delivery</h2><div class="row">
+    ${fld("job.github", "GitHub", "publish source or report", sel("job.github", [["default","skill default"],["true","yes"],["false","no"]]))}
+    ${fld("job.ipfs", "IPFS / site", "pin and ENS name", sel("job.ipfs", [["off","—"],["true","yes"],["label","yes, with a name"],["false","no"]]).replace("<select", '<select data-struct="1"'))}
+    ${j.ipfs === "label" ? fld("job.ipfsLabel", "Site name", "&lt;name&gt;.site.identitymd.eth", txt("job.ipfsLabel", "tip-jar")) : ""}
+    ${isLaunch ? fld("job.onchain", "Onchain", wf ? "required" : "launch kind", sel("job.onchain", wf ? [["","—"],["evm_project","evm_project"],["univ4_hook","univ4_hook"]] : [["","—"],["true","true"],["evm_project","evm_project"],["univ4_hook","univ4_hook"]]).replace("<select", '<select data-struct="1"')) : ""}
+  </div>
+  ${wf ? `<div class="small muted">Permissions derived from the draft: github ${esc(String(S.job.github === "true"))}, ipfs ${esc(S.job.ipfs === "label" ? S.job.ipfsLabel : S.job.ipfs === "true")}, onchain {kind: ${esc(S.job.onchain||"—")}, chainId: ${WF_CHAIN}} (Sepolia on api.imd.fun).</div>` : ""}
+  ${ctx === "launch.open" ? `<div class="small muted">A launch ends with an on-chain deployment.</div>` : ""}
+  </div>`;
+  return h;
+}
+
+function renderOracleForm(){
+  const r = S.or, list = r.answerType.endsWith("[]");
+  return `<div class="sec"><h2>The question</h2>
+    ${fld("or.question", "Question", `${r.question.length} / 2,000`, area("or.question", "Did … on September 21, 2026 UTC?", "tall"))}
+    <div class="row">
+      ${fld("or.chainId", "chainId", "chain with a configured RPC", txt("or.chainId", "1"))}
+      ${fld("or.answerType", "Answer type", "", sel("or.answerType", ANSWER_TYPES).replace("<select", '<select data-struct="1"'))}
+      ${fld("or.evidence", "Evidence", r.evidence === "chain" ? "the deployer reproduces it from chain data" : "off-chain sources, panel consensus", sel("or.evidence", [["chain","chain"],["panel","panel"]]).replace("<select", '<select data-struct="1"'))}
+    </div>
+    <div class="f" data-f="or.hours"><label><b>Window</b><span>pinned to exact blocks at quote time</span></label>
+      <div class="seg small" id="winSeg"><button type="button" data-win="hours" class="${r.windowMode==="hours"?"on":""}">last hours</button><button type="button" data-win="blocks" class="${r.windowMode==="blocks"?"on":""}">blocks</button></div></div>
+    ${r.windowMode === "hours" ? fld("or.hours", "Hours", "1–720", `<input type="number" data-k="or.hours" data-t="str" value="${esc(r.hours)}">`)
+      : `<div class="row2">${fld("or.fromBlock", "fromBlock", "", txt("or.fromBlock"))}${fld("or.toBlock", "toBlock", "", txt("or.toBlock"))}</div>`}
+  </div>
+  <div class="sec"><h2>The panel</h2><div class="row">
+    ${fld("or.panelSize", "Panel", "2–10 seats per the docs", `<input type="number" data-k="or.panelSize" data-t="str" value="${esc(r.panelSize)}">`)}
+    ${fld("or.quorum", "Quorum", "all must match, 2 to panel", `<input type="number" data-k="or.quorum" data-t="str" value="${esc(r.quorum)}">`)}
+    ${fld("or.validForSeconds", "Signature validity", "seconds, 60–2,592,000", sel("or.validForSeconds", [["3600","1 hour"],["86400","1 day"],["604800","7 days"],["2592000","30 days"],...(["3600","86400","604800","2592000"].includes(r.validForSeconds) ? [] : [[r.validForSeconds, r.validForSeconds + " s"]])]))}
+    ${list ? fld("or.head", "Head", "leading entries that must agree · 1–32", `<input type="number" data-k="or.head" data-t="str" value="${esc(r.head)}">`) : ""}
+    ${r.answerType === "uint256" ? fld("or.toleranceBps", "Tolerance", "bps 0–10,000", `<input type="number" data-k="or.toleranceBps" data-t="str" value="${esc(r.toleranceBps)}" placeholder="0">`) : ""}
+  </div></div>
+  <div class="sec"><h2>Definitions <small>pin the metric, the period, the sources</small></h2>
+    ${fld("or.definitions", "Definitions", "key = value, one per line · values max 512", kvA("or.definitions", "calendar = Use [2026-09-21T00:00:00Z, 2026-09-22T00:00:00Z).\nmissing = Unavailable historical evidence is not false. Report inability rather than guessing."))}
+  </div>
+  <div class="sec"><h2>Guards</h2>
+    ${r.answerType.startsWith("address") || r.answerType.startsWith("bytes32") ? `<div class="row2">
+      ${fld("or.allow", "Allow", "allowed addresses or bytes32, one per line", linesA("or.allow"))}
+      ${fld("or.deny", "Deny", "excluded addresses or bytes32", linesA("or.deny"))}</div>` : ""}
+    ${r.answerType.startsWith("address") ? `<label class="check" style="margin-bottom:12px"><input type="checkbox" data-k="or.mustHaveCode" data-t="bool"${r.mustHaveCode?" checked":""}> the answer must be a contract</label>` : ""}
+    ${r.answerType === "uint256" ? `<div class="row2">${fld("or.min", "Min", "decimal", txt("or.min", "0"))}${fld("or.max", "Max", "decimal", txt("or.max"))}</div>` : ""}
+    <div class="row2">${fld("or.sources", "Sources", "URL prefixes the evidence must come from", linesA("or.sources", "https://github.com/owner/repo/"))}
+    ${fld("or.minSources", "Min sources", "distinct hosts, 1–32", `<input type="number" data-k="or.minSources" data-t="str" value="${esc(r.minSources)}">`)}</div>
+  </div>
+  <div class="sec"><h2>Consumer <small>optional · the EIP-712 domain your contract verifies</small></h2><div class="row2">
+    ${fld("or.consumerChainId", "chainId", "", txt("or.consumerChainId", "1"))}
+    ${fld("or.consumerContract", "verifyingContract", "", txt("or.consumerContract", "0x…"))}</div></div>`;
+}
+
+function renderForm(){
+  const h = S.action === "oracle.request" ? renderOracleForm() : renderJobForm(S.action);
+  $("#form").innerHTML = h;
+  $("#actionSeg").querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.action === S.action));
+  $("#actionHelp").textContent = {"job.open":"a network job, no deployment", "launch.open":"a job that ends in an on-chain deployment", "workflow.open":"contracts → deploy → site, one payment", "oracle.request":"a typed question and a panel that signs the answer"}[S.action];
+  renderPresets();
+}
+function renderAll(){ renderForm(); refresh(); }
+
+/* ================= preview + validation ================= */
+let lastProblems = [];
+function refresh(){
+  persist();
+  const input = buildInput();
+  const {problems, bytes} = SKILLS.length ? validate(S.action, input) : {problems:[{lvl:"warn", path:"", msg:"skill catalog not loaded: partial validation"}], bytes:0};
+  lastProblems = problems;
+  $("#json").textContent = JSON.stringify({action:S.action, input}, null, 2);
+  $("#bytes").textContent = bytes ? `${bytes} / 16384 B` : "";
+  const errs = problems.filter(p => p.lvl === "err").length, warns = problems.length - errs;
+  $("#probSummary").innerHTML = errs ? `<span class="tag err">${errs} errors</span>` : warns ? `<span class="tag warn">${warns} warnings</span>` : `<span class="tag ok">ready</span>`;
+  $("#probs").innerHTML = problems.length ? problems.map(p => `<li class="${p.lvl}" data-path="${esc(p.path)}">${esc(p.msg)}</li>`).join("")
+    : `<li class="ok">No problems found locally. The quote runs the last check: it rebuilds the job and checks that capable seats exist.</li>`;
+  document.querySelectorAll(".is-bad").forEach(e => e.classList.remove("is-bad"));
+  problems.filter(p => p.lvl === "err").forEach(p => document.querySelectorAll(`[data-k="${CSS.escape(p.path)}"]`).forEach(e => e.classList.add("is-bad")));
+  $("#quoteBtn").disabled = errs > 0;
+}
+
+/* ================= form events ================= */
+function parseVal(el){
+  const t = el.dataset.t;
+  if (t === "bool") return el.checked;
+  if (t === "lines") return lines(el.value);
+  if (t === "kv") return kvParse(el.value);
+  if (t === "int") return el.value === "" ? "" : Number(el.value);
+  return el.value;
+}
+$("#form").addEventListener("input", e => {
+  const el = e.target.closest("[data-k]"); if (!el) return;
+  setP(el.dataset.k, parseVal(el));
+  if (el.dataset.t === "path" && /\.outputs\.\d+\.path$/.test(el.dataset.k)) {   // fill mediaType from the extension
+    const mk = el.dataset.k.replace(/path$/, "mediaType"), ext = (el.value.match(/\.[a-z0-9]+$/i)||[""])[0].toLowerCase();
+    if (!getP(mk) && MEDIA[ext]) { setP(mk, MEDIA[ext]); const m = document.querySelector(`[data-k="${mk}"]`); if (m) m.value = MEDIA[ext]; }
+  }
+  if (el.dataset.k === "job.objective" || el.dataset.k === "or.question") { const lab = el.closest(".f").querySelector("label span"); if (lab) lab.textContent = `${el.value.length} / ${el.dataset.k === "or.question" ? "2,000" : "8,000"}`; }
+  refresh();
+});
+$("#form").addEventListener("change", e => { const el = e.target; if (el.matches("select[data-struct]")) { renderForm(); refresh(); } });
+$("#form").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  const j = S.job;
+  if (b.dataset.mode) { j.mode = b.dataset.mode; if (j.mode === "steps" && !j.steps.length) j.steps = [blankStep()]; }
+  else if (b.dataset.shape) { j.shape = b.dataset.shape; if (j.shape === "dag") autoKeys(); }
+  else if (b.dataset.win) S.or.windowMode = b.dataset.win;
+  else if (b.dataset.chip) { const cur = getP(b.dataset.chip) || []; const v = b.dataset.v; setP(b.dataset.chip, cur.includes(v) ? cur.filter(x => x !== v) : [...cur, v]); }
+  else if (b.dataset.dep !== undefined) { const s = j.steps[+b.dataset.dep], v = b.dataset.v; s.dependsOn = s.dependsOn.includes(v) ? s.dependsOn.filter(x => x !== v) : [...s.dependsOn, v]; }
+  else if (b.id === "addStep") { j.steps.push(blankStep(j.steps.length ? "write-foundry-tests" : "build-contract-project")); if (j.shape === "dag") autoKeys(); }
+  else if (b.dataset.rmStep !== undefined) { const gone = j.steps.splice(+b.dataset.rmStep, 1)[0]; j.steps.forEach(s => s.dependsOn = s.dependsOn.filter(d => d !== gone.key)); }
+  else if (b.dataset.mv !== undefined) { const i = +b.dataset.mv, k = i + +b.dataset.d; if (k < 0 || k >= j.steps.length) return; [j.steps[i], j.steps[k]] = [j.steps[k], j.steps[i]]; }
+  else if (b.dataset.del) { getP(b.dataset.del).splice(+b.dataset.i, 1); }
+  else if (b.dataset.addIn) { getP(b.dataset.addIn).push({name:"", path:"", mediaType:"", bytes:"", hash:"", submissionHash:""}); }
+  else if (b.dataset.addOut) { const p = {report:["report","artifacts/report.md","text/markdown"], image:["image","artifacts/image.png","image/png"], json:["data","artifacts/data.json","application/json"], blank:["","artifacts/",""]}[b.dataset.preset];
+    getP(b.dataset.addOut).push({name:p[0], path:p[1], mediaType:p[2]}); }
+  else if (b.dataset.gotoNet) { showTab("net"); return; }
+  else return;
+  renderForm(); refresh();
+});
+$("#form").addEventListener("change", e => {
+  if (e.target.id === "quickStep" && e.target.value) { S.job.steps.push(blankStep(e.target.value)); if (S.job.shape === "dag") autoKeys(); renderForm(); refresh(); }
+});
+function autoKeys(){
+  const used = new Set();
+  S.job.steps.forEach((s, i) => {
+    const fresh = !s.key;
+    if (!s.key) { let base = (s.skill||"step").replace(/^(build|write|implement|create)-/, "").split("-")[0].replace(/[^a-z0-9_]/g, "") || "step"; if (!/^[a-z]/.test(base)) base = "s" + base; let k = base, n = 2; while (used.has(k) || S.job.steps.some((x, xi) => xi !== i && x.key === k)) k = base + n++; s.key = k.slice(0, 32); }
+    used.add(s.key);
+    if (fresh && i > 0 && !s.dependsOn.length) s.dependsOn = [S.job.steps[i-1].key];
+  });
+}
+$("#probs").addEventListener("click", e => {
+  const li = e.target.closest("li[data-path]"); if (!li || !li.dataset.path) return;
+  const el = document.querySelector(`[data-k="${CSS.escape(li.dataset.path)}"]`) || document.querySelector(`[data-f="${CSS.escape(li.dataset.path)}"]`);
+  if (el) { el.closest("details")?.setAttribute("open", ""); el.scrollIntoView({behavior:"smooth", block:"center"}); el.focus?.({preventScroll:true}); }
+});
+$("#actionSeg").addEventListener("click", e => {
+  const b = e.target.closest("button[data-action]"); if (!b) return;
+  S.action = b.dataset.action;
+  if (S.action === "workflow.open") { S.job.mode = "steps"; if (!["chain","dag"].includes(S.job.shape)) S.job.shape = "chain"; if (!S.job.steps.length) S.job.steps = [blankStep("build-contract-project"), blankStep("frontend-for-contract"), blankStep("adversarial-review")]; if (!S.job.onchain || S.job.onchain === "true") S.job.onchain = "evm_project"; if (S.job.ipfs === "off" || S.job.ipfs === "false") S.job.ipfs = "true"; if (S.job.github === "default") S.job.github = "true"; }
+  if (S.action === "launch.open" && !S.job.onchain) S.job.onchain = "evm_project";
+  renderAll(); resetQuote();
+});
+
+/* ================= presets (docs examples) ================= */
+const PRESETS = [
+  ["job.open","Sourced research report",{objective:"Write a sourced report comparing three approaches to deterministic EVM testing.",skill:"research-report",outputs:[{name:"report",path:"artifacts/report.md",mediaType:"text/markdown"}],minCitations:5,github:false}],
+  ["job.open","Image",{objective:"Create a warm illustration of a bakery storefront for a website hero.",skill:"create-image",outputs:[{name:"hero",path:"artifacts/hero.png",mediaType:"image/png"}],github:false}],
+  ["job.open","Chain: ERC-4626 vault + tests + review",{objective:"Build an ERC-4626 vault with a mock token and meaningful tests. Do not deploy it.",shape:"chain",references:["defi-native","solidity-security-review"],steps:[{skill:"build-contract-project"},{skill:"write-foundry-tests",paths:["test"],objective:"Add invariant tests for share accounting and rounding.",acceptanceCriteria:["totalAssets never falls below the sum of redeemable assets"]},{skill:"adversarial-review"}],github:true}],
+  ["job.open","Fan-out: dashboard with two components",{objective:"Build a token dashboard with a price chart and a holders table.",shape:"fan_out_join",steps:[{skill:"implement-component",objective:"The price chart.",paths:["src/chart"]},{skill:"implement-component",objective:"The holders table.",paths:["src/holders"]},{skill:"integrate-project",objective:"Wire both into one page and build the export."}],ipfs:"token-dashboard"}],
+  ["job.open","DAG: vesting, test, review, docs",{objective:"Implement a vesting contract, test it, review it and write its README.",shape:"dag",contracts:["src/Vesting.sol"],references:["solidity-security-review"],steps:[{skill:"implement-one-contract",key:"impl",dependsOn:[],objective:"Linear vesting with a cliff.",acceptanceCriteria:["release() never pays more than vested"],paths:["src/Vesting.sol"],variables:{contract:"Vesting"}},{skill:"write-foundry-tests",key:"tests",dependsOn:["impl"],paths:["test/Vesting.t.sol"]},{skill:"adversarial-review",key:"review",dependsOn:["impl"],references:["pashov-skill"]},{skill:"write-readme-and-docs",key:"docs",dependsOn:["tests","review"],paths:["README.md"],outputs:[{name:"audit-notes",path:"artifacts/audit-notes.md",mediaType:"text/markdown"}]}],github:true}],
+  ["job.open","Template: impl + test + review",{objective:"Implement and test a timelock savings contract.",template:"impl_tests_review",contracts:["src/TimelockSavings.sol"]}],
+  ["job.open","Template: fuzz a repo",{objective:"Fuzz the vault's share accounting.",template:"fuzz",repoUrl:"https://github.com/OWNER/REPO",baseCommit:"0123456789abcdef0123456789abcdef01234567",contracts:["test/VaultInvariants.t.sol"],projectPath:".",runs:100000}],
+  ["job.open","Template: research panel",{objective:"Which L2s settle to Ethereum with a live fraud or validity proof today?",template:"research",rubric:{contains:["one row per L2","the proof system and whether it is live"],mayNotRestOn:["L2BEAT alone"]},panelSize:5,panelQuorum:3,minCitations:6}],
+  ["launch.open","Launch: burning Uniswap v4 hook",{objective:"Build a Uniswap v4 hook that burns a share of every swap, with tests and an independent review.",shape:"chain",references:["uniswap-v4-hooks","uniswap-v4-security"],steps:[{skill:"build-contract-project"},{skill:"adversarial-review"}],onchain:"univ4_hook"}],
+  ["workflow.open","Workflow: token + site (chain)",{request:"Build an ERC-20 token called Tip Vault (symbol TIPV) with a fixed supply minted to the deployer, a full Foundry test suite and an independent review; deploy it; then publish a small website that shows the token, its supply and a connected wallet's balance.",context:"Sepolia only. GitHub publication and IPFS hosting are approved. Keep the supply fixed; no owner mint.",draft:{objective:"Build the TIPV ERC-20 with tests and an independent review, deploy it, then build the website against the live deployment.",shape:"chain",onchain:"evm_project",github:true,ipfs:true,contracts:["TipVault"],steps:[{skill:"build-contract-project"},{skill:"frontend-for-contract"},{skill:"adversarial-review"}]}}],
+  ["workflow.open","Workflow: tip jar (dag, named site)",{request:"Release Tip Jar (TIPS): a fixed-supply ERC-20 and a TipJar contract that forwards ETH tips to a recipient, with invariant tests and an independent review; deploy both on Sepolia; then publish a one-page site to tip and read totals.",context:"Sepolia only. GitHub and IPFS approved. Site name tip-jar. No owner, no admin, no upgrade.",draft:{objective:"Build TIPS and TipJar with tests and a review, deploy them, then build the tipping page against the live deployment.",shape:"dag",onchain:"evm_project",github:true,ipfs:"tip-jar",contracts:["TipsToken","TipJar"],references:["solidity-security-review"],steps:[{skill:"build-contract-project",key:"contracts",dependsOn:[],objective:"TipsToken and TipJar with a Foundry project.",acceptanceCriteria:["TipJar never holds ETH after a tip"]},{skill:"write-foundry-tests",key:"tests",dependsOn:["contracts"],paths:["test"],objective:"Invariant and fuzz tests for TipJar."},{skill:"adversarial-review",key:"review",dependsOn:["tests"]},{skill:"frontend-for-contract",key:"site",dependsOn:["review"],objective:"Connect a wallet, tip in ETH, show the recipient's total."}]}}],
+  ["oracle.request","Oracle: yes/no from web sources (panel)",{v:1,question:"Did openai/openai-python publish a non-prerelease GitHub release on September 21, 2026 UTC?",chainId:1,window:{hours:48},answerType:"bool",evidence:"panel",panelSize:5,quorum:4,validForSeconds:86400,definitions:{project:"Use https://github.com/openai/openai-python/releases and release published_at timestamps. Exclude drafts and prereleases.",calendar:"Use [2026-09-21T00:00:00Z, 2026-09-22T00:00:00Z). Blockchain blocks are context only.",missing:"Unavailable historical evidence is not false. Report inability rather than guessing."},guards:{sources:["https://github.com/openai/openai-python/"],minSources:1}}],
+  ["oracle.request","Oracle: IMD burned (number from chain)",{v:1,question:"How much IMD was burned on Ethereum mainnet in the window?",chainId:1,window:{hours:24},answerType:"uint256",evidence:"chain",panelSize:5,quorum:5,toleranceBps:0,validForSeconds:3600,definitions:{burn:"Transfer events from any address to 0x0000000000000000000000000000000000000000 on 0xd34a99bc0f67ae1bbd63c660e6d0b0dd03e263b7."},guards:{min:"0",max:"10000000000000000000000000"}}],
+  ["oracle.request","Oracle: top 3 v4 pools with IMD (ranking)",{v:1,question:"Which three Uniswap v4 pools paired with IMD had the most swap volume in the last 24 hours?",chainId:1,window:{hours:24},answerType:"bytes32[]",evidence:"chain",head:3,panelSize:7,quorum:5,validForSeconds:86400,guards:{deny:["0x0000000000000000000000000000000000000000000000000000000000000000"]}}],
+];
+function renderPresets(){
+  $("#presetSel").innerHTML = `<option value="">— choose —</option>` + PRESETS.map((p, i) => p[0] === S.action ? `<option value="${i}">${esc(p[1])}</option>` : "").join("")
+    + `<option value="blank">Blank</option>`;
+}
+$("#presetSel").addEventListener("change", e => {
+  const v = e.target.value; if (!v) return;
+  if (v === "blank") { if (S.action === "oracle.request") S.or = blankOracle(); else { S.job = blankJob(); S.wf = {request:"", context:""}; if (S.action !== "job.open") { S.job.mode = "steps"; S.job.steps = [blankStep()]; } } renderAll(); resetQuote(); return; }
+  const p = PRESETS[+v]; loadInput(p[0], JSON.parse(JSON.stringify(p[2]))); resetQuote();
+  toast("Example loaded: replace the objective and details with your own");
+});
+
+/* JSON edit */
+$("#editJson").onclick = () => { $("#jsonEdit").value = $("#json").textContent; $("#json").hidden = true; $("#jsonEditWrap").hidden = false; };
+$("#cancelJson").onclick = () => { $("#json").hidden = false; $("#jsonEditWrap").hidden = true; };
+$("#applyJson").onclick = () => {
+  let o; try { o = JSON.parse($("#jsonEdit").value); } catch (e) { return toast("Invalid JSON: " + e.message); }
+  let action = o.action || S.action, input = o.input || o;
+  if (!o.action) { if (input.question) action = "oracle.request"; else if (input.draft) action = "workflow.open"; else if (input.onchain !== undefined) action = "launch.open"; }
+  loadInput(action, input); $("#cancelJson").onclick(); resetQuote();
+};
+$("#copyJson").onclick = async () => { try { await navigator.clipboard.writeText(JSON.stringify(buildInput(), null, 2)); toast("input copied"); } catch { toast("copy failed"); } };
+
+/* ================= quote + pay ================= */
+const post = (url, body) => fetch(url, {method:"POST", headers:{"Content-Type":"application/json", "X-Compose":"1"}, body:JSON.stringify(body || {})}).then(r => r.json());
+const get = url => fetch(url).then(r => r.json());
+let currentOrder = null, tick = null;
+function resetQuote(){ currentOrder = null; $("#quoteOut").innerHTML = ""; $("#payBtn").disabled = true; clearInterval(tick); }
+$("#quoteBtn").onclick = async () => {
+  const b = $("#quoteBtn"); b.disabled = true; b.textContent = "Quoting…";
+  try {
+    const res = await post("/local/quote", {action:S.action, input:buildInput(), label:$("#labelIn").value});
+    showQuote(res);
+  } catch (e) { $("#quoteOut").innerHTML = `<div class="errbox">Local server unreachable: ${esc(e.message)}</div>`; }
+  b.disabled = false; b.textContent = "Quote (free)"; refreshOrders();
+};
+function explainError(body){
+  const code = body?.error || body?.code || "error";
+  const hints = {invalid_request:"The body does not match the schema (an unknown field, a wrong type or a limit). Check the warnings and the JSON.",
+    invalid_input:"The network refused the input; nothing charged.", request_limit:"Too many requests: 10 quotes a minute per IP and token.", action_not_enabled:"Action not enabled right now.",
+    origin_not_allowed:"Cross-origin browser call: use the local server.", body_too_large:"Over 16 KiB."};
+  const probs = body?.problems || body?.blockers || [];
+  return `<div class="errbox"><b>${esc(code)}</b>${body?.detail ? ` — ${esc(body.detail)}` : ""}<div class="small muted" style="margin-top:4px">${esc(hints[code]||"")}</div>
+    ${probs.length ? `<ul class="probs" style="margin-top:8px">${probs.map(p => `<li class="err">${esc(typeof p === "string" ? p : (p.code ? p.code + ": " : "") + (p.detail || p.message || JSON.stringify(p)))}</li>`).join("")}</ul>` : ""}</div>`;
+}
+function showQuote(res){
+  const o = res.body?.order;
+  if ((res.status === 200 || res.status === 201) && o) {
+    currentOrder = o;
+    const q = o.quote || {};
+    $("#quoteOut").innerHTML = `<div class="warnbox" style="border-color:var(--ok)"><b>Valid.</b> The network accepts the request.
+      <dl class="kv" style="margin-top:8px"><dt>order</dt><dd>${esc(o.id)}</dd><dt>price</dt><dd>${fmtIMD(q.amount)} IMD</dd><dt>to</dt><dd>${esc(q.payTo||"")}</dd><dt>expires</dt><dd id="qExp"></dd></dl></div>`;
+    const upd = () => { const s = Math.round((q.expiresAt||0) - Date.now()/1000); const el = $("#qExp"); if (!el) return clearInterval(tick);
+      el.textContent = s > 0 ? `in ${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}` : "expired: quote again"; $("#payBtn").disabled = s < 30; };
+    clearInterval(tick); upd(); tick = setInterval(upd, 1000);
+  } else {
+    $("#quoteOut").innerHTML = explainError(res.body) + `<div class="small muted">HTTP ${res.status}. Nothing charged.</div>`;
+    $("#payBtn").disabled = true;
+  }
+}
+$("#payBtn").onclick = () => currentOrder && openPay(currentOrder.id);
+const fmtIMD = a => { try { const n = BigInt(a); const w = n / 10n**18n, f = (n % 10n**18n).toString().padStart(18,"0").replace(/0+$/,""); return f ? `${w}.${f.slice(0,6)}` : `${w}`; } catch { return "?"; } };
+
+/* ---- wallet (EIP-1193) ---- */
+const W = {addr:null, bal:null, allow:null};
+const eth = () => window.ethereum;
+const pad = a => a.toLowerCase().replace(/^0x/, "").padStart(64, "0");
+async function call(to, data){ return BigInt(await eth().request({method:"eth_call", params:[{to, data}, "latest"]})); }
+async function readWallet(){
+  if (!W.addr) return;
+  try {
+    W.bal = await call(IMD, "0x70a08231" + pad(W.addr));
+    W.allow = await call(IMD, "0xdd62ed3e" + pad(W.addr) + pad(PERMIT2));
+  } catch { W.bal = W.allow = null; }
+  $("#walletBtn").innerHTML = `<span class="dot on"></span>${W.addr.slice(0,6)}…${W.addr.slice(-4)}${W.bal != null ? ` · ${fmtIMD(W.bal)} IMD` : ""}`;
+}
+async function connect(){
+  if (!eth()) { toast("No wallet in the browser (MetaMask, Rabby…)"); return false; }
+  const [a] = await eth().request({method:"eth_requestAccounts"}); W.addr = a;
+  const cid = await eth().request({method:"eth_chainId"});
+  if (cid !== "0x1") { try { await eth().request({method:"wallet_switchEthereumChain", params:[{chainId:"0x1"}]}); } catch { toast("Switch the wallet to Ethereum mainnet"); return false; } }
+  await readWallet(); return true;
+}
+$("#walletBtn").onclick = () => connect().catch(e => toast(e.message));
+if (eth()) { eth().on?.("accountsChanged", a => { W.addr = a[0] || null; if (W.addr) readWallet(); else $("#walletBtn").textContent = "Connect wallet"; }); }
+
+/* ---- the payment modal ---- */
+function modal(html){ $("#overlay").hidden = false; $("#overlay").innerHTML = `<div class="scrim" data-close="1"></div><div class="modal">${html}</div>`; }
+function closeOverlay(){ $("#overlay").hidden = true; $("#overlay").innerHTML = ""; }
+$("#overlay").addEventListener("click", e => { if (e.target.dataset.close) closeOverlay(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeOverlay(); });
+function plog(msg, cls=""){ const l = $("#payLog"); if (l) { l.insertAdjacentHTML("beforeend", `<div class="${cls}">${esc(msg)}</div>`); l.scrollTop = l.scrollHeight; } }
+
+async function openPay(orderId){
+  const row = (await get("/local/orders")).find(r => r.orderId === orderId);
+  const need = BigInt(row?.quote?.amount || CAPS?.actions?.[0]?.payment?.amount || "500000000000000000");
+  modal(`<h2>Pay and send</h2>
+    <p class="small">Order <b>${esc(orderId)}</b> · ${esc(row?.action||"")} · ${fmtIMD(need)} IMD</p>
+    <p class="small muted">You will sign twice with the same wallet: the Permit2 payment (x402) and the EIP-712 approval of the quote. The server pays the gas. If the payment already started, a retry reuses the order and never charges twice.</p>
+    <div id="payState" class="kv" style="margin:10px 0"></div>
+    <div class="btns" id="payBtns"></div>
+    <div class="log" id="payLog" style="margin-top:12px"></div>`);
+  const render = async () => {
+    if (!W.addr) { $("#payState").innerHTML = `<dt>wallet</dt><dd>not connected</dd>`; $("#payBtns").innerHTML = `<button class="btn primary" id="pConn">Connect wallet</button><button class="btn" data-close="1">Close</button>`;
+      $("#pConn").onclick = async () => { if (await connect().catch(e => (toast(e.message), false))) render(); }; return; }
+    await readWallet();
+    const okBal = W.bal != null && W.bal >= need, okAl = W.allow != null && W.allow >= need;
+    $("#payState").innerHTML = `<dt>wallet</dt><dd>${esc(W.addr)}</dd><dt>IMD balance</dt><dd>${W.bal == null ? "?" : fmtIMD(W.bal)} ${okBal ? '<span class="tag ok">ok</span>' : '<span class="tag err">insufficient</span>'}</dd>
+      <dt>Permit2 allowance</dt><dd>${W.allow == null ? "?" : W.allow > 10n**30n ? "unlimited" : fmtIMD(W.allow)} ${okAl ? '<span class="tag ok">ok</span>' : '<span class="tag warn">approve needed</span>'}</dd>`;
+    $("#payBtns").innerHTML = (!okAl ? `<button class="btn" id="pApprove">Approve Permit2 for 5 IMD</button>` : "")
+      + `<button class="btn primary" id="pGo"${okBal && okAl ? "" : " disabled"}>Sign and pay ${fmtIMD(need)} IMD</button><button class="btn" data-close="1">Close</button>`;
+    if ($("#pApprove")) $("#pApprove").onclick = async () => {
+      try { const amt = 5n * 10n**18n;
+        const tx = await eth().request({method:"eth_sendTransaction", params:[{from:W.addr, to:IMD, data:"0x095ea7b3" + pad(PERMIT2) + amt.toString(16).padStart(64,"0")}]});
+        plog("approve sent: " + tx + " — waiting for confirmation…");
+        for (let i = 0; i < 60; i++) { await sleep(4000); const r = await eth().request({method:"eth_getTransactionReceipt", params:[tx]}); if (r) { plog(r.status === "0x1" ? "approve confirmed" : "approve failed", r.status === "0x1" ? "" : "err"); break; } }
+        render();
+      } catch (e) { plog("approve cancelled: " + (e.message||e), "err"); }
+    };
+    $("#pGo").onclick = () => pay(orderId, need).catch(e => plog("✗ " + (e.shortMessage || e.message || e), "err"));
+  };
+  render();
+}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+let X402 = null;
+async function libs(){
+  if (X402) return X402;
+  plog("loading viem and @x402 (esm.sh)…");
+  const [viem, http, client, evm] = await Promise.all([
+    import("https://esm.sh/viem@2.48.11"), import("https://esm.sh/@x402/core@2.27.0/http"),
+    import("https://esm.sh/@x402/core@2.27.0/client"), import("https://esm.sh/@x402/evm@2.27.0/exact/client")]);
+  return X402 = {viem, http, client, evm};
+}
+/* find an EIP-712 typed-data object anywhere in the challenge */
+function findTyped(o, path="", out=[]){
+  if (!o || typeof o !== "object") return out;
+  if (o.domain && o.types && o.primaryType && o.message) out.push({path, td:o});
+  for (const [k, v] of Object.entries(o)) findTyped(v, path ? path + "." + k : k, out);
+  return out;
+}
+async function pay(orderId, need){
+  $("#pGo").disabled = true;
+  const {viem, http, client, evm} = await libs();
+  const wc = viem.createWalletClient({transport: viem.custom(eth())});
+  const account = viem.getAddress(W.addr);
+  const signer = {address: account, signTypedData: m => wc.signTypedData({account, ...m})};
+
+  plog("1/4 requesting the 402 challenge…");
+  const ch = await post(`/local/submit/${orderId}`, {});
+  if (ch.status !== 402) {
+    if (ch.status === 200 || ch.status === 202) { plog("the order is already paid or in progress: " + (ch.body?.status || ch.status)); return followOrder(orderId); }
+    plog("unexpected response " + ch.status + ": " + JSON.stringify(ch.body), "err"); return;
+  }
+  const hdr = ch.headers["payment-required"];
+  if (!hdr) { plog("the 402 has no PAYMENT-REQUIRED header", "err"); plog(JSON.stringify(ch.body, null, 1)); return; }
+  const required = http.decodePaymentRequiredHeader(hdr);
+  const req = (required.accepts || [])[0] || {};
+  // refuse anything that is not exactly what /requests/capabilities advertises
+  const cap = CAPS?.actions?.find(a => a.payment)?.payment || {};
+  const same = (a, b) => String(a||"").toLowerCase() === String(b||"").toLowerCase();
+  if (!same(req.asset, IMD) || (cap.payTo && !same(req.payTo, cap.payTo)) || BigInt(req.amount || req.maxAmountRequired || 0) !== need || req.network !== "eip155:1") {
+    plog("the challenge does not match the published price: stopping", "err"); plog(JSON.stringify(req, null, 1)); return;
+  }
+  plog(`2/4 Permit2 signature: ${fmtIMD(need)} IMD → ${req.payTo}`);
+  const xc = new client.x402Client();
+  // IMD is not a default x402 asset: allow it explicitly, capped at the quoted price
+  xc.setSpendControls({allowedAssets:[{network:"eip155:1", asset:IMD, maxAmountPerPayment:need.toString()}]});
+  evm.registerExactEvmScheme(xc, {signer});
+  const payment = await xc.createPaymentPayload(required);
+
+  plog("3/4 signing the quote approval (EIP-712)…");
+  const offer = ch.body || {}, q = offer.quote || {};
+  if (!q.id || !q.quoteHash || !offer.requesterScopeHash || !offer.resourceUrl || !q.payment) { plog("the 402 body lacks quote / requesterScopeHash / resourceUrl: stopping", "err"); plog(JSON.stringify(offer, null, 1)); return; }
+  if (q.id !== orderId || !same(q.payment.asset, req.asset) || !same(q.payment.payTo, req.payTo) || String(q.payment.amount) !== String(req.amount)) { plog("the quote does not match the payment requirements: stopping", "err"); return; }
+  const paymentHeader = http.encodePaymentSignatureHeader(payment);
+  // hash exactly what the server will decode from the header
+  // canonicalHash in the paid-action module is sha256 of canonical JSON (it reproduces the challenge's inputHash)
+  const paymentHash = "0x" + await sha256Hex(canonicalJSON(http.decodePaymentSignatureHeader(paymentHeader)));
+  if (offer.input && offer.quote.inputHash && await sha256Hex(canonicalJSON(offer.input)) !== offer.quote.inputHash) plog("  note: inputHash does not reproduce locally; the hash rule may have changed", "err");
+  const typed = {
+    domain: {name: "IdentityMD Paid Action", version: "1", chainId: Number(q.payment.network.slice(7))},
+    primaryType: "QuoteApproval",
+    types: {QuoteApproval: [
+      {name:"resource", type:"string"}, {name:"requesterScopeHash", type:"bytes32"}, {name:"quoteId", type:"string"},
+      {name:"quoteHash", type:"bytes32"}, {name:"paymentHash", type:"bytes32"}, {name:"action", type:"string"},
+      {name:"asset", type:"address"}, {name:"amount", type:"uint256"}, {name:"payTo", type:"address"}, {name:"expiresAt", type:"uint256"}]},
+    message: {resource: offer.resourceUrl, requesterScopeHash: "0x" + offer.requesterScopeHash.replace(/^0x/, ""), quoteId: q.id,
+      quoteHash: "0x" + q.quoteHash.replace(/^0x/, ""), paymentHash, action: q.action, asset: viem.getAddress(q.payment.asset),
+      amount: BigInt(q.payment.amount), payTo: viem.getAddress(q.payment.payTo), expiresAt: BigInt(q.expiresAt)},
+  };
+  plog(`  QuoteApproval · ${q.action} · quote ${q.id.slice(0, 8)}… · expires ${new Date(q.expiresAt * 1000).toLocaleTimeString()}`);
+  const quoteSignature = await wc.signTypedData({account, ...typed});
+  plog("4/4 sending payment…");
+  const res = await post(`/local/submit/${orderId}`, {paymentSignature: paymentHeader, quoteSignature});
+  if (res.status === 200 || res.status === 202) { plog("✓ accepted (" + (res.body?.status || res.status) + "). Following the order…"); followOrder(orderId); }
+  else plog(`✗ ${res.status} ${JSON.stringify(res.body)}`, "err");
+}
+async function sha256Hex(str){
+  const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str));
+  return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, "0")).join("");
+}
+function canonicalJSON(v){
+  if (Array.isArray(v)) return "[" + v.map(canonicalJSON).join(",") + "]";
+  if (v && typeof v === "object") return "{" + Object.keys(v).filter(k => v[k] !== undefined).sort().map(k => JSON.stringify(k) + ":" + canonicalJSON(v[k])).join(",") + "}";
+  return JSON.stringify(v);
+}
+function stripDomain(t){ const c = {...t}; delete c.EIP712Domain; return c; }
+/* fill message fields the server left for the client (payer, payment signature, permit nonce/deadline) */
+function fillTyped(td, payment, account){
+  const m = {...td.message}, fields = td.types[td.primaryType] || [];
+  const p2 = payment?.payload?.permit2Authorization || payment?.payload?.authorization || {};
+  const src = {payer:account, from:account, owner:account, wallet:account, signer:account,
+    paymentSignature:payment?.payload?.signature, permitSignature:payment?.payload?.signature, signature:payment?.payload?.signature,
+    nonce:p2.nonce, deadline:p2.deadline, permitNonce:p2.nonce, permitDeadline:p2.deadline};
+  for (const f of fields) if ((m[f.name] === undefined || m[f.name] === null || m[f.name] === "") && src[f.name] !== undefined) m[f.name] = src[f.name];
+  return {...td, message:m};
+}
+async function followOrder(orderId){
+  for (let i = 0; i < 90; i++) {
+    const r = await get(`/local/order/${orderId}`);
+    const st = r.body?.status;
+    plog(`status: ${st}`);
+    if (st === "admitted") { const a = r.body.admission?.result; plog("✓ admitted: " + JSON.stringify(a)); refreshOrders(); return; }
+    if (["payment_failed","expired"].includes(st)) { plog("✗ " + st + " " + JSON.stringify(r.body.payment || {}), "err"); refreshOrders(); return; }
+    await sleep(5000);
+  }
+}
+
+/* ================= orders tab ================= */
+const FINAL = ["admitted","payment_failed","expired"];
+async function refreshOrders(){
+  let rows; try { rows = await get("/local/orders"); } catch { return; }
+  $("#ordCount").textContent = rows.length ? `(${rows.length})` : "";
+  const now = Date.now()/1000;
+  $("#ordRows").innerHTML = rows.length ? rows.map(r => {
+    const exp = r.quote?.expiresAt, open = !FINAL.includes(r.status);
+    const quotedLive = r.status === "quoted" && exp && exp > now + 30;
+    const a = r.admission;
+    const res = a ? (a.kind === "refused" ? `<span class="tag err">refused</span>` : [a.jobId && `<a href="#" data-job="${esc(a.jobId)}">job</a>`, a.workflowId && `<a href="#" data-wf="${esc(a.workflowId)}">workflow</a>`, a.requestId && `<a href="#" data-or="${esc(a.requestId)}">oracle</a>`].filter(Boolean).join(" · ")) : "";
+    const obj = r.input?.objective || r.input?.request || r.input?.question || "";
+    return `<tr><td class="small">${new Date(r.createdAt*1000).toLocaleString()}</td>
+      <td><div>${esc(r.label || "")}</div><div class="small muted clip">${esc(obj)}</div></td>
+      <td class="small">${esc(r.action)}</td>
+      <td>${tagFor(r.status)}${r.status === "quoted" && exp ? `<div class="small muted">${exp > now ? "expires " + new Date(exp*1000).toLocaleTimeString() : "expired"}</div>` : ""}</td>
+      <td class="small">${res}</td>
+      <td><div class="btns">${quotedLive ? `<button class="btn sm primary" data-pay="${esc(r.orderId)}">Pay</button>` : ""}
+        ${open ? `<button class="btn sm" data-check="${esc(r.orderId)}">Refresh</button>` : ""}
+        <button class="btn sm" data-reuse="${esc(r.orderId)}">Reuse</button>
+        <button class="btn sm" data-forget="${esc(r.orderId)}" title="Remove from the local list">×</button></div></td></tr>`;
+  }).join("") : `<tr><td colspan="6" class="muted">No orders yet. Create a quote from the Compose tab.</td></tr>`;
+  window._orders = rows;
+}
+function tagFor(s){ const c = {admitted:"ok", paid:"ok", payment_failed:"err", expired:"dim", quoted:"warn", payment_pending:"warn", admission_pending:"warn"}[s] || "dim"; return `<span class="tag ${c}">${esc(s || "?")}</span>`; }
+$("#ordRows").addEventListener("click", async e => {
+  const t = e.target.closest("[data-pay],[data-check],[data-reuse],[data-forget],[data-job],[data-wf],[data-or]"); if (!t) return; e.preventDefault();
+  if (t.dataset.pay) openPay(t.dataset.pay);
+  else if (t.dataset.check) { await get(`/local/order/${t.dataset.check}`); refreshOrders(); }
+  else if (t.dataset.reuse) { const r = window._orders.find(o => o.orderId === t.dataset.reuse); loadInput(r.action, JSON.parse(JSON.stringify(r.input))); $("#labelIn").value = r.label || ""; resetQuote(); showTab("compose"); }
+  else if (t.dataset.forget) { if (confirm("Remove from the local list? The token that reads the order back will be lost.")) { await post(`/local/forget/${t.dataset.forget}`); refreshOrders(); } }
+  else if (t.dataset.job) openJob(t.dataset.job);
+  else if (t.dataset.wf) openWorkflow(t.dataset.wf);
+  else if (t.dataset.or) openOracle(t.dataset.or);
+});
+setInterval(async () => {
+  const open = (window._orders||[]).filter(r => ["payment_pending","admission_pending","paid"].includes(r.status));
+  for (const r of open) await get(`/local/order/${r.orderId}`);
+  if (open.length) refreshOrders();
+}, 15000);
+
+/* ================= network tab ================= */
+const api = p => get("/api" + p).then(r => r.status === 200 ? r.body : Promise.reject(new Error((r.body?.error || "HTTP " + r.status))));
+let netView = "jobs";
+async function loadStats(){
+  try {
+    const h = await api("/health");
+    $("#netDot").innerHTML = `<span class="dot ${h.status === "ok" ? "on" : "warn"}"></span><span>${esc(h.version || "api")}</span>`;
+    const p = h.payments || {};
+    $("#stats").innerHTML = [["connected daemons", h.connectedDaemons], ["working", h.workingNow], ["oracle queued", h.pendingOracle],
+      ["payments", p.enabled ? "on" : "off"], ["paid orders", p.orders?.paid], ["gas wallet", p.gasWallet ? (p.gasWallet.low ? "low" : "ok") : "—"]]
+      .map(([k, v]) => `<div class="stat"><div class="v">${esc(v ?? "—")}</div><div class="k">${esc(k)}</div></div>`).join("");
+  } catch { $("#netDot").innerHTML = `<span class="dot off"></span><span>api</span>`; }
+}
+$("#netSeg").addEventListener("click", e => { const b = e.target.closest("button[data-net]"); if (!b) return; netView = b.dataset.net; $("#netSeg").querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); loadNet(); });
+const ago = t => { const s = (Date.now() - new Date(t)) / 1000; return s < 3600 ? `${Math.round(s/60)} min ago` : s < 86400 ? `${Math.round(s/3600)} h ago` : `${Math.round(s/86400)} d ago`; };
+async function loadNet(q){
+  const box = $("#netBody"); box.innerHTML = `<p class="muted">Loading…</p>`;
+  try {
+    if (netView === "jobs") {
+      const d = await api("/jobs?limit=60" + (q ? "&q=" + encodeURIComponent(q) : ""));
+      box.innerHTML = `<div class="f" style="max-width:420px"><input type="text" id="jobQ" placeholder="search by objective or id…" value="${esc(q||"")}"></div>
+        <div class="tbl-wrap"><table><thead><tr><th>Status</th><th>Type</th><th>Objective</th><th>Updated</th></tr></thead><tbody>
+        ${d.jobs.map(j => `<tr class="click" data-job="${esc(j.id)}"><td>${tagFor(j.state === "completed" ? "admitted" : j.state === "failed" || j.state === "blocked" ? "payment_failed" : "quoted").replace(/>[^<]*</, ">" + esc(j.state) + "<")}</td><td class="small">${esc(j.template)}</td><td><div class="clip">${esc(j.objective)}</div></td><td class="small muted">${ago(j.updatedAt)}</td></tr>`).join("")}</tbody></table></div>`;
+      $("#jobQ").onkeydown = e => { if (e.key === "Enter") loadNet(e.target.value.trim()); };
+    } else if (netView === "workflows") {
+      const d = await api("/workflows?limit=40");
+      box.innerHTML = `<div class="tbl-wrap"><table><thead><tr><th>Status</th><th>Objective</th><th></th></tr></thead><tbody>
+        ${d.workflows.map(w => `<tr class="click" data-wf="${esc(w.id)}"><td><span class="tag ${w.status==="completed"?"ok":["blocked","cancelled"].includes(w.status)?"err":"warn"}">${esc(w.status)}</span></td><td><div class="clip">${esc(w.objective)}</div></td><td class="small muted">${w.waitingForHosting ? "waiting for hosting" : ""}</td></tr>`).join("")}</tbody></table></div>`;
+    } else if (netView === "oracle") {
+      const d = await api("/oracle/requests?limit=40");
+      box.innerHTML = `<div class="tbl-wrap"><table><thead><tr><th>Status</th><th>Question</th><th>Panel</th></tr></thead><tbody>
+        ${d.requests.map(r => `<tr class="click" data-or="${esc(r.id)}"><td><span class="tag ${r.status==="attested"?"ok":["disagreed","blocked","mismatch","refused","failed"].includes(r.status)?"err":"warn"}">${esc(r.status)}</span></td><td><div class="clip">${esc(r.question)}</div></td><td class="small">${esc(r.quorum)}/${esc(r.panelSize)}</td></tr>`).join("")}</tbody></table></div>`;
+    } else {
+      box.innerHTML = `<div class="tbl-wrap"><table><thead><tr><th>Skill</th><th>Role</th><th>Requires</th><th>Tier</th><th>Description</th></tr></thead><tbody>
+        ${SKILLS.map(s => `<tr><td><b>${esc(s.id)}</b> <span class="muted small">v${esc(s.version)}</span></td><td class="small">${esc(s.role)}</td><td class="small">${esc((s.requires||[]).join(", "))}${NEEDS_PATHS.includes(s.id) ? '<div class="muted">paths</div>' : ""}</td><td class="small">${esc(s.inference || "—")}</td><td class="small">${esc(s.description)}</td></tr>`).join("")}</tbody></table></div>`;
+    }
+  } catch (e) { box.innerHTML = `<div class="errbox">${esc(e.message)}</div>`; }
+}
+$("#netBody").addEventListener("click", e => {
+  const r = e.target.closest("[data-job],[data-wf],[data-or]"); if (!r) return;
+  if (r.dataset.job) openJob(r.dataset.job); else if (r.dataset.wf) openWorkflow(r.dataset.wf); else openOracle(r.dataset.or);
+});
+function drawer(html){ $("#overlay").hidden = false; $("#overlay").innerHTML = `<div class="scrim" data-close="1"></div><div class="drawer"><button class="btn sm close" data-close="1">Close ✕</button>${html}</div>`; }
+async function openJob(id){
+  drawer(`<p class="muted">Loading the job…</p>`);
+  const [j, res] = await Promise.all([api(`/jobs/${id}`), api(`/jobs/${id}/result`).catch(() => null)]);
+  const files = res?.files || [];
+  const dl = res?.delivery || j.delivery || {};
+  window._jobFiles = files;
+  const commit = dl.commit, repo = dl.repoUrl;
+  drawer(`<h2>Job</h2><h3 style="word-break:break-all">${esc(id)}</h3>
+    <dl class="kv"><dt>status</dt><dd>${esc(j.state)}</dd><dt>type</dt><dd>${esc(j.template || "")}</dd>${repo ? `<dt>repo</dt><dd><a href="${esc(repo)}" target="_blank" rel="noopener">${esc(repo)}</a></dd><dt>commit</dt><dd>${esc(commit||"")}</dd>` : ""}
+    <dt>explorer</dt><dd><a href="https://explorer.imd.fun/jobs/${esc(id)}" target="_blank" rel="noopener">open</a></dd></dl>
+    <h2 style="margin-top:16px">Objective</h2><div class="code" style="white-space:pre-wrap">${esc(j.objective || "")}</div>
+    ${repo && commit ? `<div class="btns" style="margin-top:12px"><button class="btn primary" id="fromRepo">Continue from this repo</button></div>` : ""}
+    <h2 style="margin-top:16px">Accepted files ${res?.complete ? "" : '<span class="tag warn">incomplete</span>'}</h2>
+    ${files.length ? `<table><thead><tr><th>name</th><th>path</th><th>bytes</th><th></th></tr></thead><tbody>${files.map((f, i) => `<tr><td>${esc(f.name)}</td><td class="small">${esc(f.path)}</td><td class="small">${esc(f.bytes)}</td>
+      <td><div class="btns"><a class="btn sm" href="${esc(f.url?.startsWith("http") ? f.url : "https://api.imd.fun" + f.url)}" target="_blank" rel="noopener">download</a><button class="btn sm primary" data-use="${i}">use as input</button></div></td></tr>`).join("")}</tbody></table>` : `<p class="muted small">No accepted named files.</p>`}
+    <h2 style="margin-top:16px">Nodes</h2>
+    <div class="code">${esc(JSON.stringify((j.nodes || []).map(n => ({key:n.key || n.id, skill:n.skill, state:n.state, verdict:n.verdict?.accepted ?? n.verdict, seat:n.seat})), null, 1))}</div>`);
+  $("#overlay").querySelectorAll("[data-use]").forEach(b => b.onclick = () => {
+    const f = files[+b.dataset.use];
+    const inp = {name:f.name, path:f.path, mediaType:f.mediaType, bytes:f.bytes, hash:f.hash, submissionHash:f.submissionHash};
+    if (S.action === "oracle.request") S.action = "job.open";
+    if (S.job.inputs.some(x => x.name === inp.name)) inp.name = inp.name + "_" + (S.job.inputs.length + 1);
+    S.job.inputs.push(inp); closeOverlay(); showTab("compose"); renderAll();
+    toast(`Added input "${inp.name}": the agent will find it at .imd/reads/artifacts/${inp.name}`);
+  });
+  if ($("#fromRepo")) $("#fromRepo").onclick = () => { if (S.action === "oracle.request") S.action = "job.open"; S.job.repoUrl = repo; S.job.baseCommit = commit; closeOverlay(); showTab("compose"); renderAll(); toast("repoUrl and baseCommit set"); };
+}
+async function openWorkflow(id){
+  drawer(`<p class="muted">Loading…</p>`);
+  const w = await api(`/workflows/${id}`);
+  const stages = ["contracts","deployment","frontend","publishing","validating","completed"];
+  const at = stages.indexOf(w.status);
+  drawer(`<h2>Workflow</h2><h3 style="word-break:break-all">${esc(id)}</h3>
+    <div class="chips" style="margin:10px 0 14px">${stages.map((s, i) => `<span class="chip${i <= at ? " on" : ""}">${s}</span>`).join("")}${at < 0 ? `<span class="tag err">${esc(w.status)}</span>` : ""}</div>
+    <dl class="kv"><dt>chain</dt><dd>${esc(w.chainId)}</dd><dt>contracts</dt><dd>${w.contracts ? `<a href="#" data-job="${esc(w.contracts.id)}">${esc(w.contracts.state)}</a> ${w.contracts.repoUrl ? `· <a href="${esc(w.contracts.repoUrl)}" target="_blank" rel="noopener">repo</a>` : ""}` : "—"}</dd>
+    <dt>launch</dt><dd>${esc(w.launch?.status || "—")}</dd><dt>frontend</dt><dd>${w.frontend ? `<a href="#" data-job="${esc(w.frontend.id)}">${esc(w.frontend.state)}</a>` : "—"}</dd>
+    <dt>site</dt><dd>${w.site?.ensName ? `<a href="https://${esc(w.site.ensName)}.limo" target="_blank" rel="noopener">${esc(w.site.ensName)}</a>` : esc(w.site?.status || "—")}</dd>
+    <dt>validation</dt><dd>${esc(w.validation?.status || "—")}</dd>${w.failure ? `<dt>error</dt><dd>${esc(JSON.stringify(w.failure))}</dd>` : ""}</dl>
+    <h2 style="margin-top:16px">Objective</h2><div class="code" style="white-space:pre-wrap">${esc(w.objective || "")}</div>`);
+  $("#overlay").querySelectorAll("[data-job]").forEach(a => a.onclick = e => { e.preventDefault(); openJob(a.dataset.job); });
+}
+async function openOracle(id){
+  drawer(`<p class="muted">Loading…</p>`);
+  const r = await api(`/oracle/requests/${id}?members=0`);
+  const att = r.status === "attested" ? await api(`/oracle/requests/${id}/attestation`).catch(() => null) : null;
+  drawer(`<h2>Oracle</h2><h3 style="word-break:break-all">${esc(id)}</h3>
+    <dl class="kv"><dt>status</dt><dd>${tagFor(r.status === "attested" ? "admitted" : "quoted").replace(/>[^<]*</, ">" + esc(r.status) + "<")}</dd>
+    ${att ? `<dt>answer</dt><dd>${esc(att.message?.answer)} ${att.message?.figure && att.message.figure !== "0" ? "· " + esc(att.message.figure) : ""}</dd><dt>signed by</dt><dd>${esc(att.signer)}</dd><dt>expires</dt><dd>${att.message?.expiresAt ? new Date(att.message.expiresAt*1000).toLocaleString() : ""}</dd>` : ""}
+    ${r.failure ? `<dt>error</dt><dd>${esc(JSON.stringify(r.failure))}</dd>` : ""}</dl>
+    <h2 style="margin-top:16px">Request</h2><div class="code">${esc(JSON.stringify(r.request || r, null, 1))}</div>
+    <div class="btns" style="margin-top:12px"><button class="btn" id="orReuse">Reuse as a template</button></div>`);
+  $("#orReuse").onclick = () => { const q = r.request || r; const b = {v:1, question:q.question, chainId:q.chainId, window:{hours:24}, answerType:q.answerType, evidence:q.evidence, panelSize:q.panelSize, quorum:q.quorum, validForSeconds:q.validForSeconds, head:q.head, toleranceBps:q.toleranceBps, definitions:q.definitions, guards:q.guards};
+    Object.keys(b).forEach(k => b[k] === undefined && delete b[k]); loadInput("oracle.request", b); closeOverlay(); showTab("compose"); toast("Question loaded: the window is reset to 24 h"); };
+}
+
+/* ================= prompt for the user's own agent ================= */
+const HELPER_REPO = "https://github.com/pointbreak01/imd-compose";
+function agentPrompt(){
+  const run = SKILLS.filter(s => s.role !== "reference" && !INTERNAL.includes(s.id));
+  const ref = SKILLS.filter(s => s.role === "reference");
+  const needs = s => (s.requires||[]).length ? ` [needs ${s.requires.join(", ")}]` : "";
+  return `You write request bodies for the identity.md swarm (api.imd.fun). Answer with ONE JSON object and nothing else: {"action": "...", "input": {...}}. No comments, no markdown fences, and no fields that are not listed here.
+
+ACTIONS
+- job.open: work done by contributor machines. The input has exactly one of "skill" (one runnable skill), "template", or "shape" + "steps".
+- launch.open: like job.open plus "onchain": true | "univ4_hook" | "evm_project" (deploys on Sepolia). Include an adversarial-review step.
+- workflow.open: ONLY for "contracts deployed on Sepolia plus a website built against them". {"request": a plain-language brief, "context": constraints and approvals, "draft": a job.open-style input}. The draft needs shape chain or dag, onchain (evm_project or univ4_hook), github true, ipfs (true or a site label), an adversarial-review step and exactly one frontend-for-contract or build-website step. A website without contracts is a job.open with skill build-website and ipfs.
+- oracle.request: a typed question answered by a panel of seats (see ORACLE).
+
+JOB FIELDS (job.open, launch.open, workflow draft)
+- objective (required, max 8,000 characters): the whole brief in plain English: what to build or answer, the constraints, and what "done" means.
+- skill: one runnable skill id from the list below.
+- template: ${TEMPLATES.join(" | ")}.
+- shape: ${SHAPES.join(" | ")}, with 1-6 steps. Each step: {skill, objective (max 3,000), acceptanceCriteria (max 8, each max 500 characters), paths, references, outputs, key, dependsOn, variables}. In a dag every step needs key (^[a-z][a-z0-9_]{0,31}$) and dependsOn ([] for a root), and all branches must join into one final step. fan_out_join usually ends with integrate-project.
+- references: up to 8 reference skill ids (knowledge attached to the work).
+- paths: up to 16 repository-relative paths the work may write (for example "src/Vault.sol", "test", "script/Deploy.s.sol", "README.md"). REQUIRED on every job or step whose skill is one of: ${NEEDS_PATHS.join(", ")}.
+- outputs: up to 32 {name (^[a-zA-Z][a-zA-Z0-9_-]{0,63}$), path (under artifacts/), mediaType}. Needed for: ${NAMED_OUTPUT.join(", ")}.
+- repoUrl + baseCommit: start from an existing public repository. Always both; baseCommit is the full 40-character lowercase commit.
+- contracts: up to 4 contract names or paths.
+- github: true or false (publish the delivered repository). ipfs: true, false, or a site label (lowercase letters, digits and hyphens, 1-32) published as <label>.site.identitymd.eth.
+- research template only: rubric {contains: 1-8 checks, mayNotRestOn: up to 8}, panelSize 1-9, panelQuorum up to panelSize. minCitations 0-20.
+- fuzz template: exactly one harness in contracts, runs 1,000-10,000,000, usually with repoUrl + baseCommit.
+- implement-one-contract only works as a step and needs "variables": {"contract": "<ContractName>"}; for a single contract without that, use implement-contract.
+- Never use parentJobId, projectId, deploymentLaunchId or submissionKey. onchain is not allowed on job.open.
+
+ORACLE (oracle.request)
+{"v": 1, question, chainId, window: {"hours": 1-720} or {"fromBlock", "toBlock"}, answerType: ${ANSWER_TYPES.join(" | ")}, evidence: "chain" or "panel", panelSize 2-10, quorum 2 to panelSize, validForSeconds 60-2,592,000, definitions {key: text up to 512 characters} (name the sources, the period and what to do when data is missing), head 1-32 for list answers, toleranceBps 0-10,000, guards {allow, deny, mustHaveCode, min, max, sources, minSources}}.
+
+RUNNABLE SKILLS
+${run.map(s => `- ${s.id}: ${s.description}${needs(s)}`).join("\n")}
+
+REFERENCE SKILLS (only inside references)
+${ref.map(s => `- ${s.id}: ${s.description}`).join("\n")}
+
+RULES
+- Prefer the simplest request that works: one skill for one deliverable; a chain only when an independent test or review adds value.
+- Write the objective and the acceptance criteria so a stranger can check the result from the delivered files alone.
+- Skills that need tool:image, tool:audio or tool:video run only on the few machines that have that tool.
+- Only a dag uses key and dependsOn; a chain runs its steps in order without them.
+- Acceptance criteria must be checkable from the files (a test that passes, a file that exists), not opinions or coverage percentages.
+- If what I ask for cannot be expressed with these fields, say so in one line instead of inventing a field.
+
+EXAMPLES
+{"action":"job.open","input":{"objective":"Write a sourced report comparing three approaches to deterministic EVM testing.","skill":"research-report","outputs":[{"name":"report","path":"artifacts/report.md","mediaType":"text/markdown"}],"minCitations":5}}
+{"action":"launch.open","input":{"objective":"Build a fixed-supply ERC-20 and a staking contract, test them independently, review them and deploy on Sepolia.","shape":"chain","onchain":"evm_project","references":["solidity-security-review"],"steps":[{"skill":"build-contract-project"},{"skill":"write-foundry-tests","paths":["test"],"acceptanceCriteria":["forge test passes, including tests for reward accrual and withdrawal"]},{"skill":"adversarial-review"}]}}
+{"action":"job.open","input":{"objective":"A one-page website that explains the project in plain words, with a light and dark theme.","skill":"build-website","ipfs":"my-site"}}
+
+WHAT I WANT
+<describe the task here>`;
+}
+function renderPrompt(){
+  $("#agentPrompt").value = agentPrompt();
+  $("#promptInfo").textContent = `${SKILLS.length} skills · ${STATIC ? "catalog snapshot " + SKILLS_DATE : "live catalog"}`;
+}
+const SKILLS_DATE = "2026-09-26";
+$("#copyPrompt").onclick = async () => { try { await navigator.clipboard.writeText($("#agentPrompt").value); toast("prompt copied"); } catch { $("#agentPrompt").select(); toast("select and copy by hand"); } };
+function applyStatic(){
+  STATIC = true;
+  document.querySelectorAll('[data-tab="orders"],[data-tab="net"],#netDot,#walletBtn').forEach(e => e.hidden = true);
+  $("#sendBox").hidden = true; $("#staticBox").hidden = false;
+  $("#tab-compose .lede").innerHTML = "Pick what to ask for, fill in the fields and check the problems on the right, or let your own agent write the JSON. This hosted copy composes and checks; quoting and paying need the local helper (see <b>Quote and pay</b>).";
+  $("#helperCmd").textContent = `git clone ${HELPER_REPO}\ncd imd-compose && python3 server.py`;
+}
+
+/* ================= shell ================= */
+function showTab(t){
+  document.querySelectorAll("[data-tab]").forEach(b => b.classList.toggle("is-here", b.dataset.tab === t));
+  ["compose","orders","net"].forEach(x => $("#tab-" + x).hidden = x !== t);
+  if (t === "orders") refreshOrders();
+  if (t === "net") { loadStats(); loadNet(); }
+  try { localStorage.setItem("imd-compose-tab", t); } catch {}
+}
+document.querySelectorAll("[data-tab]").forEach(b => b.onclick = () => showTab(b.dataset.tab));
+function toast(m){ const d = document.createElement("div"); d.className = "toast"; d.textContent = m; document.body.appendChild(d); setTimeout(() => d.remove(), 3800); }
+$("#themeBtn").onclick = () => { const r = document.documentElement, cur = r.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); r.dataset.theme = cur === "dark" ? "light" : "dark"; try { localStorage.setItem("imd-compose-theme", r.dataset.theme); } catch {} };
+try { const th = localStorage.getItem("imd-compose-theme"); if (th) document.documentElement.dataset.theme = th; } catch {}
+
+(async function boot(){
+  SKILLS = SKILLS_SNAPSHOT; renderAll(); renderPrompt();
+  let helper = false;
+  try { helper = Array.isArray(await get("/local/orders")); } catch {}
+  if (!helper) {  // no local server behind this page (e.g. IPFS): compose and check only
+    applyStatic(); renderAll(); renderPrompt(); showTab("compose"); return;
+  }
+  try { const s = await api("/skills"); SKILLS = Array.isArray(s) ? s : s.skills || []; } catch (e) { toast("Live skill catalog unavailable, using the snapshot: " + e.message); }
+  try { CAPS = await api("/requests/capabilities"); } catch {}
+  renderAll(); renderPrompt(); loadStats(); refreshOrders();
+  let t = "compose"; try { t = localStorage.getItem("imd-compose-tab") || t; } catch {}
+  showTab(t);
+  if (eth()) eth().request({method:"eth_accounts"}).then(a => { if (a[0]) { W.addr = a[0]; readWallet(); } }).catch(() => {});
+})();
+</script>
+</body>
+</html>
