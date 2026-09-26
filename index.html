@@ -123,6 +123,26 @@ pre,.code{background:var(--code);border:1.5px solid var(--soft);padding:12px;ove
 .kv{display:grid;grid-template-columns:max-content 1fr;gap:3px 14px;font-size:12px}
 .kv dt{color:var(--dim)}.kv dd{margin:0;word-break:break-all}
 
+/* what happens next: the compose to-do strip, the orders flow, the rows that wait for you */
+.todo{border:var(--rule);margin:0 0 20px;max-width:980px}
+.todo-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:10px 14px}
+.todo-row+.todo-row{border-top:1px solid var(--soft)}
+.todo-row p{margin:0;flex:1;min-width:220px}
+.todo-row.sign{box-shadow:inset 5px 0 0 var(--lamp)}
+.todo-row.run{box-shadow:inset 5px 0 0 var(--ok)}
+.flow{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:var(--rule);padding:0;margin:0 0 20px;max-width:980px}
+.flow li{padding:12px 14px;font-size:12px;color:var(--dim)}
+.flow li+li{border-left:var(--rule)}
+.flow strong{display:block;color:var(--ink);margin-bottom:2px}
+.flow b{color:var(--ink)}
+.flow em{font-style:normal;font-weight:700;color:var(--ink);margin-right:6px}
+@media (max-width:700px){.flow{grid-template-columns:1fr}.flow li+li{border-left:0;border-top:var(--rule)}}
+tr.needs>td:first-child{box-shadow:inset 5px 0 0 var(--lamp)}
+tr.live>td:first-child{box-shadow:inset 5px 0 0 var(--ok)}
+.nx .h{display:block;font-weight:700}
+.nav-todo{color:var(--lamp);font-weight:700}
+.pill-cell.is-here .nav-todo{color:var(--paper)}
+
 /* tables */
 table{width:100%;border-collapse:collapse;font-size:12px}
 th{text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);font-weight:600;padding:6px 8px;border-bottom:var(--rule)}
@@ -333,6 +353,7 @@ input,textarea{caret-color:var(--ink)}
 <section id="tab-compose">
   <h1>Ask the swarm</h1>
   <p class="lede" id="lede">Machines run by identity.md holders pick up work: reports, smart contracts, websites, images, answers to questions. Say what you want, check it for free, then pay 0.5 IMD from your wallet.</p>
+  <div class="todo" id="todo" hidden aria-live="polite"></div>
 
   <div class="scene" id="scene">
    <div class="scene-row">
@@ -351,7 +372,7 @@ input,textarea{caret-color:var(--ink)}
           <div class="m-controls">
             <div class="m-price" aria-label="Price: 0.5 IMD, the quote is free"><span>price</span><b>0.5 IMD</b><small>the quote is free</small></div>
             <button type="button" class="key" id="mQuote" disabled><em>1</em><span>Get a quote</span><small>free, checks it can run</small></button>
-            <div class="coin"><i class="slot" aria-hidden="true"></i><button type="button" class="key coin-key" id="mPay" disabled><em>2</em><span>Insert coin</span><small>pay 0.5 IMD from your wallet</small></button></div>
+            <div class="coin"><i class="slot" aria-hidden="true"></i><button type="button" class="key coin-key" id="mPay" disabled><em>2</em><span>Insert coin</span><small>sign in your wallet, 0.5 IMD</small></button></div>
           </div>
           <div class="m-tray"><div class="receipt" id="mReceipt"><div id="mStatus" class="r-status">Your receipt comes out here: the quote, then the order.</div></div></div>
 
@@ -414,6 +435,7 @@ input,textarea{caret-color:var(--ink)}
         <ol class="send-steps small">
           <li><b>Get a quote.</b> Free: the network rebuilds your request and says whether machines can take it.</li>
           <li><b>Pay 0.5 IMD</b> from your wallet on Ethereum mainnet. The wallet asks for two signatures.</li>
+          <li><b>Follow it in Orders.</b> The quote waits there if you sign later, and that is where the work and its result show up.</li>
         </ol>
         <div class="f"><label for="labelIn"><b>Name it</b><span>only for you, to find it in Orders</span></label><input type="text" id="labelIn" placeholder="e.g. vault audit"></div>
         <div class="btns">
@@ -439,9 +461,14 @@ input,textarea{caret-color:var(--ink)}
 <!-- ============ ORDERS ============ -->
 <section id="tab-orders" hidden>
   <h1>Your orders</h1>
-  <p class="lede">Every quote created here, saved in <code>~/.config/imd-compose/orders.json</code> with the token that reads it back. Open orders refresh on their own.</p>
+  <p class="lede">Every quote you get in Compose lands here. Sign the ones you did not pay at the machine, then follow what the swarm does with them. This page refreshes on its own.</p>
+  <ol class="flow">
+    <li><em>1</em><strong>Quote</strong>free, in Compose. Valid 10 minutes.</li>
+    <li><em>2</em><strong>Sign and pay</strong>at the machine, or here with <b>Sign and pay</b>. Your wallet signs twice.</li>
+    <li><em>3</em><strong>The swarm works</strong>minutes to hours. Open the job here for its progress and files.</li>
+  </ol>
   <div class="tbl-wrap"><table>
-    <thead><tr><th>Created</th><th>Label / objective</th><th>Action</th><th>Status</th><th>Result</th><th></th></tr></thead>
+    <thead><tr><th>Created</th><th>Label / objective</th><th>Action</th><th>Status</th><th>Next step</th><th></th></tr></thead>
     <tbody id="ordRows"></tbody>
   </table></div>
 </section>
@@ -1125,8 +1152,9 @@ function explainError(body){
 function showQuote(res){
   const o = res.body?.order;
   if ((res.status === 200 || res.status === 201) && o) {
-    currentOrder = o; roomEvent("quote", {ok:true, id:o.id});
+    currentOrder = o;
     const q = o.quote || {};
+    roomEvent("quote", {ok:true, id:o.id, exp:q.expiresAt});
     $("#quoteOut").innerHTML = `<div class="warnbox" style="border-color:var(--ok)"><b>Valid.</b> The network accepts the request.
       <dl class="kv" style="margin-top:8px"><dt>order</dt><dd>${esc(o.id)}</dd><dt>price</dt><dd>${fmtIMD((q.payment||q).amount)} IMD</dd><dt>to</dt><dd>${esc((q.payment||q).payTo||"")}</dd><dt>expires</dt><dd id="qExp"></dd></dl></div>`;
     const upd = () => { const s = Math.round((q.expiresAt||0) - Date.now()/1000); const el = $("#qExp"); if (!el) return clearInterval(tick);
@@ -1167,7 +1195,7 @@ if (eth()) { eth().on?.("accountsChanged", a => { W.addr = a[0] || null; if (W.a
 /* ---- the payment modal ---- */
 function modal(html){ $("#overlay").hidden = false; $("#overlay").innerHTML = `<div class="scrim" data-close="1"></div><div class="modal">${html}</div>`; }
 function closeOverlay(){ $("#overlay").hidden = true; $("#overlay").innerHTML = ""; }
-$("#overlay").addEventListener("click", e => { if (e.target.dataset.close) closeOverlay(); });
+$("#overlay").addEventListener("click", e => { if (e.target.dataset.close) closeOverlay(); else if (e.target.dataset.goto) { closeOverlay(); showTab(e.target.dataset.goto); } });
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeOverlay(); });
 function plog(msg, cls=""){ const l = $("#payLog"); if (l) { l.insertAdjacentHTML("beforeend", `<div class="${cls}">${esc(msg)}</div>`); l.scrollTop = l.scrollHeight; } }
 
@@ -1177,6 +1205,7 @@ async function openPay(orderId){
   modal(`<h2>Pay and send</h2>
     <p class="small">Order <b>${esc(orderId)}</b> · ${esc(row?.action||"")} · ${fmtIMD(need)} IMD</p>
     <p class="small muted">You will sign twice with the same wallet: the Permit2 payment (x402) and the EIP-712 approval of the quote. The server pays the gas. If the payment already started, a retry reuses the order and never charges twice.</p>
+    <p class="small muted">Closing this window cancels nothing: the order stays in <b>Orders</b>, where you can sign it later or follow it.</p>
     <div id="payState" class="kv" style="margin:10px 0"></div>
     <div class="btns" id="payBtns"></div>
     <div class="log" id="payLog" style="margin-top:12px"></div>`);
@@ -1300,35 +1329,91 @@ async function followOrder(orderId){
     const r = await get(`/local/order/${orderId}`);
     const st = r.body?.status;
     plog(`status: ${st}`);
-    if (st === "admitted") { const a = r.body.admission?.result; plog("✓ admitted: " + JSON.stringify(a)); refreshOrders(); roomEvent("sent", {ok:true}); return; }
+    if (st === "admitted") { const a = r.body.admission?.result; plog("✓ admitted: " + JSON.stringify(a)); refreshOrders(); roomEvent("sent", {ok:true});
+      if ($("#payBtns")) $("#payBtns").innerHTML = `<button class="btn primary" data-goto="orders">Follow it in Orders</button><button class="btn" data-close="1">Close</button>`; return; }
     if (["payment_failed","expired"].includes(st)) { plog("✗ " + st + " " + JSON.stringify(r.body.payment || {}), "err"); refreshOrders(); roomEvent("sent", {ok:false, status:st}); return; }
     await sleep(5000);
   }
+  plog("still going: Orders keeps checking it, you can close this window");
 }
 
 /* ================= orders tab ================= */
 const FINAL = ["admitted","payment_failed","expired"];
-async function refreshOrders(){
-  let rows; try { rows = await get("/local/orders"); } catch { return; }
-  $("#ordCount").textContent = rows.length ? `(${rows.length})` : "";
-  const now = Date.now()/1000;
+const PAYING = ["payment_pending","admission_pending","paid"];
+// what the admitted work is doing, read from api.imd.fun; final states are read once
+const WORK = {}, WORK_DONE = ["completed","failed","blocked","cancelled","attested","disagreed","mismatch","refused"];
+const WORK_BAD = ["failed","blocked","cancelled","disagreed","mismatch","refused"];
+function workOf(a){
+  if (!a || a.kind === "refused") return null;
+  if (a.requestId) return {k:"or", id:a.requestId, name:"oracle"};
+  if (a.workflowId) return {k:"wf", id:a.workflowId, name:"workflow"};
+  return a.jobId ? {k:"job", id:a.jobId, name:"job"} : null;
+}
+async function readWork(rows){
+  const todo = rows.map(r => r.status === "admitted" && workOf(r.admission)).filter(w => w && !WORK_DONE.includes(WORK[w.id]));
+  let changed = false;
+  await Promise.all(todo.map(async w => { try {
+    const d = await api(w.k === "job" ? `/jobs/${w.id}` : w.k === "wf" ? `/workflows/${w.id}` : `/oracle/requests/${w.id}?members=0`);
+    const st = w.k === "job" ? d.state : d.status;
+    if (st && st !== WORK[w.id]) { WORK[w.id] = st; changed = true; }
+  } catch {} }));
+  return changed;
+}
+const quoteLive = r => r.status === "quoted" && r.quote?.expiresAt > Date.now()/1000 + 30;
+const hhmm = t => new Date(t*1000).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+function nextStep(r){
+  if (quoteLive(r)) return `<span class="h">Sign in your wallet</span><span class="muted">before ${hhmm(r.quote.expiresAt)}, then it expires</span>`;
+  if (r.status === "quoted" || r.status === "expired") return `<span class="muted">Quote expired, nothing charged. <b>Reuse</b> to quote again.</span>`;
+  if (PAYING.includes(r.status)) return `<span class="h">Payment going through</span><span class="muted">checked every 15 s</span>`;
+  if (r.status === "payment_failed") return `<span class="h">Payment failed</span><span class="muted"><b>Reuse</b> to get a new quote.</span>`;
+  if (r.status !== "admitted") return "";
+  if (r.admission?.kind === "refused") return `<span class="tag err">refused</span> <span class="muted">by the network</span>`;
+  const w = workOf(r.admission); if (!w) return "";
+  const st = WORK[w.id], link = `<a href="#" data-${w.k}="${esc(w.id)}">open the ${w.name}</a>`;
+  if (!st) return `<span class="h">With the swarm</span>${link}`;
+  if (["completed","attested"].includes(st)) return `<span class="h">Done</span>${link} for the result`;
+  if (WORK_BAD.includes(st)) return `<span class="h">Stopped</span><span class="tag err">${esc(st)}</span> ${link}`;
+  return `<span class="h">The swarm is working</span><span class="tag warn">${esc(st)}</span> ${link}`;
+}
+function renderOrders(rows){
+  const sign = rows.filter(quoteLive), paying = rows.filter(r => PAYING.includes(r.status));
+  const running = rows.filter(r => { const w = r.status === "admitted" && workOf(r.admission); return w && !WORK_DONE.includes(WORK[w.id]); });
+  $("#ordCount").innerHTML = sign.length ? `<span class="nav-todo">· ${sign.length} to sign</span>`
+    : running.length + paying.length ? `<span class="nav-todo" style="color:inherit">· ${running.length + paying.length} running</span>` : rows.length ? `(${rows.length})` : "";
   $("#ordRows").innerHTML = rows.length ? rows.map(r => {
-    const exp = r.quote?.expiresAt, open = !FINAL.includes(r.status);
-    const quotedLive = r.status === "quoted" && exp && exp > now + 30;
-    const a = r.admission;
-    const res = a ? (a.kind === "refused" ? `<span class="tag err">refused</span>` : [a.jobId && `<a href="#" data-job="${esc(a.jobId)}">job</a>`, a.workflowId && `<a href="#" data-wf="${esc(a.workflowId)}">workflow</a>`, a.requestId && `<a href="#" data-or="${esc(a.requestId)}">oracle</a>`].filter(Boolean).join(" · ")) : "";
+    const live = quoteLive(r), open = !FINAL.includes(r.status) && (r.status !== "quoted" || live);
     const obj = r.input?.objective || r.input?.request || r.input?.question || "";
-    return `<tr><td class="small">${new Date(r.createdAt*1000).toLocaleString()}</td>
+    return `<tr class="${live ? "needs" : running.includes(r) || paying.includes(r) ? "live" : ""}"><td class="small">${new Date(r.createdAt*1000).toLocaleString()}</td>
       <td><div>${esc(r.label || "")}</div><div class="small muted clip">${esc(obj)}</div></td>
       <td class="small">${esc(r.action)}</td>
-      <td>${tagFor(r.status)}${r.status === "quoted" && exp ? `<div class="small muted">${exp > now ? "expires " + new Date(exp*1000).toLocaleTimeString() : "expired"}</div>` : ""}</td>
-      <td class="small">${res}</td>
-      <td><div class="btns">${quotedLive ? `<button class="btn sm primary" data-pay="${esc(r.orderId)}">Pay</button>` : ""}
+      <td>${tagFor(r.status === "quoted" && !live ? "expired" : r.status)}</td>
+      <td class="small nx">${nextStep(r)}</td>
+      <td><div class="btns">${live ? `<button class="btn sm primary" data-pay="${esc(r.orderId)}">Sign and pay</button>` : ""}
         ${open ? `<button class="btn sm" data-check="${esc(r.orderId)}">Refresh</button>` : ""}
         <button class="btn sm" data-reuse="${esc(r.orderId)}">Reuse</button>
         <button class="btn sm" data-forget="${esc(r.orderId)}" title="Remove from the local list">×</button></div></td></tr>`;
-  }).join("") : `<tr><td colspan="6" class="muted">No orders yet. Create a quote from the Compose tab.</td></tr>`;
-  window._orders = rows;
+  }).join("") : `<tr><td colspan="6" class="muted">No orders yet. Get a quote in the Compose tab and it shows up here.</td></tr>`;
+  renderTodo(sign, running.length + paying.length);
+}
+// Compose: say what is waiting, so nobody has to guess that it lives in Orders
+function renderTodo(sign, busy){
+  const box = $("#todo"); if (!box) return;
+  const cur = currentOrder?.id, waiting = sign.filter(r => r.orderId !== cur);
+  const rows = waiting.slice(0, 3).map(r => `<div class="todo-row sign"><p><b>Waiting for your signature:</b> ${esc(r.label || r.input?.objective || r.input?.question || r.action)} <span class="muted">· quote valid until ${hhmm(r.quote.expiresAt)}</span></p>
+      <button type="button" class="btn sm primary" data-pay="${esc(r.orderId)}">Sign and pay</button></div>`);
+  if (waiting.length > 3) rows.push(`<div class="todo-row sign"><p>${waiting.length - 3} more waiting.</p><button type="button" class="btn sm" data-tab-link="orders">Open Orders</button></div>`);
+  if (busy) rows.push(`<div class="todo-row run"><p><b>${busy} request${busy > 1 ? "s" : ""} with the swarm.</b> <span class="muted">Progress and results are in Orders.</span></p>
+      <button type="button" class="btn sm" data-tab-link="orders">Follow in Orders</button></div>`);
+  box.innerHTML = rows.join(""); box.hidden = STATIC || !rows.length;
+}
+$("#todo").addEventListener("click", e => {
+  const t = e.target.closest("[data-pay],[data-tab-link]"); if (!t) return;
+  if (t.dataset.pay) openPay(t.dataset.pay); else showTab(t.dataset.tabLink);
+});
+async function refreshOrders(){
+  let rows; try { rows = await get("/local/orders"); } catch { return; }
+  window._orders = rows; renderOrders(rows);
+  if (await readWork(rows)) renderOrders(rows);
 }
 function tagFor(s){ const c = {admitted:"ok", paid:"ok", payment_failed:"err", expired:"dim", quoted:"warn", payment_pending:"warn", admission_pending:"warn"}[s] || "dim"; return `<span class="tag ${c}">${esc(s || "?")}</span>`; }
 $("#ordRows").addEventListener("click", async e => {
@@ -1341,10 +1426,13 @@ $("#ordRows").addEventListener("click", async e => {
   else if (t.dataset.wf) openWorkflow(t.dataset.wf);
   else if (t.dataset.or) openOracle(t.dataset.or);
 });
+let polls = 0;
 setInterval(async () => {
-  const open = (window._orders||[]).filter(r => ["payment_pending","admission_pending","paid"].includes(r.status));
+  const rows = window._orders || [], open = rows.filter(r => PAYING.includes(r.status));
   for (const r of open) await get(`/local/order/${r.orderId}`);
-  if (open.length) refreshOrders();
+  // payments every 15 s; the swarm's work once a minute; otherwise just redraw (quotes expire)
+  if (open.length || (++polls % 4 === 0 && rows.some(r => r.status === "admitted" && workOf(r.admission) && !WORK_DONE.includes(WORK[workOf(r.admission).id])))) refreshOrders();
+  else renderOrders(rows);
 }, 15000);
 
 /* ================= network tab ================= */
@@ -1566,8 +1654,8 @@ let PEPE = null, lastLook = 0;
 function roomEvent(kind, data){
   const st = $("#mStatus");
   if (kind === "reset") st.textContent = "Your receipt comes out here: the quote, then the order.";
-  if (kind === "quote") { st.innerHTML = data.ok ? "<b>Quote ready.</b> Press <b>2 · Insert coin</b> before it expires; your wallet shows what you sign." : "<b>No quote.</b> Nothing was charged. The reason is below."; printReceipt(); }
-  if (kind === "sent") { st.innerHTML = data.ok ? `<b>The swarm has your request.</b> Follow it in <a href="#" data-tab-link="orders">Orders</a>.` : `<b>Not sent</b> (${esc(data.status)}). Get a new quote to try again.`; printReceipt(); }
+  if (kind === "quote") { st.innerHTML = data.ok ? `<b>Quote ready. Next: press 2 · Insert coin</b> and sign twice in your wallet.${data.exp ? ` Not now? It waits in <a href="#" data-tab-link="orders">Orders</a> until ${hhmm(data.exp)}.` : ""}` : "<b>No quote.</b> Nothing was charged. The reason is below."; printReceipt(); }
+  if (kind === "sent") { st.innerHTML = data.ok ? `<b>The swarm has your request.</b> The work takes minutes to hours; its progress and result show up in Orders.<div class="btns" style="margin-top:8px"><button type="button" class="btn sm primary" data-tab-link="orders">Follow it in Orders</button></div>` : `<b>Not sent</b> (${esc(data.status)}). Get a new quote to try again.`; printReceipt(); }
   syncKeys(); machineUpdate();
   if (!PEPE) return;
   if (kind === "goal") PEPE.react("greet");
